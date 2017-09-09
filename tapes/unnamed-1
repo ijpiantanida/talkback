@@ -1,0 +1,89 @@
+{
+    "meta": {
+        "createdAt": "2017-09-09T23:46:45.314Z",
+        "host": "https://api.dicen.tech",
+        "humanReadable": true
+    },
+    "req": {
+        "url": "/api/topics/3/reviews/my_review",
+        "headers": {
+            "origin": "https://dicen.tech",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "en-US,en;q=0.8,es;q=0.6",
+            "authorization": "Bearer 459c4f1d89dd8cd5c0e15df4cc4a3f35b4c406320a28564053ac7387d36c31265984c101d272c8ab2d550dd1b1f5f0452614a88cd2d42eb11bcaaf1aed213f75",
+            "content-type": "application/json",
+            "accept": "*/*",
+            "referer": "https://dicen.tech/topics/ruby",
+            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36",
+            "connection": "keep-alive",
+            "content-length": "731"
+        },
+        "body": "eyJjb21tZW50IjoiTXkgZmF2b3JpdGUgbGFuZ3VhZ2UgYnkgZmFyLlxuSXRzIHN5bnRheCdzIHNpbXBsaWNpdHkgYW5kIGl0cyBwb3dlcmZ1bCBvYmplY3QgbW9kZWwgbWFrZXMgd29ya2luZyB3aXRoIFJ1YnkgdmVyeSBlbmpveWFibGUuXG5JIG9ubHkgd2lzaCBpdCB3YXMgYSBsaXR0bGUgYml0IGZhc3RlciwgYnV0IGl0J3MgYSBwcmljZSB3b3J0aCBwYXlpbmcgc3BlY2lhbGx5IHdoZW4gc3RhcnRpbmcgb24gYSBuZXcgaWRlYS4yIiwiZXhwZXJpZW5jZSI6IjMwMCIsInVwZGF0ZWRfYXQiOiJNb24sIDIxIEF1ZyAyMDE3IDIwOjMwOjQ1ICswMDAwIiwiaWQiOjMsInJhdGluZyI6NSwidG9waWMiOnsiaWQiOjMsImF2YXRhcl91cmwiOiJodHRwczovL3Jlcy5jbG91ZGluYXJ5LmNvbS9kaWNlbnRlY2gvaW1hZ2UvdXBsb2FkL3YxNTAwOTU1NjIwL3RvcGljcy1pY29ucy9iY3N0MTB6cGM0c2hvMm13YzlzOS5qcGciLCJuYW1lIjoiUnVieSIsInNsdWciOiJydWJ5IiwiY2F0ZWdvcnkiOiJsYW5ndWFnZSIsInJhdGluZyI6IjQuMCIsInJhdGluZ19jb3VudCI6NSwiY3JlYXRlZF9hdCI6IlR1ZSwgMjUgSnVsIDIwMTcgMDQ6MDc6NTkgKzAwMDAifSwidXNlciI6eyJpZCI6MSwidXNlcm5hbWUiOiJpanBpYW50YW5pZGEiLCJhdmF0YXJfdXJsIjoiaHR0cHM6Ly9hdmF0YXJzMy5naXRodWJ1c2VyY29udGVudC5jb20vdS8xODU4MjM4P3Y9NCIsIm5hbWUiOiJJZ25hY2lvIFBpYW50YW5pZGEifX0="
+    },
+    "res": {
+        "status": 200,
+        "headers": {
+            "server": [
+                "Cowboy"
+            ],
+            "date": [
+                "Sat, 09 Sep 2017 23:46:48 GMT"
+            ],
+            "connection": [
+                "keep-alive"
+            ],
+            "access-control-allow-origin": [
+                "https://dicen.tech"
+            ],
+            "access-control-allow-methods": [
+                "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS"
+            ],
+            "access-control-expose-headers": [
+                ""
+            ],
+            "access-control-max-age": [
+                "1728000"
+            ],
+            "access-control-allow-credentials": [
+                "true"
+            ],
+            "x-frame-options": [
+                "SAMEORIGIN"
+            ],
+            "x-xss-protection": [
+                "1; mode=block"
+            ],
+            "x-content-type-options": [
+                "nosniff"
+            ],
+            "content-type": [
+                "application/json; charset=utf-8"
+            ],
+            "etag": [
+                "W/\"fcc1620f7621fa18beaa6e9f27e8ff69\""
+            ],
+            "cache-control": [
+                "max-age=0, private, must-revalidate"
+            ],
+            "x-request-id": [
+                "e1435a95-44b0-414b-90db-a4a29d07c598"
+            ],
+            "x-runtime": [
+                "0.043607"
+            ],
+            "strict-transport-security": [
+                "max-age=15552000; includeSubDomains"
+            ],
+            "vary": [
+                "Origin"
+            ],
+            "transfer-encoding": [
+                "chunked"
+            ],
+            "via": [
+                "1.1 vegur"
+            ]
+        },
+        "body": "{\"id\":3,\"comment\":\"My favorite language by far.\\nIts syntax's simplicity and its powerful object model makes working with Ruby very enjoyable.\\nI only wish it was a little bit faster, but it's a price worth paying specially when starting on a new idea.2\",\"experience\":\"300\",\"rating\":5,\"updated_at\":\"Sat, 09 Sep 2017 23:27:31 +0000\",\"topic\":{\"id\":3,\"avatar_url\":\"https://res.cloudinary.com/dicentech/image/upload/v1500955620/topics-icons/bcst10zpc4sho2mwc9s9.jpg\",\"name\":\"Ruby\",\"slug\":\"ruby\",\"category\":\"language\",\"rating\":\"4.0\",\"rating_count\":5,\"created_at\":\"Tue, 25 Jul 2017 04:07:59 +0000\"},\"user\":{\"id\":1,\"username\":\"ijpiantanida\",\"avatar_url\":\"https://avatars3.githubusercontent.com/u/1858238?v=4\",\"name\":\"Ignacio Piantanida\"}}"
+    }
+}

@@ -16,10 +16,3 @@ const talkback = usrOpts => {
 };
 
 module.exports = talkback;
-
-const server = talkback({
-  port: 7788,
-  host: "https://api.dicen.tech",
-  ignoreHeaders: ["x-correlation-id", "asd"]
-});
-server.listen();

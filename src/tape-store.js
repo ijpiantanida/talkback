@@ -9,31 +9,15 @@ class TapeStore {
     this.cache = [];
   }
 
-  async load() {
+  load() {
     if (!fs.existsSync(this.path)) {
       fs.mkdirSync(this.path);
     }
 
-    const items = await new Promise((res, rej) => {
-      fs.readdir(this.path, (err, items) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        res(items);
-      });
-    });
+    const items = fs.readdirSync(this.path);
     for (let i = 0; i < items.length; i++) {
       const filename = items[i];
-      const data = await new Promise((res, rej) => {
-        fs.readFile(`${this.path}${filename}`, "utf8", (err, file) => {
-          if (err) {
-            rej(err);
-            return;
-          }
-          res(file);
-        });
-      });
+      const data = fs.readFileSync(`${this.path}${filename}`, "utf8");
       const raw = JSON.parse(data);
       const tape = Tape.fromStore(raw, this.options);
       this.cache.push(tape);
@@ -51,23 +35,9 @@ class TapeStore {
 
   save(tape) {
     const {url, method, headers} = tape.req;
-    let reqBody;
-    const reqMediaType = new MediaType(tape.req);
-    if (reqMediaType.isHumanReadable()) {
-      tape.meta.reqHumanReadable = true;
-      reqBody = tape.req.body.toString("utf8");
-    } else {
-      reqBody = tape.req.body.toString("base64");
-    }
+    const reqBody = this.bodyFor(tape.req, tape, "reqHumanReadable");
+    const resBody = this.bodyFor(tape.res, tape, "resHumanReadable");
 
-    let resBody;
-    const resMediaType = new MediaType(tape.res);
-    if (resMediaType.isHumanReadable()) {
-      tape.meta.resHumanReadable = true;
-      resBody = tape.res.body.toString("utf8");
-    } else {
-      resBody = tape.res.body.toString("base64");
-    }
     this.cache.push(tape);
 
     const toSave = {
@@ -84,11 +54,19 @@ class TapeStore {
       }
     };
 
-    const filename = `${this.path}unnamed-${this.cache.length}`;
+    const filename = `${this.path}unnamed-${this.cache.length}.json`;
     console.log(`Saving request ${tape.req.url} at ${filename}`);
-    return new Promise((resolve, reject) =>
-      fs.writeFile(filename, JSON.stringify(toSave, null, 4), () => resolve())
-    );
+    fs.writeFileSync(filename, JSON.stringify(toSave, null, 4));
+  }
+
+  bodyFor(reqResHtml, tape, metaProp) {
+    const mediaType = new MediaType(reqResHtml);
+    if (mediaType.isHumanReadable()) {
+      tape.meta[metaProp] = true;
+      return reqResHtml.body.toString("utf8");
+    } else {
+      return reqResHtml.body.toString("base64");
+    }
   }
 }
 

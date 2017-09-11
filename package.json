@@ -10,10 +10,11 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^3.5.0",
-    "nodemon": "^1.12.0"
+    "nodemon": "^1.12.0",
+    "nyc": "^11.2.1"
   },
   "scripts": {
     "start": "nodemon --watch ./src --watch index.js",
-    "test": "mocha  -r mocha-setup.js test"
+    "test": "nyc --reporter=lcov --reporter=text-summary mocha  -r mocha-setup.js test"
   }
 }

@@ -132,11 +132,14 @@ var MediaType = function () {
 }();
 
 var fs = require("fs");
+var path = require("path");
+var mkdirp = require("mkdirp");
 var TapeStore = function () {
   function TapeStore(options) {
     _classCallCheck(this, TapeStore);
 
-    this.path = options.path.endsWith("/") ? options.path : options.path + "/";
+    this.path = path.normalize(options.path + "/");
+    console.log("this.path", this.path);
     this.options = options;
     this.cache = [];
   }
@@ -144,17 +147,23 @@ var TapeStore = function () {
   _createClass(TapeStore, [{
     key: "load",
     value: function load() {
-      if (!fs.existsSync(this.path)) {
-        fs.mkdirSync(this.path);
-      }
+      mkdirp.sync(this.path);
 
       var items = fs.readdirSync(this.path);
       for (var i = 0; i < items.length; i++) {
         var filename = items[i];
-        var data = fs.readFileSync("" + this.path + filename, "utf8");
-        var raw = JSON.parse(data);
-        var tape = Tape.fromStore(raw, this.options);
-        this.cache.push(tape);
+        var fullPath = "" + this.path + filename;
+        var stat = fs.statSync(fullPath);
+        if (!stat.isDirectory()) {
+          try {
+            var data = fs.readFileSync(fullPath, "utf8");
+            var raw = JSON.parse(data);
+            var tape = Tape.fromStore(raw, this.options);
+            this.cache.push(tape);
+          } catch (e) {
+            console.log("Error reading tape " + fullPath, e);
+          }
+        }
       }
       console.log("Loaded " + this.cache.length + " tapes");
     }
@@ -287,63 +296,66 @@ var TalkbackServer = function () {
       return makeRealRequest;
     }()
   }, {
-    key: "start",
-    value: function start(callback) {
+    key: "handleRequest",
+    value: function handleRequest(req, res) {
       var _this = this;
 
-      this.tapeStore.load();
-      this.server = http.createServer(function (req, res) {
-        var reqBody = [];
-        req.on("data", function (chunk) {
-          reqBody.push(chunk);
-        }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
-          var tape, fRes;
-          return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-            while (1) {
-              switch (_context2.prev = _context2.next) {
-                case 0:
-                  reqBody = Buffer.concat(reqBody);
-                  req.body = reqBody;
-                  tape = new Tape(req, _this.options);
-                  fRes = _this.tapeStore.find(tape);
+      var reqBody = [];
+      req.on("data", function (chunk) {
+        reqBody.push(chunk);
+      }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+        var tape, fRes;
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                reqBody = Buffer.concat(reqBody);
+                req.body = reqBody;
+                tape = new Tape(req, _this.options);
+                fRes = _this.tapeStore.find(tape);
 
-                  if (fRes) {
-                    _context2.next = 14;
-                    break;
-                  }
-
-                  if (!_this.options.record) {
-                    _context2.next = 13;
-                    break;
-                  }
-
-                  _context2.next = 8;
-                  return _this.makeRealRequest(req);
-
-                case 8:
-                  fRes = _context2.sent;
-
-                  tape.res = _extends({}, fRes);
-                  _this.tapeStore.save(tape);
+                if (fRes) {
                   _context2.next = 14;
                   break;
+                }
 
-                case 13:
-                  fRes = _this.onNoRecord(req);
+                if (!_this.options.record) {
+                  _context2.next = 13;
+                  break;
+                }
 
-                case 14:
+                _context2.next = 8;
+                return _this.makeRealRequest(req);
 
-                  res.writeHead(fRes.status, fRes.headers);
-                  res.end(fRes.body);
+              case 8:
+                fRes = _context2.sent;
 
-                case 16:
-                case "end":
-                  return _context2.stop();
-              }
+                tape.res = _extends({}, fRes);
+                _this.tapeStore.save(tape);
+                _context2.next = 14;
+                break;
+
+              case 13:
+                fRes = _this.onNoRecord(req);
+
+              case 14:
+
+                res.writeHead(fRes.status, fRes.headers);
+                res.end(fRes.body);
+
+              case 16:
+              case "end":
+                return _context2.stop();
             }
-          }, _callee2, _this);
-        })));
-      });
+          }
+        }, _callee2, _this);
+      })));
+    }
+  }, {
+    key: "start",
+    value: function start(callback) {
+      this.tapeStore.load();
+      this.server = http.createServer(this.handleRequest.bind(this));
       this.server.listen(this.options.port, callback);
       return this.server;
     }

@@ -38,32 +38,34 @@ export default class TalkbackServer {
     };
   }
 
+  handleRequest(req, res) {
+    let reqBody = [];
+    req.on("data", (chunk) => {
+      reqBody.push(chunk);
+    }).on("end", async () => {
+      reqBody = Buffer.concat(reqBody);
+      req.body = reqBody;
+      const tape = new Tape(req, this.options);
+      let fRes = this.tapeStore.find(tape);
+
+      if (!fRes) {
+        if (this.options.record) {
+          fRes = await this.makeRealRequest(req);
+          tape.res = {...fRes};
+          this.tapeStore.save(tape);
+        } else {
+          fRes = this.onNoRecord(req);
+        }
+      }
+
+      res.writeHead(fRes.status, fRes.headers);
+      res.end(fRes.body);
+    });
+  }
+
   start(callback) {
     this.tapeStore.load();
-    this.server = http.createServer((req, res) => {
-      let reqBody = [];
-      req.on("data", (chunk) => {
-        reqBody.push(chunk);
-      }).on("end", async () => {
-        reqBody = Buffer.concat(reqBody);
-        req.body = reqBody;
-        const tape = new Tape(req, this.options);
-        let fRes = this.tapeStore.find(tape);
-
-        if (!fRes) {
-          if (this.options.record) {
-            fRes = await this.makeRealRequest(req);
-            tape.res = {...fRes};
-            this.tapeStore.save(tape);
-          } else {
-            fRes = this.onNoRecord(req);
-          }
-        }
-
-        res.writeHead(fRes.status, fRes.headers);
-        res.end(fRes.body);
-      });
-    });
+    this.server = http.createServer(this.handleRequest.bind(this));
     this.server.listen(this.options.port, callback);
     return this.server;
   }

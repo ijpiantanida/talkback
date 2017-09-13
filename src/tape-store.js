@@ -1,26 +1,35 @@
 const fs = require("fs");
+const path = require("path");
+const mkdirp = require("mkdirp");
 import MediaType from "./media-type";
 import Tape from "./tape";
 
 export default class TapeStore {
   constructor(options) {
-    this.path = options.path.endsWith("/") ? options.path : options.path + "/";
+    this.path = path.normalize(options.path + "/");
+    console.log("this.path", this.path);
     this.options = options;
     this.cache = [];
   }
 
   load() {
-    if (!fs.existsSync(this.path)) {
-      fs.mkdirSync(this.path);
-    }
+    mkdirp.sync(this.path);
 
     const items = fs.readdirSync(this.path);
     for (let i = 0; i < items.length; i++) {
       const filename = items[i];
-      const data = fs.readFileSync(`${this.path}${filename}`, "utf8");
-      const raw = JSON.parse(data);
-      const tape = Tape.fromStore(raw, this.options);
-      this.cache.push(tape);
+      const fullPath = `${this.path}${filename}`;
+      const stat = fs.statSync(fullPath);
+      if (!stat.isDirectory()) {
+        try {
+          const data = fs.readFileSync(fullPath, "utf8");
+          const raw = JSON.parse(data);
+          const tape = Tape.fromStore(raw, this.options);
+          this.cache.push(tape);
+        } catch (e) {
+          console.log(`Error reading tape ${fullPath}`, e);
+        }
+      }
     }
     console.log(`Loaded ${this.cache.length} tapes`);
   }

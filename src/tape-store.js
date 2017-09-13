@@ -7,7 +7,6 @@ import Tape from "./tape";
 export default class TapeStore {
   constructor(options) {
     this.path = path.normalize(options.path + "/");
-    console.log("this.path", this.path);
     this.options = options;
     this.cache = [];
   }

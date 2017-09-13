@@ -1,4 +1,4 @@
-class Tape {
+export default class Tape {
   constructor(req, options) {
     this.req = {
       url: req.url,
@@ -63,5 +63,3 @@ class Tape {
     return headersSame;
   }
 }
-
-module.exports = Tape;

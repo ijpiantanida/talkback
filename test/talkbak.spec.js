@@ -1,4 +1,4 @@
-const talkbak = require("../index");
+const talkbak = require("../src/index");
 const testServer = require("./support/test-server");
 const fs = require("fs");
 const fetch = require("node-fetch");

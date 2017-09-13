@@ -1,6 +1,5 @@
 const contentTypeParser = require("content-type");
 
-
 const humanReadableContentTypes = [
   "application/javascript",
   "application/json",
@@ -10,7 +9,7 @@ const humanReadableContentTypes = [
   "text/plain"
 ];
 
-class MediaType {
+export default class MediaType {
   constructor(htmlReqRes) {
     this.htmlReqRes = htmlReqRes;
   }
@@ -38,5 +37,3 @@ class MediaType {
     }
   }
 }
-
-module.exports = MediaType;

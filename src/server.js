@@ -1,10 +1,10 @@
 const http = require("http");
 const fetch = require("node-fetch");
 
-const Tape = require("./tape");
-const TapeStore = require("./tape-store");
+import Tape from "./tape";
+import TapeStore from "./tape-store";
 
-class TalkbackServer {
+export default class TalkbackServer {
   constructor(options) {
     this.options = options;
     this.tapeStore = new TapeStore(this.options);
@@ -72,5 +72,3 @@ class TalkbackServer {
     this.server.close();
   }
 }
-
-module.exports = TalkbackServer;

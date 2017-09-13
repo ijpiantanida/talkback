@@ -1,4 +1,4 @@
-const Server = require("./src/server");
+import Server from "./server";
 
 const defaultOptions = {
   port: 8080,

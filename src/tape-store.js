@@ -1,8 +1,8 @@
 const fs = require("fs");
-const Tape = require("./tape");
-const MediaType = require("./media-type");
+import MediaType from "./media-type";
+import Tape from "./tape";
 
-class TapeStore {
+export default class TapeStore {
   constructor(options) {
     this.path = options.path.endsWith("/") ? options.path : options.path + "/";
     this.options = options;
@@ -69,5 +69,3 @@ class TapeStore {
     }
   }
 }
-
-module.exports = TapeStore;

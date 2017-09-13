@@ -1,8 +1,9 @@
 {
   "name": "talkback",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
+  "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
     "content-type": "^1.0.2",
     "node-fetch": "^1.7.2"
@@ -30,6 +31,17 @@
     "sourceMap": false,
     "instrument": false
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ijpiantanida/talkback"
+  },
+  "keywords": [
+    "http-proxy",
+    "record",
+    "vcr",
+    "playback"
+  ],
+  "author": "Ignacio Piantanida",
   "scripts": {
     "build": "node tools/build.js",
     "start": "nodemon --watch ./src --watch index.js",

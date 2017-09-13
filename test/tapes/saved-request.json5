@@ -1,3 +1,4 @@
+// This file is in JSON5 format, so it can have comments
 {
     "meta": {
         "createdAt": "2017-09-10T23:19:27.010Z",
@@ -31,5 +32,5 @@
             ]
         },
         "body": "{\"ok\":true}"
-    }
+    },
 }

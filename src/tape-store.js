@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const JSON5 = require("json5");
 const mkdirp = require("mkdirp");
 import MediaType from "./media-type";
 import Tape from "./tape";
@@ -22,7 +23,7 @@ export default class TapeStore {
       if (!stat.isDirectory()) {
         try {
           const data = fs.readFileSync(fullPath, "utf8");
-          const raw = JSON.parse(data);
+          const raw = JSON5.parse(data);
           const tape = Tape.fromStore(raw, this.options);
           this.cache.push(tape);
         } catch (e) {
@@ -62,9 +63,9 @@ export default class TapeStore {
       }
     };
 
-    const filename = `${this.path}unnamed-${this.cache.length}.json`;
+    const filename = `${this.path}unnamed-${this.cache.length}.json5`;
     console.log(`Saving request ${tape.req.url} at ${filename}`);
-    fs.writeFileSync(filename, JSON.stringify(toSave, null, 4));
+    fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
   }
 
   bodyFor(reqResHtml, tape, metaProp) {

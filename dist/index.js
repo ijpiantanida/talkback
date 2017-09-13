@@ -8,7 +8,6 @@ var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGe
 var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
-var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
 
 var bufferShim = require("buffer-shims");
 
@@ -133,13 +132,13 @@ var MediaType = function () {
 
 var fs = require("fs");
 var path = require("path");
+var JSON5 = require("json5");
 var mkdirp = require("mkdirp");
 var TapeStore = function () {
   function TapeStore(options) {
     _classCallCheck(this, TapeStore);
 
     this.path = path.normalize(options.path + "/");
-    console.log("this.path", this.path);
     this.options = options;
     this.cache = [];
   }
@@ -157,7 +156,7 @@ var TapeStore = function () {
         if (!stat.isDirectory()) {
           try {
             var data = fs.readFileSync(fullPath, "utf8");
-            var raw = JSON.parse(data);
+            var raw = JSON5.parse(data);
             var tape = Tape.fromStore(raw, this.options);
             this.cache.push(tape);
           } catch (e) {
@@ -204,9 +203,9 @@ var TapeStore = function () {
         })
       };
 
-      var filename = this.path + "unnamed-" + this.cache.length + ".json";
+      var filename = this.path + "unnamed-" + this.cache.length + ".json5";
       console.log("Saving request " + tape.req.url + " at " + filename);
-      fs.writeFileSync(filename, _JSON$stringify(toSave, null, 4));
+      fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
   }, {
     key: "bodyFor",

@@ -1,6 +1,7 @@
 import talkbak from "../src/index";
 import testServer from "./support/test-server";
 
+const JSON5 = require("json5");
 const fs = require("fs");
 const fetch = require("node-fetch");
 
@@ -57,7 +58,7 @@ describe("talkback", async () => {
     const body = await res.json();
     expect(body).to.eql(expectedResBody);
 
-    const tape = JSON.parse(fs.readFileSync(tapesPath + "/unnamed-2.json"));
+    const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"));
     expect(tape.meta.reqHumanReadable).to.eq(true);
     expect(tape.meta.resHumanReadable).to.eq(true);
     expect(tape.req.url).to.eql("/test/1");
@@ -75,7 +76,7 @@ describe("talkback", async () => {
     const body = await res.json();
     expect(body).to.eql(expectedResBody);
 
-    const tape = JSON.parse(fs.readFileSync(tapesPath + "/unnamed-2.json"));
+    const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"));
     expect(tape.meta.reqHumanReadable).to.be.undefined;
     expect(tape.meta.resHumanReadable).to.be.undefined;
     expect(tape.req.url).to.eql("/test/2");

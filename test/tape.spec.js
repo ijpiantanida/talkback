@@ -1,4 +1,4 @@
-const Tape = require("../src/tape");
+import Tape from "../src/tape";
 
 const raw = {
   meta: {

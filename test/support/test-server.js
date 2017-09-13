@@ -41,4 +41,4 @@ const testServer = () => {
   });
 };
 
-module.exports = testServer;
+export default testServer;

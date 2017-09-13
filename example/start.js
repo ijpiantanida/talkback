@@ -1,8 +1,8 @@
-const talkback = require("../src/index");
+var talkback = require("../dist/index");
 
-const host = "https://api.github.com";
-const server = talkback({
-  host,
+var host = "https://api.github.com";
+var server = talkback({
+  host: host,
   path: __dirname + "/tapes"
 });
-server.start(() => console.log(`Talkback server for ${host} started`));
+server.start();

@@ -1,5 +1,6 @@
-const talkbak = require("../src/index");
-const testServer = require("./support/test-server");
+import talkbak from "../src/index";
+import testServer from "./support/test-server";
+
 const fs = require("fs");
 const fetch = require("node-fetch");
 

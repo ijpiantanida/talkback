@@ -1,3 +1,5 @@
+const bufferShim = require("buffer-shims");
+
 export default class Tape {
   constructor(req, options) {
     this.req = {
@@ -18,18 +20,18 @@ export default class Tape {
   static fromStore(raw, options) {
     const req = {...raw.req};
     if (raw.meta.resHumanReadable) {
-      req.body = Buffer.from(raw.req.body);
+      req.body = bufferShim.from(raw.req.body);
     } else {
-      req.body = Buffer.from(raw.req.body, "base64");
+      req.body = bufferShim.from(raw.req.body, "base64");
     }
 
     const tape = new Tape(req, options);
     tape.meta = raw.meta;
     tape.res = {...raw.res};
     if (tape.meta.resHumanReadable) {
-      tape.res.body = Buffer.from(tape.res.body);
+      tape.res.body = bufferShim.from(tape.res.body);
     } else {
-      tape.res.body = Buffer.from(raw.res.body, "base64");
+      tape.res.body = bufferShim.from(raw.res.body, "base64");
     }
     return tape;
   }

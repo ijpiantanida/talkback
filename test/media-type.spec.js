@@ -1,4 +1,4 @@
-const MediaType = require("../src/media-type");
+import MediaType from "../src/media-type";
 
 describe("MediaType", () => {
   describe("isHumanReadable", () => {

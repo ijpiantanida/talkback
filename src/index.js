@@ -15,4 +15,4 @@ const talkback = usrOpts => {
   return new Server(opts);
 };
 
-module.exports = talkback;
+export default talkback;

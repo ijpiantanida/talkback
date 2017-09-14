@@ -9,6 +9,41 @@ var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCh
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
 
+var Sumary$1 = function () {
+  function Sumary(tapes) {
+    _classCallCheck(this, Sumary);
+
+    this.tapes = tapes;
+  }
+
+  _createClass(Sumary, [{
+    key: "print",
+    value: function print() {
+      console.log("===== SUMMARY =====");
+      var newTapes = this.tapes.filter(function (t) {
+        return t.new;
+      });
+      if (newTapes.length > 0) {
+        console.log("New tapes:");
+        newTapes.forEach(function (t) {
+          return console.log("- " + t.path);
+        });
+      }
+      var unusedTapes = this.tapes.filter(function (t) {
+        return !t.used;
+      });
+      if (unusedTapes.length > 0) {
+        console.log("Unused tapes:");
+        unusedTapes.forEach(function (t) {
+          return console.log("- " + t.path);
+        });
+      }
+    }
+  }]);
+
+  return Sumary;
+}();
+
 var bufferShim = require("buffer-shims");
 
 var Tape = function () {
@@ -130,7 +165,7 @@ var MediaType = function () {
   return MediaType;
 }();
 
-var fs = require("fs");
+var fs$1 = require("fs");
 var path = require("path");
 var JSON5 = require("json5");
 var mkdirp = require("mkdirp");
@@ -140,7 +175,7 @@ var TapeStore = function () {
 
     this.path = path.normalize(options.path + "/");
     this.options = options;
-    this.cache = [];
+    this.tapes = [];
   }
 
   _createClass(TapeStore, [{
@@ -148,32 +183,34 @@ var TapeStore = function () {
     value: function load() {
       mkdirp.sync(this.path);
 
-      var items = fs.readdirSync(this.path);
+      var items = fs$1.readdirSync(this.path);
       for (var i = 0; i < items.length; i++) {
         var filename = items[i];
         var fullPath = "" + this.path + filename;
-        var stat = fs.statSync(fullPath);
+        var stat = fs$1.statSync(fullPath);
         if (!stat.isDirectory()) {
           try {
-            var data = fs.readFileSync(fullPath, "utf8");
+            var data = fs$1.readFileSync(fullPath, "utf8");
             var raw = JSON5.parse(data);
             var tape = Tape.fromStore(raw, this.options);
-            this.cache.push(tape);
+            tape.path = filename;
+            this.tapes.push(tape);
           } catch (e) {
             console.log("Error reading tape " + fullPath, e);
           }
         }
       }
-      console.log("Loaded " + this.cache.length + " tapes");
+      console.log("Loaded " + this.tapes.length + " tapes");
     }
   }, {
     key: "find",
     value: function find(newTape) {
-      var foundTape = this.cache.find(function (t) {
+      var foundTape = this.tapes.find(function (t) {
         return newTape.sameRequestAs(t);
       });
       if (foundTape) {
-        console.log("Serving cached request for " + newTape.req.url);
+        foundTape.used = true;
+        console.log("Serving cached request for " + newTape.req.url + " from tape " + foundTape.path);
         return foundTape.res;
       }
     }
@@ -188,7 +225,9 @@ var TapeStore = function () {
       var reqBody = this.bodyFor(tape.req, tape, "reqHumanReadable");
       var resBody = this.bodyFor(tape.res, tape, "resHumanReadable");
 
-      this.cache.push(tape);
+      tape.new = true;
+      tape.used = true;
+      this.tapes.push(tape);
 
       var toSave = {
         meta: tape.meta,
@@ -203,9 +242,11 @@ var TapeStore = function () {
         })
       };
 
-      var filename = this.path + "unnamed-" + this.cache.length + ".json5";
+      var tapeName = "unnamed-" + this.tapes.length + ".json5";
+      tape.path = tapeName;
+      var filename = this.path + tapeName;
       console.log("Saving request " + tape.req.url + " at " + filename);
-      fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
+      fs$1.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
   }, {
     key: "bodyFor",
@@ -225,6 +266,7 @@ var TapeStore = function () {
 
 var http = require("http");
 var fetch = require("node-fetch");
+var fs = require("fs");
 
 var TalkbackServer = function () {
   function TalkbackServer(options) {
@@ -356,12 +398,27 @@ var TalkbackServer = function () {
       this.tapeStore.load();
       this.server = http.createServer(this.handleRequest.bind(this));
       this.server.listen(this.options.port, callback);
+
+      var closeSignalHandler = this.close.bind(this);
+      process.on("exit", closeSignalHandler);
+      process.on("SIGINT", closeSignalHandler);
+      process.on("SIGTERM", closeSignalHandler);
+
       return this.server;
     }
   }, {
     key: "close",
     value: function close() {
+      if (this.closed) {
+        return;
+      }
+      this.closed = true;
       this.server.close();
+
+      if (this.options.summary) {
+        var summary = new Sumary$1(this.tapeStore.tapes);
+        summary.print();
+      }
     }
   }]);
 
@@ -372,7 +429,8 @@ var defaultOptions = {
   port: 8080,
   record: true,
   ignoreHeaders: [],
-  path: "./tapes/"
+  path: "./tapes/",
+  summary: true
 };
 
 var talkback = function talkback(usrOpts) {

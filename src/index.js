@@ -4,7 +4,8 @@ const defaultOptions = {
   port: 8080,
   record: true,
   ignoreHeaders: [],
-  path: "./tapes/"
+  path: "./tapes/",
+  summary: true
 };
 
 const talkback = usrOpts => {

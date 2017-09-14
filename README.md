@@ -43,6 +43,7 @@ Options:
 * `path`: (String) Path where to load and save tapes. Default `./tapes/`
 * `ignoreHeaders`: (Array(String)) List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. Default `[]`
 * `record`: (Boolean) Whether talkback should proxy and record unknown requests or fail fast and return 404. Default `true`
+* `summary`: (Boolean) Whether to print a summary of new and unused tapes at exit. Default `true`
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.

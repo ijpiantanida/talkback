@@ -1,6 +1,8 @@
 const http = require("http");
 const fetch = require("node-fetch");
+const fs = require("fs");
 
+import Summary from "./summary";
 import Tape from "./tape";
 import TapeStore from "./tape-store";
 
@@ -67,10 +69,25 @@ export default class TalkbackServer {
     this.tapeStore.load();
     this.server = http.createServer(this.handleRequest.bind(this));
     this.server.listen(this.options.port, callback);
+
+    const closeSignalHandler = this.close.bind(this);
+    process.on("exit", closeSignalHandler);
+    process.on("SIGINT", closeSignalHandler);
+    process.on("SIGTERM", closeSignalHandler);
+
     return this.server;
   }
 
   close() {
+    if (this.closed) {
+      return;
+    }
+    this.closed = true;
     this.server.close();
+
+    if (this.options.summary) {
+      const summary = new Summary(this.tapeStore.tapes);
+      summary.print();
+    }
   }
 }

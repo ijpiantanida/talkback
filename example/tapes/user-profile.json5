@@ -1,0 +1,93 @@
+// Tapes can have comments because they are JSON5
+// You can edit both req and res, but probably not meta unless you know what you're doing
+{
+    meta: { // You shouldn't be touching this
+        createdAt: "2017-09-13T23:36:27.952Z",
+        host: "https://api.github.com",
+        resHumanReadable: true
+    },
+    req: {
+        url: "/users/ijpiantanida",
+        method: "GET",
+        headers: {
+            "user-agent": "curl/7.54.0",
+            accept: "*/*"
+        },
+        body: ""
+    },
+    res: {
+        status: 200,
+        headers: {
+            server: [
+                "GitHub.com"
+            ],
+            date: [
+                "Wed, 13 Sep 2017 23:36:28 GMT"
+            ],
+            "content-type": [
+                "application/json; charset=utf-8"
+            ],
+            "content-length": [
+                "1376"
+            ],
+            connection: [
+                "close"
+            ],
+            status: [
+                "200 OK"
+            ],
+            "x-ratelimit-limit": [
+                "60"
+            ],
+            "x-ratelimit-remaining": [
+                "59"
+            ],
+            "x-ratelimit-reset": [
+                "1505349388"
+            ],
+            "cache-control": [
+                "public, max-age=60, s-maxage=60"
+            ],
+            vary: [
+                "Accept"
+            ],
+            etag: [
+                "\"052de87e9283eccfa78a9f70e5cf4830\""
+            ],
+            "last-modified": [
+                "Fri, 25 Aug 2017 04:10:24 GMT"
+            ],
+            "x-github-media-type": [
+                "github.v3; format=json"
+            ],
+            "access-control-expose-headers": [
+                "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+            ],
+            "access-control-allow-origin": [
+                "*"
+            ],
+            "content-security-policy": [
+                "default-src 'none'"
+            ],
+            "strict-transport-security": [
+                "max-age=31536000; includeSubdomains; preload"
+            ],
+            "x-content-type-options": [
+                "nosniff"
+            ],
+            "x-frame-options": [
+                "deny"
+            ],
+            "x-xss-protection": [
+                "1; mode=block"
+            ],
+            "x-runtime-rack": [
+                "0.033883"
+            ],
+            "x-github-request-id": [
+                "CE64:309E:255CC6F:4E0823D:59B9C0FC"
+            ]
+        },
+        body: "{\n  \"login\": \"ijpiantanida\",\n  \"id\": 1858238,\n  \"avatar_url\": \"https://avatars3.githubusercontent.com/u/1858238?v=4\",\n  \"gravatar_id\": \"\",\n  \"url\": \"https://api.github.com/users/ijpiantanida\",\n  \"html_url\": \"https://github.com/ijpiantanida\",\n  \"followers_url\": \"https://api.github.com/users/ijpiantanida/followers\",\n  \"following_url\": \"https://api.github.com/users/ijpiantanida/following{/other_user}\",\n  \"gists_url\": \"https://api.github.com/users/ijpiantanida/gists{/gist_id}\",\n  \"starred_url\": \"https://api.github.com/users/ijpiantanida/starred{/owner}{/repo}\",\n  \"subscriptions_url\": \"https://api.github.com/users/ijpiantanida/subscriptions\",\n  \"organizations_url\": \"https://api.github.com/users/ijpiantanida/orgs\",\n  \"repos_url\": \"https://api.github.com/users/ijpiantanida/repos\",\n  \"events_url\": \"https://api.github.com/users/ijpiantanida/events{/privacy}\",\n  \"received_events_url\": \"https://api.github.com/users/ijpiantanida/received_events\",\n  \"type\": \"User\",\n  \"site_admin\": false,\n  \"name\": \"Ignacio Piantanida\",\n  \"company\": \"@10Pines \",\n  \"blog\": \"https://www.10pines.com\",\n  \"location\": \"Buenos Aires, Argentina\",\n  \"email\": null,\n  \"hireable\": true,\n  \"bio\": \"Coding stuff is fun. Let's code!\\r\\n\\r\\n\",\n  \"public_repos\": 19,\n  \"public_gists\": 1,\n  \"followers\": 3,\n  \"following\": 0,\n  \"created_at\": \"2012-06-17T04:39:06Z\",\n  \"updated_at\": \"2017-08-25T04:10:24Z\"\n}\n"
+    }
+}

@@ -1,0 +1,81 @@
+// Tapes can have comments because they are JSON5
+// You can edit both req and res, but probably not meta unless you know what you're doing
+{
+    meta: {
+        createdAt: "2017-09-13T23:38:04.538Z",
+        host: "https://api.github.com",
+        resHumanReadable: true
+    },
+    req: {
+        url: "/repos/not-valid",
+        method: "GET",
+        headers: {
+            "user-agent": "curl/7.54.0",
+            accept: "*/*"
+        },
+        body: ""
+    },
+    res: {
+        status: 404,
+        headers: {
+            server: [
+                "GitHub.com"
+            ],
+            date: [
+                "Wed, 13 Sep 2017 23:38:05 GMT"
+            ],
+            "content-type": [
+                "application/json; charset=utf-8"
+            ],
+            "content-length": [
+                "87"
+            ],
+            connection: [
+                "close"
+            ],
+            status: [
+                "404 Not Found"
+            ],
+            "x-ratelimit-limit": [
+                "60"
+            ],
+            "x-ratelimit-remaining": [
+                "57"
+            ],
+            "x-ratelimit-reset": [
+                "1505349388"
+            ],
+            "x-github-media-type": [
+                "github.v3; format=json"
+            ],
+            "access-control-expose-headers": [
+                "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+            ],
+            "access-control-allow-origin": [
+                "*"
+            ],
+            "content-security-policy": [
+                "default-src 'none'"
+            ],
+            "strict-transport-security": [
+                "max-age=31536000; includeSubdomains; preload"
+            ],
+            "x-content-type-options": [
+                "nosniff"
+            ],
+            "x-frame-options": [
+                "deny"
+            ],
+            "x-xss-protection": [
+                "1; mode=block"
+            ],
+            "x-runtime-rack": [
+                "0.025337"
+            ],
+            "x-github-request-id": [
+                "CE99:309C:1973077:378DBC2:59B9C15C"
+            ]
+        },
+        body: "{\n  \"message\": \"Not Found\",\n  \"documentation_url\": \"https://developer.github.com/v3\"\n}\n"
+    }
+}

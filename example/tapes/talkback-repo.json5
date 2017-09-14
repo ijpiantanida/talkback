@@ -1,0 +1,93 @@
+// Tapes can have comments because they are JSON5
+// You can edit both req and res, but probably not meta unless you know what you're doing
+{
+    meta: { // You shouldn't touch this
+        createdAt: "2017-09-13T23:37:48.247Z",
+        host: "https://api.github.com",
+        resHumanReadable: true
+    },
+    req: {
+        url: "/repos/ijpiantanida/talkback",
+        method: "GET",
+        headers: {
+            "user-agent": "curl/7.54.0",
+            accept: "*/*"
+        },
+        body: ""
+    },
+    res: {
+        status: 200,
+        headers: {
+            server: [
+                "GitHub.com"
+            ],
+            date: [
+                "Wed, 13 Sep 2017 23:37:49 GMT"
+            ],
+            "content-type": [
+                "application/json; charset=utf-8"
+            ],
+            "content-length": [
+                "5283"
+            ],
+            connection: [
+                "close"
+            ],
+            status: [
+                "200 OK"
+            ],
+            "x-ratelimit-limit": [
+                "60"
+            ],
+            "x-ratelimit-remaining": [
+                "58"
+            ],
+            "x-ratelimit-reset": [
+                "1505349388"
+            ],
+            "cache-control": [
+                "public, max-age=60, s-maxage=60"
+            ],
+            vary: [
+                "Accept"
+            ],
+            etag: [
+                "\"412896c22637a9de72dce2042327bb43\""
+            ],
+            "last-modified": [
+                "Mon, 11 Sep 2017 22:40:57 GMT"
+            ],
+            "x-github-media-type": [
+                "github.v3; format=json"
+            ],
+            "access-control-expose-headers": [
+                "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+            ],
+            "access-control-allow-origin": [
+                "*"
+            ],
+            "content-security-policy": [
+                "default-src 'none'"
+            ],
+            "strict-transport-security": [
+                "max-age=31536000; includeSubdomains; preload"
+            ],
+            "x-content-type-options": [
+                "nosniff"
+            ],
+            "x-frame-options": [
+                "deny"
+            ],
+            "x-xss-protection": [
+                "1; mode=block"
+            ],
+            "x-runtime-rack": [
+                "1.092651"
+            ],
+            "x-github-request-id": [
+                "CE8E:309E:255EF2D:4E0D213:59B9C14C"
+            ]
+        },
+        body: "{\n  \"id\": 103073370,\n  \"name\": \"talkback\",\n  \"full_name\": \"ijpiantanida/talkback\",\n  \"owner\": {\n    \"login\": \"ijpiantanida\",\n    \"id\": 1858238,\n    \"avatar_url\": \"https://avatars3.githubusercontent.com/u/1858238?v=4\",\n    \"gravatar_id\": \"\",\n    \"url\": \"https://api.github.com/users/ijpiantanida\",\n    \"html_url\": \"https://github.com/ijpiantanida\",\n    \"followers_url\": \"https://api.github.com/users/ijpiantanida/followers\",\n    \"following_url\": \"https://api.github.com/users/ijpiantanida/following{/other_user}\",\n    \"gists_url\": \"https://api.github.com/users/ijpiantanida/gists{/gist_id}\",\n    \"starred_url\": \"https://api.github.com/users/ijpiantanida/starred{/owner}{/repo}\",\n    \"subscriptions_url\": \"https://api.github.com/users/ijpiantanida/subscriptions\",\n    \"organizations_url\": \"https://api.github.com/users/ijpiantanida/orgs\",\n    \"repos_url\": \"https://api.github.com/users/ijpiantanida/repos\",\n    \"events_url\": \"https://api.github.com/users/ijpiantanida/events{/privacy}\",\n    \"received_events_url\": \"https://api.github.com/users/ijpiantanida/received_events\",\n    \"type\": \"User\",\n    \"site_admin\": false\n  },\n  \"private\": false,\n  \"html_url\": \"https://github.com/ijpiantanida/talkback\",\n  \"description\": \"A node.js HTTP proxy that records and playbacks requests\",\n  \"fork\": false,\n  \"url\": \"https://api.github.com/repos/ijpiantanida/talkback\",\n  \"forks_url\": \"https://api.github.com/repos/ijpiantanida/talkback/forks\",\n  \"keys_url\": \"https://api.github.com/repos/ijpiantanida/talkback/keys{/key_id}\",\n  \"collaborators_url\": \"https://api.github.com/repos/ijpiantanida/talkback/collaborators{/collaborator}\",\n  \"teams_url\": \"https://api.github.com/repos/ijpiantanida/talkback/teams\",\n  \"hooks_url\": \"https://api.github.com/repos/ijpiantanida/talkback/hooks\",\n  \"issue_events_url\": \"https://api.github.com/repos/ijpiantanida/talkback/issues/events{/number}\",\n  \"events_url\": \"https://api.github.com/repos/ijpiantanida/talkback/events\",\n  \"assignees_url\": \"https://api.github.com/repos/ijpiantanida/talkback/assignees{/user}\",\n  \"branches_url\": \"https://api.github.com/repos/ijpiantanida/talkback/branches{/branch}\",\n  \"tags_url\": \"https://api.github.com/repos/ijpiantanida/talkback/tags\",\n  \"blobs_url\": \"https://api.github.com/repos/ijpiantanida/talkback/git/blobs{/sha}\",\n  \"git_tags_url\": \"https://api.github.com/repos/ijpiantanida/talkback/git/tags{/sha}\",\n  \"git_refs_url\": \"https://api.github.com/repos/ijpiantanida/talkback/git/refs{/sha}\",\n  \"trees_url\": \"https://api.github.com/repos/ijpiantanida/talkback/git/trees{/sha}\",\n  \"statuses_url\": \"https://api.github.com/repos/ijpiantanida/talkback/statuses/{sha}\",\n  \"languages_url\": \"https://api.github.com/repos/ijpiantanida/talkback/languages\",\n  \"stargazers_url\": \"https://api.github.com/repos/ijpiantanida/talkback/stargazers\",\n  \"contributors_url\": \"https://api.github.com/repos/ijpiantanida/talkback/contributors\",\n  \"subscribers_url\": \"https://api.github.com/repos/ijpiantanida/talkback/subscribers\",\n  \"subscription_url\": \"https://api.github.com/repos/ijpiantanida/talkback/subscription\",\n  \"commits_url\": \"https://api.github.com/repos/ijpiantanida/talkback/commits{/sha}\",\n  \"git_commits_url\": \"https://api.github.com/repos/ijpiantanida/talkback/git/commits{/sha}\",\n  \"comments_url\": \"https://api.github.com/repos/ijpiantanida/talkback/comments{/number}\",\n  \"issue_comment_url\": \"https://api.github.com/repos/ijpiantanida/talkback/issues/comments{/number}\",\n  \"contents_url\": \"https://api.github.com/repos/ijpiantanida/talkback/contents/{+path}\",\n  \"compare_url\": \"https://api.github.com/repos/ijpiantanida/talkback/compare/{base}...{head}\",\n  \"merges_url\": \"https://api.github.com/repos/ijpiantanida/talkback/merges\",\n  \"archive_url\": \"https://api.github.com/repos/ijpiantanida/talkback/{archive_format}{/ref}\",\n  \"downloads_url\": \"https://api.github.com/repos/ijpiantanida/talkback/downloads\",\n  \"issues_url\": \"https://api.github.com/repos/ijpiantanida/talkback/issues{/number}\",\n  \"pulls_url\": \"https://api.github.com/repos/ijpiantanida/talkback/pulls{/number}\",\n  \"milestones_url\": \"https://api.github.com/repos/ijpiantanida/talkback/milestones{/number}\",\n  \"notifications_url\": \"https://api.github.com/repos/ijpiantanida/talkback/notifications{?since,all,participating}\",\n  \"labels_url\": \"https://api.github.com/repos/ijpiantanida/talkback/labels{/name}\",\n  \"releases_url\": \"https://api.github.com/repos/ijpiantanida/talkback/releases{/id}\",\n  \"deployments_url\": \"https://api.github.com/repos/ijpiantanida/talkback/deployments\",\n  \"created_at\": \"2017-09-11T00:54:27Z\",\n  \"updated_at\": \"2017-09-11T22:40:57Z\",\n  \"pushed_at\": \"2017-09-13T23:29:29Z\",\n  \"git_url\": \"git://github.com/ijpiantanida/talkback.git\",\n  \"ssh_url\": \"git@github.com:ijpiantanida/talkback.git\",\n  \"clone_url\": \"https://github.com/ijpiantanida/talkback.git\",\n  \"svn_url\": \"https://github.com/ijpiantanida/talkback\",\n  \"homepage\": \"\",\n  \"size\": 55,\n  \"stargazers_count\": 0,\n  \"watchers_count\": 0,\n  \"language\": \"JavaScript\",\n  \"has_issues\": true,\n  \"has_projects\": true,\n  \"has_downloads\": true,\n  \"has_wiki\": true,\n  \"has_pages\": false,\n  \"forks_count\": 0,\n  \"mirror_url\": null,\n  \"open_issues_count\": 0,\n  \"forks\": 0,\n  \"open_issues\": 0,\n  \"watchers\": 0,\n  \"default_branch\": \"master\",\n  \"network_count\": 0,\n  \"subscribers_count\": 1\n}\n"
+    },
+}

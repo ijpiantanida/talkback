@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
+    "babel-runtime": "^6.26.0",
     "content-type": "^1.0.2",
     "json5": "^0.5.1",
     "mkdirp": "^0.5.1",

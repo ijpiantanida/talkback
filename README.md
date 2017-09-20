@@ -42,7 +42,7 @@ Options:
 
 | Name | Type | Description | Default|   
 |------|------|-------------|--------|
-| **host** | `String` | Where to proxy unkown requests| |
+| **host** | `String` | Where to proxy unknown requests| |
 | **port** | `String` |Talkback port | 8080|
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |

@@ -93,7 +93,7 @@ describe("talkback", async () => {
     expect(body).to.eql({ok: true});
   });
 
-  it("returns a 404 if recording is disabled and the request is unkown", async () => {
+  it("returns a 404 if recording is disabled and the request is unknown", async () => {
     talkback = await startTalkback(false);
 
     const res = await fetch("http://localhost:8899/test/1", {compress: false});

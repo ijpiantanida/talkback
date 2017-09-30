@@ -1,10 +1,11 @@
 # Talkback
 
 Talkback is a standalone HTTP proxy that can record and playback requests.   
-Although built as a node.js library, it can be used to playback requests from any language.   
+Although built as a node.js library, it can be used to playback requests from any language as you should run it as a separate process.    
 Very useful for integration tests environments or mocking HTTP servers.   
 Heavily inspired by [flickr/yakbak](https://github.com/flickr/yakbak).   
 
+[![npm version](https://badge.fury.io/js/talkback.svg)](https://badge.fury.io/js/talkback)
 [![Build Status](https://travis-ci.org/ijpiantanida/talkback.svg?branch=master)](https://travis-ci.org/ijpiantanida/talkback)
 
 ## Installation
@@ -38,17 +39,20 @@ server.close();
 Returns an unstarted talkback server instance.   
 
 Options:
-* `host`: (String) Where to proxy unknown request
-* `port`: (Number) Talkback port. Default 8080
-* `path`: (String) Path where to load and save tapes. Default `./tapes/`
-* `ignoreHeaders`: (Array(String)) List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. Default `[]`
-* `record`: (Boolean) Whether talkback should proxy and record unknown requests or fail fast and return 404. Default `true`
-* `summary`: (Boolean) Whether to print a summary of new and unused tapes at exit. Default `true`
+
+| Name | Type | Description | Default|   
+|------|------|-------------|--------|
+| **host** | `String` | Where to proxy unknown requests| |
+| **port** | `String` |Talkback port | 8080|
+| **path** | `String` | Path where to load and save tapes | `./tapes/` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
+| **record** | `Boolean` | Whether talkback should proxy and record unknown requests or fail fast and return 404 | `true` |
+| **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.
 
-### stop()
+### close()
 Stops the HTTP server.
 
 ## Tapes

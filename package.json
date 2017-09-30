@@ -1,11 +1,12 @@
 {
   "name": "talkback",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "main": "index.js",
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
     "babel-runtime": "^6.26.0",
+    "buffer-shims": "^1.0.0",
     "content-type": "^1.0.2",
     "json5": "^0.5.1",
     "mkdirp": "^0.5.1",
@@ -18,7 +19,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.0",
-    "buffer-shims": "^1.0.0",
     "chai": "^4.1.2",
     "del": "^3.0.0",
     "mocha": "^3.5.0",

@@ -35,7 +35,7 @@ server.start(() => console.log("Talkback Started");
 server.close();
 ```
 
-### talback(opts)
+### talkback(opts)
 Returns an unstarted talkback server instance.   
 
 Options:

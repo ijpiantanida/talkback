@@ -81,5 +81,17 @@ When recording is disabled and an unknown requests arrives, talkback will just l
 
 It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.   
 
+## Exit summary
+After some time you will probably have tons of different tapes for your app's test suite. It can be difficult to know if all of them are still needed.
+To help, when talkback exits, it will print a list of all the tapes that have NOT been used and a list of all the new tapes.
+```
+===== SUMMARY =====
+New tapes:
+- unnamed-4.json5
+Unused tapes:
+- not-valid-request.json5
+- user-profile.json5
+```
+
 # Licence
 MIT

@@ -13,8 +13,8 @@ export default class TalkbackServer {
   }
 
   onNoRecord(req) {
-    console.log(`Tape for ${req.url} not found and recording is disabled`);
-    console.log({
+    this.options.logger.log(`Tape for ${req.url} not found and recording is disabled`);
+    this.options.logger.log({
       url: req.url,
       headers: req.headers
     });
@@ -29,7 +29,7 @@ export default class TalkbackServer {
     delete headers.host;
 
     const host = this.options.host;
-    console.log(`Making real request to ${host}${url}`);
+    this.options.logger.log(`Making real request to ${host}${url}`);
 
     const fRes = await fetch(host + url, {method, headers, body, compress: false});
     const buff = await fRes.buffer();

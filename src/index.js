@@ -1,10 +1,12 @@
 import Server from "./server";
+import Logger from "./logger";
 
 const defaultOptions = {
-  port: 8080,
-  record: true,
   ignoreHeaders: [],
   path: "./tapes/",
+  port: 8080,
+  record: true,
+  silent: false,
   summary: true
 };
 
@@ -13,6 +15,10 @@ const talkback = usrOpts => {
     ...defaultOptions,
     ...usrOpts
   };
+
+  const logger = new Logger(opts);
+  opts.logger = logger;
+
   return new Server(opts);
 };
 

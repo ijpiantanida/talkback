@@ -15,7 +15,8 @@ const startTalkback = async (record) => {
     path: tapesPath,
     port: 8899,
     host: proxiedHost,
-    record
+    record,
+    silent: true
   });
   await talkback.start();
   return talkback;

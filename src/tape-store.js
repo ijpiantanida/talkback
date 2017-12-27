@@ -28,7 +28,7 @@ export default class TapeStore {
           tape.path = filename;
           this.tapes.push(tape);
         } catch (e) {
-          console.log(`Error reading tape ${fullPath}`, e);
+          console.log(`Error reading tape ${fullPath}`, e.message);
         }
       }
     }
@@ -39,7 +39,7 @@ export default class TapeStore {
     const foundTape = this.tapes.find(t => newTape.sameRequestAs(t));
     if (foundTape) {
       foundTape.used = true;
-      console.log(`Serving cached request for ${newTape.req.url} from tape ${foundTape.path}`);
+      this.options.logger.log(`Serving cached request for ${newTape.req.url} from tape ${foundTape.path}`);
       return foundTape.res;
     }
   }
@@ -70,7 +70,7 @@ export default class TapeStore {
     const tapeName = `unnamed-${this.tapes.length}.json5`;
     tape.path = tapeName;
     const filename = this.path + tapeName;
-    console.log(`Saving request ${tape.req.url} at ${filename}`);
+    this.options.logger.log(`Saving request ${tape.req.url} at ${filename}`);
     fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
   }
 

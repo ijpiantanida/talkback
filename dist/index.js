@@ -9,7 +9,7 @@ var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCh
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
 
-var Sumary$1 = function () {
+var Sumary = function () {
   function Sumary(tapes) {
     _classCallCheck(this, Sumary);
 
@@ -196,7 +196,7 @@ var TapeStore = function () {
             tape.path = filename;
             this.tapes.push(tape);
           } catch (e) {
-            console.log("Error reading tape " + fullPath, e);
+            console.log("Error reading tape " + fullPath, e.message);
           }
         }
       }
@@ -210,7 +210,7 @@ var TapeStore = function () {
       });
       if (foundTape) {
         foundTape.used = true;
-        console.log("Serving cached request for " + newTape.req.url + " from tape " + foundTape.path);
+        this.options.logger.log("Serving cached request for " + newTape.req.url + " from tape " + foundTape.path);
         return foundTape.res;
       }
     }
@@ -245,7 +245,7 @@ var TapeStore = function () {
       var tapeName = "unnamed-" + this.tapes.length + ".json5";
       tape.path = tapeName;
       var filename = this.path + tapeName;
-      console.log("Saving request " + tape.req.url + " at " + filename);
+      this.options.logger.log("Saving request " + tape.req.url + " at " + filename);
       fs$1.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
   }, {
@@ -279,8 +279,8 @@ var TalkbackServer = function () {
   _createClass(TalkbackServer, [{
     key: "onNoRecord",
     value: function onNoRecord(req) {
-      console.log("Tape for " + req.url + " not found and recording is disabled");
-      console.log({
+      this.options.logger.log("Tape for " + req.url + " not found and recording is disabled");
+      this.options.logger.log({
         url: req.url,
         headers: req.headers
       });
@@ -304,7 +304,7 @@ var TalkbackServer = function () {
 
                 host = this.options.host;
 
-                console.log("Making real request to " + host + url);
+                this.options.logger.log("Making real request to " + host + url);
 
                 _context.next = 7;
                 return fetch(host + url, { method: method, headers: headers, body: body, compress: false });
@@ -416,7 +416,7 @@ var TalkbackServer = function () {
       this.server.close();
 
       if (this.options.summary) {
-        var summary = new Sumary$1(this.tapeStore.tapes);
+        var summary = new Sumary(this.tapeStore.tapes);
         summary.print();
       }
     }
@@ -425,16 +425,40 @@ var TalkbackServer = function () {
   return TalkbackServer;
 }();
 
+var Logger = function () {
+  function Logger(options) {
+    _classCallCheck(this, Logger);
+
+    this.options = options;
+  }
+
+  _createClass(Logger, [{
+    key: "log",
+    value: function log(message) {
+      if (!this.options.silent) {
+        console.log(message);
+      }
+    }
+  }]);
+
+  return Logger;
+}();
+
 var defaultOptions = {
-  port: 8080,
-  record: true,
   ignoreHeaders: [],
   path: "./tapes/",
+  port: 8080,
+  record: true,
+  silent: false,
   summary: true
 };
 
 var talkback = function talkback(usrOpts) {
   var opts = _extends({}, defaultOptions, usrOpts);
+
+  var logger = new Logger(opts);
+  opts.logger = logger;
+
   return new TalkbackServer(opts);
 };
 

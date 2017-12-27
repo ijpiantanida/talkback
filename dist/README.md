@@ -35,7 +35,7 @@ server.start(() => console.log("Talkback Started");
 server.close();
 ```
 
-### talback(opts)
+### talkback(opts)
 Returns an unstarted talkback server instance.   
 
 Options:
@@ -47,6 +47,7 @@ Options:
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
 | **record** | `Boolean` | Whether talkback should proxy and record unknown requests or fail fast and return 404 | `true` |
+| **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |
 
 ### start([callback])
@@ -80,6 +81,18 @@ Talkback proxying and recording can be disabled through the `record` option.
 When recording is disabled and an unknown requests arrives, talkback will just log an error message, and return a 404 response without proxying the request to `host`.   
 
 It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.   
+
+## Exit summary
+After some time you will probably have tons of different tapes for your app's test suite. It can be difficult to know if all of them are still required.   
+To help, when talkback exits, it will print a list of all the tapes that have NOT been used and a list of all the new tapes. If your test suite is green, you can safely delete anything that hasn't been used.
+```
+===== SUMMARY =====
+New tapes:
+- unnamed-4.json5
+Unused tapes:
+- not-valid-request.json5
+- user-profile.json5
+```
 
 # Licence
 MIT

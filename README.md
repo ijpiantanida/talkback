@@ -31,7 +31,7 @@ const opts = {
   path: "./my-tapes"
 };
 const server = talkback(opts);
-server.start(() => console.log("Talkback Started");
+server.start(() => console.log("Talkback Started"));
 server.close();
 ```
 

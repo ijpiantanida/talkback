@@ -5,7 +5,7 @@ const raw = {
   meta: {
     createdAt: new Date(),
     reqHumanReadable: true,
-    resHumanReadable: true
+    resHumanReadable: false
   },
   req: {
     url: "/foo/bar/1",
@@ -21,7 +21,7 @@ const raw = {
       "accept": ["application/json"],
       "x-ignored": ["2"]
     },
-    body: "ABC"
+    body: "SGVsbG8="
   }
 };
 const opts = {
@@ -41,7 +41,7 @@ describe("Tape", () => {
 
       expect(tape.res.headers["accept"]).to.eql(["application/json"]);
       expect(tape.res.headers["x-ignored"]).to.eql(["2"]);
-      expect(tape.res.body.equals(Buffer.from("ABC"))).to.be.true;
+      expect(tape.res.body.equals(Buffer.from("Hello"))).to.be.true;
     });
 
     it("creates a tape from the raw file data with req and res not human readable", () => {
@@ -50,7 +50,7 @@ describe("Tape", () => {
         meta: {
           ...raw.meta,
           reqHumanReadable: false,
-          resHumanReadable: false
+          resHumanReadable: true
         },
         req: {
           ...raw.req,
@@ -58,7 +58,7 @@ describe("Tape", () => {
         },
         res: {
           ...raw.res,
-          body: "SGVsbG8="
+          body: "ABC"
         }
       };
 
@@ -71,7 +71,7 @@ describe("Tape", () => {
 
       expect(tape.res.headers["accept"]).to.eql(["application/json"]);
       expect(tape.res.headers["x-ignored"]).to.eql(["2"]);
-      expect(tape.res.body.equals(Buffer.from("Hello"))).to.be.true;
+      expect(tape.res.body.equals(Buffer.from("ABC"))).to.be.true;
     });
   });
 

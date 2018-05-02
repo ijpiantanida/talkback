@@ -19,7 +19,7 @@ export default class Tape {
 
   static fromStore(raw, options) {
     const req = {...raw.req};
-    if (raw.meta.resHumanReadable) {
+    if (raw.meta.reqHumanReadable) {
       req.body = bufferShim.from(raw.req.body);
     } else {
       req.body = bufferShim.from(raw.req.body, "base64");

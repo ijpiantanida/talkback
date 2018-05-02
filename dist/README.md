@@ -31,7 +31,7 @@ const opts = {
   path: "./my-tapes"
 };
 const server = talkback(opts);
-server.start(() => console.log("Talkback Started");
+server.start(() => console.log("Talkback Started"));
 server.close();
 ```
 
@@ -49,6 +49,7 @@ Options:
 | **record** | `Boolean` | Whether talkback should proxy and record unknown requests or fail fast and return 404 | `true` |
 | **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |
+| **debug** | `Boolean` | Whether to print verbose debug information | `false` |
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.

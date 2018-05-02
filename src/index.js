@@ -7,7 +7,8 @@ const defaultOptions = {
   port: 8080,
   record: true,
   silent: false,
-  summary: true
+  summary: true,
+  debug: false
 };
 
 const talkback = usrOpts => {

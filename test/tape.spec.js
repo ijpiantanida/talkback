@@ -1,4 +1,5 @@
 import Tape from "../src/tape";
+import Logger from "../src/logger";
 
 const raw = {
   meta: {
@@ -24,7 +25,8 @@ const raw = {
   }
 };
 const opts = {
-  ignoreHeaders: ["x-ignored"]
+  ignoreHeaders: ["x-ignored"],
+  logger: new Logger({debug: true})
 };
 
 const tape = Tape.fromStore(raw, opts);

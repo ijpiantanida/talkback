@@ -7,6 +7,7 @@ var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
 var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
+var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
 
 var Sumary = function () {
@@ -78,25 +79,43 @@ var Tape = function () {
     }
   }, {
     key: "sameRequestAs",
-    value: function sameRequestAs(tape) {
+    value: function sameRequestAs(otherTape) {
       var _this = this;
 
-      var req = tape.req;
-      var numberOfHeaders = _Object$keys(req.headers).length;
-      var same = this.req.url === req.url && this.req.method === req.method && this.req.body.equals(req.body);
-      if (!same) {
+      var otherReq = otherTape.req;
+      var sameURL = this.req.url === otherReq.url;
+      if (!sameURL) {
+        this.options.logger.debug("Not same URL " + this.req.url + " vs " + otherReq.url);
         return false;
       }
-      if (numberOfHeaders !== _Object$keys(this.req.headers).length) {
+      var sameMethod = this.req.method === otherReq.method;
+      if (!sameMethod) {
+        this.options.logger.debug("Not same METHOD " + this.req.method + " vs " + otherReq.method);
         return false;
       }
+      var sameBody = this.req.body.equals(otherReq.body);
+      if (!sameBody) {
+        this.options.logger.debug("Not same BODY " + this.req.body + " vs " + otherReq.body);
+        return false;
+      }
+      var currentHeadersLength = _Object$keys(this.req.headers).length;
+      var otherHeadersLength = _Object$keys(otherReq.headers).length;
+      var sameNumberOfHeaders = currentHeadersLength === otherHeadersLength;
+      if (!sameNumberOfHeaders) {
+        this.options.logger.debug("Not same #HEADERS " + _JSON$stringify(this.req.headers) + " vs " + _JSON$stringify(otherReq.headers));
+        return false;
+      }
+
       var headersSame = true;
       _Object$keys(this.req.headers).forEach(function (k) {
         var entryHeader = _this.req.headers[k];
-        var header = req.headers[k];
+        var header = otherReq.headers[k];
 
         headersSame = headersSame && entryHeader === header;
       });
+      if (!headersSame) {
+        this.options.logger.debug("Not same HEADERS values " + _JSON$stringify(this.req.headers) + " vs " + _JSON$stringify(otherReq.headers));
+      }
       return headersSame;
     }
   }], [{
@@ -205,7 +224,10 @@ var TapeStore = function () {
   }, {
     key: "find",
     value: function find(newTape) {
+      var _this = this;
+
       var foundTape = this.tapes.find(function (t) {
+        _this.options.logger.debug("Comparing against tape " + t.path);
         return newTape.sameRequestAs(t);
       });
       if (foundTape) {
@@ -397,6 +419,7 @@ var TalkbackServer = function () {
     value: function start(callback) {
       this.tapeStore.load();
       this.server = http.createServer(this.handleRequest.bind(this));
+      console.log("Starting talkbak on " + this.options.port);
       this.server.listen(this.options.port, callback);
 
       var closeSignalHandler = this.close.bind(this);
@@ -426,10 +449,15 @@ var TalkbackServer = function () {
 }();
 
 var Logger = function () {
-  function Logger(options) {
+  function Logger() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, Logger);
 
     this.options = options;
+    if (this.options.debug) {
+      console.debug("DEBUG mode active");
+    }
   }
 
   _createClass(Logger, [{
@@ -437,6 +465,13 @@ var Logger = function () {
     value: function log(message) {
       if (!this.options.silent) {
         console.log(message);
+      }
+    }
+  }, {
+    key: "debug",
+    value: function debug(message) {
+      if (this.options.debug) {
+        console.debug(message);
       }
     }
   }]);
@@ -450,7 +485,8 @@ var defaultOptions = {
   port: 8080,
   record: true,
   silent: false,
-  summary: true
+  summary: true,
+  debug: false
 };
 
 var talkback = function talkback(usrOpts) {

@@ -36,7 +36,10 @@ export default class TapeStore {
   }
 
   find(newTape) {
-    const foundTape = this.tapes.find(t => newTape.sameRequestAs(t));
+    const foundTape = this.tapes.find(t => {
+      this.options.logger.debug(`Comparing against tape ${t.path}`)
+      return newTape.sameRequestAs(t);
+    });
     if (foundTape) {
       foundTape.used = true;
       this.options.logger.log(`Serving cached request for ${newTape.req.url} from tape ${foundTape.path}`);

@@ -45,23 +45,41 @@ export default class Tape {
     };
   }
 
-  sameRequestAs(tape) {
-    const req = tape.req;
-    const numberOfHeaders = Object.keys(req.headers).length;
-    let same = this.req.url === req.url && this.req.method === req.method && this.req.body.equals(req.body);
-    if (!same) {
+  sameRequestAs(otherTape) {
+    const otherReq = otherTape.req;
+    const sameURL = this.req.url === otherReq.url;
+    if(!sameURL) {
+      this.options.logger.debug(`Not same URL ${this.req.url} vs ${otherReq.url}`);
       return false;
     }
-    if (numberOfHeaders !== Object.keys(this.req.headers).length) {
+    const sameMethod = this.req.method === otherReq.method;
+    if(!sameMethod) {
+      this.options.logger.debug(`Not same METHOD ${this.req.method} vs ${otherReq.method}`);
       return false;
     }
+    const sameBody = this.req.body.equals(otherReq.body);
+    if(!sameBody) {
+      this.options.logger.debug(`Not same BODY ${this.req.body} vs ${otherReq.body}`);
+      return false;
+    }
+    const currentHeadersLength = Object.keys(this.req.headers).length;
+    const otherHeadersLength = Object.keys(otherReq.headers).length;
+    const sameNumberOfHeaders = currentHeadersLength === otherHeadersLength;
+    if(!sameNumberOfHeaders) {
+      this.options.logger.debug(`Not same #HEADERS ${JSON.stringify(this.req.headers)} vs ${JSON.stringify(otherReq.headers)}`);
+      return false;
+    }
+
     let headersSame = true;
     Object.keys(this.req.headers).forEach(k => {
       const entryHeader = this.req.headers[k];
-      const header = req.headers[k];
+      const header = otherReq.headers[k];
 
       headersSame = headersSame && entryHeader === header;
     });
+    if(!headersSame) {
+      this.options.logger.debug(`Not same HEADERS values ${JSON.stringify(this.req.headers)} vs ${JSON.stringify(otherReq.headers)}`)
+    }
     return headersSame;
   }
 }

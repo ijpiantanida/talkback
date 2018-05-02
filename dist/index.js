@@ -122,7 +122,7 @@ var Tape = function () {
     key: "fromStore",
     value: function fromStore(raw, options) {
       var req = _extends({}, raw.req);
-      if (raw.meta.resHumanReadable) {
+      if (raw.meta.reqHumanReadable) {
         req.body = bufferShim.from(raw.req.body);
       } else {
         req.body = bufferShim.from(raw.req.body, "base64");

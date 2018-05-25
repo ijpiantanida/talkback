@@ -78,8 +78,8 @@ describe("talkback", async () => {
     expect(body).to.eql(expectedResBody);
 
     const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"));
-    expect(tape.meta.reqHumanReadable).to.be.undefined;
-    expect(tape.meta.resHumanReadable).to.be.undefined;
+    expect(tape.meta.reqHumanReadable).to.eq(true);
+    expect(tape.meta.resHumanReadable).to.eq(undefined);
     expect(tape.req.url).to.eql("/test/2");
     expect(tape.res.body).to.eql("eyJvayI6dHJ1ZSwiYm9keSI6eyJmb28iOiJiYXIifX0=");
   });

@@ -3,6 +3,7 @@ import Logger from "./logger";
 
 const defaultOptions = {
   ignoreHeaders: [],
+  ignoreQueryParams: [],
   path: "./tapes/",
   port: 8080,
   record: true,

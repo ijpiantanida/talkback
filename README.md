@@ -46,6 +46,7 @@ Options:
 | **port** | `String` |Talkback port | 8080|
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
+| **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps. | `[]` |
 | **record** | `Boolean` | Whether talkback should proxy and record unknown requests or fail fast and return 404 | `true` |
 | **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |

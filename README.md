@@ -5,6 +5,8 @@ Although built as a node.js library, it can be used to playback requests from an
 Very useful for integration tests environments or mocking HTTP servers.   
 Heavily inspired by [flickr/yakbak](https://github.com/flickr/yakbak).   
 
+Read more about the reasoning behind **talkback** on [10Pines blog](https://blog.10pines.com/2017/12/18/isolating-integration-tests-from-external-http-services-with-talkback/).   
+
 [![npm version](https://badge.fury.io/js/talkback.svg)](https://badge.fury.io/js/talkback)
 [![Build Status](https://travis-ci.org/ijpiantanida/talkback.svg?branch=master)](https://travis-ci.org/ijpiantanida/talkback)
 

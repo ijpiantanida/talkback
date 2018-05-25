@@ -2,13 +2,13 @@
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
-var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
-var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
 var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
+var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
+var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
+var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
 
 var Sumary = function () {
   function Sumary(tapes) {
@@ -45,6 +45,8 @@ var Sumary = function () {
   return Sumary;
 }();
 
+var URL = require("url");
+var querystring = require("querystring");
 var bufferShim = require("buffer-shims");
 
 var Tape = function () {
@@ -60,6 +62,10 @@ var Tape = function () {
     this.options = options;
     this.headersToIgnore = ["host"].concat(this.options.ignoreHeaders);
     this.cleanupHeaders();
+
+    this.queryParamsToIgnore = this.options.ignoreQueryParams;
+    this.cleanupQueryParams();
+
     this.meta = {
       createdAt: new Date(),
       host: this.options.host
@@ -76,6 +82,33 @@ var Tape = function () {
       this.req = _extends({}, this.req, {
         headers: newHeaders
       });
+    }
+  }, {
+    key: "cleanupQueryParams",
+    value: function cleanupQueryParams() {
+      if (this.queryParamsToIgnore.length === 0) {
+        return;
+      }
+
+      var url = URL.parse(this.req.url, { parseQueryString: true });
+      if (!url.search) {
+        return;
+      }
+
+      var query = _extends({}, url.query);
+      this.queryParamsToIgnore.forEach(function (q) {
+        return delete query[q];
+      });
+
+      var newQuery = querystring.stringify(query);
+      if (newQuery) {
+        url.query = query;
+        url.search = "?" + newQuery;
+      } else {
+        url.query = null;
+        url.search = null;
+      }
+      this.req.url = URL.format(url);
     }
   }, {
     key: "sameRequestAs",
@@ -184,10 +217,11 @@ var MediaType = function () {
   return MediaType;
 }();
 
-var fs$1 = require("fs");
+var fs = require("fs");
 var path = require("path");
 var JSON5 = require("json5");
 var mkdirp = require("mkdirp");
+
 var TapeStore = function () {
   function TapeStore(options) {
     _classCallCheck(this, TapeStore);
@@ -202,14 +236,14 @@ var TapeStore = function () {
     value: function load() {
       mkdirp.sync(this.path);
 
-      var items = fs$1.readdirSync(this.path);
+      var items = fs.readdirSync(this.path);
       for (var i = 0; i < items.length; i++) {
         var filename = items[i];
         var fullPath = "" + this.path + filename;
-        var stat = fs$1.statSync(fullPath);
+        var stat = fs.statSync(fullPath);
         if (!stat.isDirectory()) {
           try {
-            var data = fs$1.readFileSync(fullPath, "utf8");
+            var data = fs.readFileSync(fullPath, "utf8");
             var raw = JSON5.parse(data);
             var tape = Tape.fromStore(raw, this.options);
             tape.path = filename;
@@ -268,7 +302,7 @@ var TapeStore = function () {
       tape.path = tapeName;
       var filename = this.path + tapeName;
       this.options.logger.log("Saving request " + tape.req.url + " at " + filename);
-      fs$1.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
+      fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
   }, {
     key: "bodyFor",
@@ -288,7 +322,6 @@ var TapeStore = function () {
 
 var http = require("http");
 var fetch = require("node-fetch");
-var fs = require("fs");
 
 var TalkbackServer = function () {
   function TalkbackServer(options) {
@@ -328,15 +361,19 @@ var TalkbackServer = function () {
 
                 this.options.logger.log("Making real request to " + host + url);
 
-                _context.next = 7;
+                if (method === "GET" || method === "HEAD") {
+                  body = null;
+                }
+
+                _context.next = 8;
                 return fetch(host + url, { method: method, headers: headers, body: body, compress: false });
 
-              case 7:
+              case 8:
                 fRes = _context.sent;
-                _context.next = 10;
+                _context.next = 11;
                 return fRes.buffer();
 
-              case 10:
+              case 11:
                 buff = _context.sent;
                 return _context.abrupt("return", {
                   status: fRes.status,
@@ -344,7 +381,7 @@ var TalkbackServer = function () {
                   body: buff
                 });
 
-              case 12:
+              case 13:
               case "end":
                 return _context.stop();
             }
@@ -372,46 +409,58 @@ var TalkbackServer = function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                _context2.prev = 0;
+
                 reqBody = Buffer.concat(reqBody);
                 req.body = reqBody;
                 tape = new Tape(req, _this.options);
                 fRes = _this.tapeStore.find(tape);
 
                 if (fRes) {
-                  _context2.next = 14;
+                  _context2.next = 15;
                   break;
                 }
 
                 if (!_this.options.record) {
-                  _context2.next = 13;
+                  _context2.next = 14;
                   break;
                 }
 
-                _context2.next = 8;
+                _context2.next = 9;
                 return _this.makeRealRequest(req);
 
-              case 8:
+              case 9:
                 fRes = _context2.sent;
 
                 tape.res = _extends({}, fRes);
                 _this.tapeStore.save(tape);
-                _context2.next = 14;
+                _context2.next = 15;
                 break;
 
-              case 13:
+              case 14:
                 fRes = _this.onNoRecord(req);
 
-              case 14:
+              case 15:
 
                 res.writeHead(fRes.status, fRes.headers);
                 res.end(fRes.body);
+                _context2.next = 24;
+                break;
 
-              case 16:
+              case 19:
+                _context2.prev = 19;
+                _context2.t0 = _context2["catch"](0);
+
+                console.error("Error handling request", _context2.t0);
+                res.statusCode = 500;
+                res.end();
+
+              case 24:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, _this);
+        }, _callee2, _this, [[0, 19]]);
       })));
     }
   }, {
@@ -481,6 +530,7 @@ var Logger = function () {
 
 var defaultOptions = {
   ignoreHeaders: [],
+  ignoreQueryParams: [],
   path: "./tapes/",
   port: 8080,
   record: true,

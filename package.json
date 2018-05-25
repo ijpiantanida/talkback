@@ -8,9 +8,9 @@
     "babel-runtime": "^6.26.0",
     "buffer-shims": "^1.0.0",
     "content-type": "^1.0.4",
-    "json5": "^0.5.1",
+    "json5": "^1.0.1",
     "mkdirp": "^0.5.1",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^2.1.2"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -21,10 +21,10 @@
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
     "del": "^3.0.0",
-    "mocha": "^4.0.1",
+    "mocha": "^5.2.0",
     "nyc": "^11.4.1",
-    "rollup": "^0.53.0",
-    "rollup-plugin-babel": "^3.0.3",
+    "rollup": "^0.59.3",
+    "rollup-plugin-babel": "^3.0.4",
     "testdouble": "^3.3.0"
   },
   "nyc": {

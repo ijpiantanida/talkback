@@ -10,13 +10,15 @@ const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = __dirname + "/tapes"
 
-const startTalkback = async (record) => {
+const startTalkback = async (opts) => {
   const talkback = talkbak({
-    path: tapesPath,
-    port: 8899,
-    host: proxiedHost,
-    record,
-    silent: true
+    ...{
+      path: tapesPath,
+      port: 8899,
+      host: proxiedHost,
+      silent: true
+    },
+    ...opts
   })
   await talkback.start()
   return talkback
@@ -47,8 +49,23 @@ describe("talkback", async () => {
     talkback.close()
   })
 
+  it("proxies but does not create a new tape when in fallback mode", async () => {
+    talkback = await startTalkback({record: false, fallback: true})
+
+    const reqBody = JSON.stringify({foo: "bar"})
+    const headers = {"content-type": "application/json"}
+    const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "POST", headers, body: reqBody})
+    expect(res.status).to.eq(200)
+
+    const expectedResBody = {ok: true, body: {foo: "bar"}}
+    const body = await res.json()
+    expect(body).to.eql(expectedResBody)
+
+    expect(tapesPath + "/unnamed-2.json5").to.not.be.a.path()
+  })
+
   it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
-    talkback = await startTalkback(true)
+    talkback = await startTalkback({record: true})
 
     const reqBody = JSON.stringify({foo: "bar"})
     const headers = {"content-type": "application/json"}
@@ -67,7 +84,7 @@ describe("talkback", async () => {
   })
 
   it("proxies and creates a new tape when the GET request is unknown", async () => {
-    talkback = await startTalkback(true)
+    talkback = await startTalkback({record: true})
 
     const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "GET"})
     expect(res.status).to.eq(200)
@@ -84,7 +101,7 @@ describe("talkback", async () => {
   })
 
   it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
-    talkback = await startTalkback(true)
+    talkback = await startTalkback({record: true})
 
     const reqBody = JSON.stringify({foo: "bar"})
     const headers = {"content-type": "application/json"}
@@ -103,7 +120,7 @@ describe("talkback", async () => {
   })
 
   it("handles when the proxied server returns a 500", async () => {
-    talkback = await startTalkback(true)
+    talkback = await startTalkback({record: true})
 
     const res = await fetch("http://localhost:8899/test/3")
     expect(res.status).to.eq(500)
@@ -114,7 +131,7 @@ describe("talkback", async () => {
   })
 
   it("loads existing tapes and uses them if they match", async () => {
-    talkback = await startTalkback(false)
+    talkback = await startTalkback({record: false})
 
     const res = await fetch("http://localhost:8899/test/3", {compress: false})
     expect(res.status).to.eq(200)
@@ -124,7 +141,7 @@ describe("talkback", async () => {
   })
 
   it("returns a 404 if recording is disabled and the request is unknown", async () => {
-    talkback = await startTalkback(false)
+    talkback = await startTalkback({record: false})
 
     const res = await fetch("http://localhost:8899/test/1", {compress: false})
     expect(res.status).to.eq(404)

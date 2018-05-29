@@ -56,6 +56,13 @@ arr-union@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/arr-union/-/arr-union-3.1.0.tgz#e39b09aea9def866a8f206e288af63919bae39c4"
 
+array-events@^0.2.0:
+  version "0.2.0"
+  resolved "http://npm.prd.costargroup.com/array-events/-/array-events-0.2.0.tgz#ff42ac53e66f485d6f883234c32252bc2286130e"
+  dependencies:
+    async-arrays "*"
+    extended-emitter "*"
+
 array-union@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/array-union/-/array-union-1.0.2.tgz#9a34410e4f4e3da23dea375be5be70f24778ec39"
@@ -81,6 +88,12 @@ assertion-error@^1.0.1:
 assign-symbols@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
+
+async-arrays@*:
+  version "1.0.1"
+  resolved "http://npm.prd.costargroup.com/async-arrays/-/async-arrays-1.0.1.tgz#347af2b70f2a7a5767a2d5679cc42bbf1c220fd9"
+  dependencies:
+    sift "*"
 
 async@^1.4.0:
   version "1.5.2"
@@ -596,6 +609,12 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
+bit-mask@^1.0.1:
+  version "1.0.2"
+  resolved "http://npm.prd.costargroup.com/bit-mask/-/bit-mask-1.0.2.tgz#42f708362119611d6223cd53202c79428bf70b81"
+  dependencies:
+    array-events "^0.2.0"
+
 brace-expansion@^1.1.7:
   version "1.1.11"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.11.tgz#3c7fcbf529d87226f3d2f52b966ff5271eb441dd"
@@ -659,6 +678,10 @@ caching-transform@^1.0.0:
     mkdirp "^0.5.1"
     write-file-atomic "^1.1.4"
 
+call-me-maybe@^1.0.1:
+  version "1.0.1"
+  resolved "http://npm.prd.costargroup.com/call-me-maybe/-/call-me-maybe-1.0.1.tgz#26d208ea89e37b5cbde60250a15f031c16a4d66b"
+
 camelcase@^1.0.2:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-1.2.1.tgz#9bb5304d2e0b56698b2c758b08a3eaa9daa58a39"
@@ -677,6 +700,13 @@ center-align@^0.1.1:
   dependencies:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
+
+chai-fs@^2.0.0:
+  version "2.0.0"
+  resolved "http://npm.prd.costargroup.com/chai-fs/-/chai-fs-2.0.0.tgz#35ae039fbbb0710f5122aae17faba1e8f41107c6"
+  dependencies:
+    bit-mask "^1.0.1"
+    readdir-enhanced "^1.4.0"
 
 chai@^4.1.2:
   version "4.1.2"
@@ -771,6 +801,13 @@ core-js@^2.4.0, core-js@^2.5.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.6.tgz#0fe6d45bf3cac3ac364a9d72de7576f4eb221b9d"
 
+cross-env@^5.1.6:
+  version "5.1.6"
+  resolved "http://npm.prd.costargroup.com/cross-env/-/cross-env-5.1.6.tgz#0dc05caf945b24e4b9e3b12871fe0e858d08b38d"
+  dependencies:
+    cross-spawn "^5.1.0"
+    is-windows "^1.0.0"
+
 cross-spawn@^4:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-4.0.2.tgz#7b9247621c23adfdd3856004a823cbe397424d41"
@@ -778,7 +815,7 @@ cross-spawn@^4:
     lru-cache "^4.0.1"
     which "^1.2.9"
 
-cross-spawn@^5.0.1:
+cross-spawn@^5.0.1, cross-spawn@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
   dependencies:
@@ -905,6 +942,10 @@ es6-map@^0.1.5:
     es6-symbol "~3.1.1"
     event-emitter "~0.3.5"
 
+es6-promise@^4.1.0:
+  version "4.2.4"
+  resolved "http://npm.prd.costargroup.com/es6-promise/-/es6-promise-4.2.4.tgz#dc4221c2b16518760bd8c39a52d8f356fc00ed29"
+
 es6-set@~0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/es6-set/-/es6-set-0.1.5.tgz#d2b3ec5d4d800ced818db538d28974db0a73ccb1"
@@ -977,6 +1018,13 @@ extend-shallow@^3.0.0, extend-shallow@^3.0.2:
   dependencies:
     assign-symbols "^1.0.0"
     is-extendable "^1.0.1"
+
+extended-emitter@*:
+  version "1.0.2"
+  resolved "http://npm.prd.costargroup.com/extended-emitter/-/extended-emitter-1.0.2.tgz#a2521ab93f3b1b69a35ff3a35da9889385a99ba0"
+  dependencies:
+    sift "*"
+    wolfy87-eventemitter "*"
 
 extglob@^2.0.4:
   version "2.0.4"
@@ -1057,6 +1105,10 @@ get-stream@^3.0.0:
 get-value@^2.0.3, get-value@^2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
+
+glob-to-regexp@^0.3.0:
+  version "0.3.0"
+  resolved "http://npm.prd.costargroup.com/glob-to-regexp/-/glob-to-regexp-0.3.0.tgz#8c5a1494d2066c570cc3bfe4496175acc4d502ab"
 
 glob@7.1.2, glob@^7.0.3, glob@^7.0.5, glob@^7.0.6:
   version "7.1.2"
@@ -1316,7 +1368,7 @@ is-utf8@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
 
-is-windows@^1.0.2:
+is-windows@^1.0.0, is-windows@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-windows/-/is-windows-1.0.2.tgz#d1850eb9791ecd18e6182ce12a30f396634bb19d"
 
@@ -1839,6 +1891,14 @@ read-pkg@^1.0.0:
     normalize-package-data "^2.3.2"
     path-type "^1.0.0"
 
+readdir-enhanced@^1.4.0:
+  version "1.5.2"
+  resolved "http://npm.prd.costargroup.com/readdir-enhanced/-/readdir-enhanced-1.5.2.tgz#61463048690ac6a455b75b62fa78a88f8dc85e53"
+  dependencies:
+    call-me-maybe "^1.0.1"
+    es6-promise "^4.1.0"
+    glob-to-regexp "^0.3.0"
+
 regenerate@^1.2.1:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.0.tgz#4a856ec4b56e4077c557589cae85e7a4c8869a11"
@@ -1993,6 +2053,10 @@ shebang-command@^1.2.0:
 shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
+
+sift@*:
+  version "5.1.0"
+  resolved "http://npm.prd.costargroup.com/sift/-/sift-5.1.0.tgz#1bbf2dfb0eb71e56c4cc7fb567fbd1351b65015e"
 
 signal-exit@^3.0.0, signal-exit@^3.0.1, signal-exit@^3.0.2:
   version "3.0.2"
@@ -2290,6 +2354,10 @@ which@^1.2.9, which@^1.3.0:
 window-size@0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.0.tgz#5438cd2ea93b202efa3a19fe8887aee7c94f9c9d"
+
+wolfy87-eventemitter@*:
+  version "5.2.4"
+  resolved "http://npm.prd.costargroup.com/wolfy87-eventemitter/-/wolfy87-eventemitter-5.2.4.tgz#5021d2952d3611cbcd195149711d9b595cd11d48"
 
 wordwrap@0.0.2:
   version "0.0.2"

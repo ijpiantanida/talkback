@@ -45,11 +45,13 @@ Options:
 | Name | Type | Description | Default|   
 |------|------|-------------|--------|
 | **host** | `String` | Where to proxy unknown requests| |
-| **port** | `String` |Talkback port | 8080|
+| **port** | `String` | Talkback port | 8080 |
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps. | `[]` |
-| **record** | `Boolean` | Whether talkback should proxy and record unknown requests or fail fast and return 404 | `true` |
+| **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes. | `false` |
+| **record** | `Boolean` | Whether talkback should proxy and record unknown requests. | `true` |
+| **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
 | **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |
 | **debug** | `Boolean` | Whether to print verbose debug information | `false` |

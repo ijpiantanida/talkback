@@ -11,14 +11,21 @@ export default class TalkbackServer {
     this.tapeStore = new TapeStore(this.options)
   }
 
-  onNoRecord(req) {
-    this.options.logger.log(`Tape for ${req.url} not found and recording is disabled`)
+  async onNoRecord(req) {
+    const fallbackMode = this.options.fallbackMode;
+    this.options.logger.log(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
     this.options.logger.log({
       url: req.url,
       headers: req.headers
     })
+
+    if (fallbackMode == "proxy") {
+      return await this.makeRealRequest(req)
+    }
+
     return {
-      status: 404
+      status: 404,
+      body: "talkback - tape not found"
     }
   }
 
@@ -60,7 +67,7 @@ export default class TalkbackServer {
             tape.res = {...fRes}
             this.tapeStore.save(tape)
           } else {
-            fRes = this.onNoRecord(req)
+            fRes = await this.onNoRecord(req)
           }
         }
 

@@ -87,10 +87,13 @@ export default class Tape {
       this.options.logger.debug(`Not same METHOD ${this.req.method} vs ${otherReq.method}`)
       return false
     }
-    const sameBody = this.req.body.equals(otherReq.body)
-    if (!sameBody) {
-      this.options.logger.debug(`Not same BODY ${this.req.body} vs ${otherReq.body}`)
-      return false
+    
+    if (!this.options.ignoreBody) {
+      const sameBody = this.req.body.equals(otherReq.body)
+      if (!sameBody) {
+        this.options.logger.debug(`Not same BODY ${this.req.body} vs ${otherReq.body}`)
+        return false
+      }
     }
     const currentHeadersLength = Object.keys(this.req.headers).length
     const otherHeadersLength = Object.keys(otherReq.headers).length

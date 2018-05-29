@@ -88,6 +88,17 @@ describe("Tape", () => {
       body: Buffer.from("QUJD", "base64")
     }
 
+    it("returns true when the request body is ignored", () => {
+      const newOpts = {
+        ...opts,
+        ignoreBody: true
+      }
+
+      const newTape = Tape.fromStore(raw, newOpts)
+      const tape2 = new Tape({...req, body: "XYZ"}, newOpts)
+      expect(newTape.sameRequestAs(tape2)).to.be.true
+    })
+
     it("returns true when everything is the same", () => {
       const tape2 = new Tape(req, opts)
       expect(tape.sameRequestAs(tape2)).to.be.true

@@ -126,10 +126,13 @@ var Tape = function () {
         this.options.logger.debug("Not same METHOD " + this.req.method + " vs " + otherReq.method);
         return false;
       }
-      var sameBody = this.req.body.equals(otherReq.body);
-      if (!sameBody) {
-        this.options.logger.debug("Not same BODY " + this.req.body + " vs " + otherReq.body);
-        return false;
+
+      if (!this.options.ignoreBody) {
+        var sameBody = this.req.body.equals(otherReq.body);
+        if (!sameBody) {
+          this.options.logger.debug("Not same BODY " + this.req.body + " vs " + otherReq.body);
+          return false;
+        }
       }
       var currentHeadersLength = _Object$keys(this.req.headers).length;
       var otherHeadersLength = _Object$keys(otherReq.headers).length;
@@ -333,24 +336,60 @@ var TalkbackServer = function () {
 
   _createClass(TalkbackServer, [{
     key: "onNoRecord",
-    value: function onNoRecord(req) {
-      this.options.logger.log("Tape for " + req.url + " not found and recording is disabled");
-      this.options.logger.log({
-        url: req.url,
-        headers: req.headers
-      });
-      return {
-        status: 404
-      };
-    }
-  }, {
-    key: "makeRealRequest",
     value: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(req) {
-        var method, url, body, headers, host, fRes, buff;
+        var fallbackMode;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
+              case 0:
+                fallbackMode = this.options.fallbackMode;
+
+                this.options.logger.log("Tape for " + req.url + " not found and recording is disabled (fallbackMode: " + fallbackMode + ")");
+                this.options.logger.log({
+                  url: req.url,
+                  headers: req.headers
+                });
+
+                if (!(fallbackMode == "proxy")) {
+                  _context.next = 7;
+                  break;
+                }
+
+                _context.next = 6;
+                return this.makeRealRequest(req);
+
+              case 6:
+                return _context.abrupt("return", _context.sent);
+
+              case 7:
+                return _context.abrupt("return", {
+                  status: 404,
+                  body: "talkback - tape not found"
+                });
+
+              case 8:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function onNoRecord(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return onNoRecord;
+    }()
+  }, {
+    key: "makeRealRequest",
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(req) {
+        var method, url, body, headers, host, fRes, buff;
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 method = req.method, url = req.url, body = req.body;
                 headers = _extends({}, req.headers);
@@ -365,17 +404,17 @@ var TalkbackServer = function () {
                   body = null;
                 }
 
-                _context.next = 8;
+                _context2.next = 8;
                 return fetch(host + url, { method: method, headers: headers, body: body, compress: false });
 
               case 8:
-                fRes = _context.sent;
-                _context.next = 11;
+                fRes = _context2.sent;
+                _context2.next = 11;
                 return fRes.buffer();
 
               case 11:
-                buff = _context.sent;
-                return _context.abrupt("return", {
+                buff = _context2.sent;
+                return _context2.abrupt("return", {
                   status: fRes.status,
                   headers: fRes.headers.raw(),
                   body: buff
@@ -383,14 +422,14 @@ var TalkbackServer = function () {
 
               case 13:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
-      function makeRealRequest(_x) {
-        return _ref.apply(this, arguments);
+      function makeRealRequest(_x2) {
+        return _ref2.apply(this, arguments);
       }
 
       return makeRealRequest;
@@ -403,13 +442,13 @@ var TalkbackServer = function () {
       var reqBody = [];
       req.on("data", function (chunk) {
         reqBody.push(chunk);
-      }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+      }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
         var tape, fRes;
-        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                _context2.prev = 0;
+                _context3.prev = 0;
 
                 reqBody = Buffer.concat(reqBody);
                 req.body = reqBody;
@@ -417,50 +456,54 @@ var TalkbackServer = function () {
                 fRes = _this.tapeStore.find(tape);
 
                 if (fRes) {
-                  _context2.next = 15;
+                  _context3.next = 17;
                   break;
                 }
 
                 if (!_this.options.record) {
-                  _context2.next = 14;
+                  _context3.next = 14;
                   break;
                 }
 
-                _context2.next = 9;
+                _context3.next = 9;
                 return _this.makeRealRequest(req);
 
               case 9:
-                fRes = _context2.sent;
+                fRes = _context3.sent;
 
                 tape.res = _extends({}, fRes);
                 _this.tapeStore.save(tape);
-                _context2.next = 15;
+                _context3.next = 17;
                 break;
 
               case 14:
-                fRes = _this.onNoRecord(req);
+                _context3.next = 16;
+                return _this.onNoRecord(req);
 
-              case 15:
+              case 16:
+                fRes = _context3.sent;
+
+              case 17:
 
                 res.writeHead(fRes.status, fRes.headers);
                 res.end(fRes.body);
-                _context2.next = 24;
+                _context3.next = 26;
                 break;
 
-              case 19:
-                _context2.prev = 19;
-                _context2.t0 = _context2["catch"](0);
+              case 21:
+                _context3.prev = 21;
+                _context3.t0 = _context3["catch"](0);
 
-                console.error("Error handling request", _context2.t0);
+                console.error("Error handling request", _context3.t0);
                 res.statusCode = 500;
                 res.end();
 
-              case 24:
+              case 26:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, _this, [[0, 19]]);
+        }, _callee3, _this, [[0, 21]]);
       })));
     }
   }, {
@@ -531,9 +574,11 @@ var Logger = function () {
 var defaultOptions = {
   ignoreHeaders: [],
   ignoreQueryParams: [],
+  ignoreBody: false,
   path: "./tapes/",
   port: 8080,
   record: true,
+  fallbackMode: "404",
   silent: false,
   summary: true,
   debug: false

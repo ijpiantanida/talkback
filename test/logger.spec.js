@@ -2,12 +2,12 @@ import Logger from "../src/logger";
 
 let log, debug;
 describe("Logger", () => {
-  before(() => {
+  beforeEach(() => {
     log = td.replace(console, 'log');
     debug = td.replace(console, 'debug');
   });
 
-  after(() => td.reset());
+  afterEach(() => td.reset());
 
   describe("#log", () => {
     it("does nothing if silent option is enabled", () => {

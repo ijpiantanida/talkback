@@ -1,5 +1,5 @@
 export default class Logger {
-  constructor(options = {}) {
+  constructor(options) {
     this.options = options;
     if(this.options.debug) {
       console.debug("DEBUG mode active")

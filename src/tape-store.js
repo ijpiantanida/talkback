@@ -4,6 +4,7 @@ const JSON5 = require("json5");
 const mkdirp = require("mkdirp");
 import MediaType from "./media-type";
 import Tape from "./tape";
+import TapeMatcher from "./tape-matcher"
 
 export default class TapeStore {
   constructor(options) {
@@ -38,7 +39,7 @@ export default class TapeStore {
   find(newTape) {
     const foundTape = this.tapes.find(t => {
       this.options.logger.debug(`Comparing against tape ${t.path}`)
-      return newTape.sameRequestAs(t);
+      return new TapeMatcher(newTape, this.options).sameAs(t);
     });
     if (foundTape) {
       foundTape.used = true;

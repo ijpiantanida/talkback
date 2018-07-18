@@ -533,7 +533,7 @@ var TalkbackServer = function () {
     value: function start(callback) {
       this.tapeStore.load();
       this.server = http.createServer(this.handleRequest.bind(this));
-      console.log("Starting talkbak on " + this.options.port);
+      console.log("Starting talkback on " + this.options.port);
       this.server.listen(this.options.port, callback);
 
       var closeSignalHandler = this.close.bind(this);

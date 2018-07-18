@@ -1,17 +1,21 @@
+// Tapes can have comments because they are JSON5
 {
     meta: {
         createdAt: "2017-09-13T23:36:27.952Z",
         host: "https://api.github.com",
-        resHumanReadable: true
+        resHumanReadable: true,
+        reqHumanReadable: true,
+        tag: "fake-post"
     },
     req: {
-        url: "/users/ijpiantanida",
-        method: "GET",
+        url: "/users",
+        method: "POST",
         headers: {
             "user-agent": "curl/7.54.0",
+            "content-type": "application/json",
             accept: "*/*"
         },
-        body: ""
+        body: "{\"username\": \"james\", \"ignore\": 3}"
     },
     res: {
         status: 200,

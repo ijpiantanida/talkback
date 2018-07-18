@@ -1,7 +1,5 @@
-// Tapes can have comments because they are JSON5
-// You can edit both req and res, but probably not meta unless you know what you're doing
 {
-    meta: { // You shouldn't touch this
+    meta: {
         createdAt: "2017-09-13T23:37:48.247Z",
         host: "https://api.github.com",
         resHumanReadable: true

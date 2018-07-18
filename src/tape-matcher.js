@@ -3,7 +3,7 @@ export default class TapeMatcher {
     this.tape = tape
     this.options = options
   }
-  
+
   sameAs(otherTape) {
     const otherReq = otherTape.req
     const req = this.tape.req
@@ -41,10 +41,18 @@ export default class TapeMatcher {
     if (!this.options.ignoreBody) {
       const sameBody = req.body.equals(otherReq.body)
       if (!sameBody) {
-        this.options.logger.debug(`Not same BODY ${req.body} vs ${otherReq.body}`)
-        return false
+        if (!this.options.bodyMatcher) {
+          this.options.logger.debug(`Not same BODY ${req.body} vs ${otherReq.body}`)
+          return false
+        }
+
+        const bodyMatches = this.options.bodyMatcher(this.tape, otherReq)
+        if(!bodyMatches) {
+          this.options.logger.debug(`Not same bodyMatcher ${req.body} vs ${otherReq.body}`)
+          return false
+        }
       }
     }
-    return true;
+    return true
   }
 }

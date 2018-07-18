@@ -1,29 +1,12 @@
-import Server from "./server";
-import Logger from "./logger";
-
-const defaultOptions = {
-  ignoreHeaders: [],
-  ignoreQueryParams: [],
-  ignoreBody: false,
-  path: "./tapes/",
-  port: 8080,
-  record: true,
-  fallbackMode: "404",
-  silent: false,
-  summary: true,
-  debug: false
-};
+import Server from "./server"
+import Logger from "./logger"
+import Options from "./options"
 
 const talkback = usrOpts => {
-  const opts = {
-    ...defaultOptions,
-    ...usrOpts
-  };
+  const opts = Options.prepare(usrOpts)
+  opts.logger = new Logger(opts)
 
-  const logger = new Logger(opts);
-  opts.logger = logger;
+  return new Server(opts)
+}
 
-  return new Server(opts);
-};
-
-export default talkback;
+export default talkback

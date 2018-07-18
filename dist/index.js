@@ -4,9 +4,9 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
+var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
 var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
 var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
-var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
 var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
 
@@ -110,50 +110,6 @@ var Tape = function () {
       }
       this.req.url = URL.format(url);
     }
-  }, {
-    key: "sameRequestAs",
-    value: function sameRequestAs(otherTape) {
-      var _this = this;
-
-      var otherReq = otherTape.req;
-      var sameURL = this.req.url === otherReq.url;
-      if (!sameURL) {
-        this.options.logger.debug("Not same URL " + this.req.url + " vs " + otherReq.url);
-        return false;
-      }
-      var sameMethod = this.req.method === otherReq.method;
-      if (!sameMethod) {
-        this.options.logger.debug("Not same METHOD " + this.req.method + " vs " + otherReq.method);
-        return false;
-      }
-
-      if (!this.options.ignoreBody) {
-        var sameBody = this.req.body.equals(otherReq.body);
-        if (!sameBody) {
-          this.options.logger.debug("Not same BODY " + this.req.body + " vs " + otherReq.body);
-          return false;
-        }
-      }
-      var currentHeadersLength = _Object$keys(this.req.headers).length;
-      var otherHeadersLength = _Object$keys(otherReq.headers).length;
-      var sameNumberOfHeaders = currentHeadersLength === otherHeadersLength;
-      if (!sameNumberOfHeaders) {
-        this.options.logger.debug("Not same #HEADERS " + _JSON$stringify(this.req.headers) + " vs " + _JSON$stringify(otherReq.headers));
-        return false;
-      }
-
-      var headersSame = true;
-      _Object$keys(this.req.headers).forEach(function (k) {
-        var entryHeader = _this.req.headers[k];
-        var header = otherReq.headers[k];
-
-        headersSame = headersSame && entryHeader === header;
-      });
-      if (!headersSame) {
-        this.options.logger.debug("Not same HEADERS values " + _JSON$stringify(this.req.headers) + " vs " + _JSON$stringify(otherReq.headers));
-      }
-      return headersSame;
-    }
   }], [{
     key: "fromStore",
     value: function fromStore(raw, options) {
@@ -220,6 +176,72 @@ var MediaType = function () {
   return MediaType;
 }();
 
+var TapeMatcher = function () {
+  function TapeMatcher(tape, options) {
+    _classCallCheck(this, TapeMatcher);
+
+    this.tape = tape;
+    this.options = options;
+  }
+
+  _createClass(TapeMatcher, [{
+    key: "sameAs",
+    value: function sameAs(otherTape) {
+      var otherReq = otherTape.req;
+      var req = this.tape.req;
+      var sameURL = req.url === otherReq.url;
+      if (!sameURL) {
+        this.options.logger.debug("Not same URL " + req.url + " vs " + otherReq.url);
+        return false;
+      }
+      var sameMethod = req.method === otherReq.method;
+      if (!sameMethod) {
+        this.options.logger.debug("Not same METHOD " + req.method + " vs " + otherReq.method);
+        return false;
+      }
+
+      var currentHeadersLength = _Object$keys(req.headers).length;
+      var otherHeadersLength = _Object$keys(otherReq.headers).length;
+      var sameNumberOfHeaders = currentHeadersLength === otherHeadersLength;
+      if (!sameNumberOfHeaders) {
+        this.options.logger.debug("Not same #HEADERS " + _JSON$stringify(req.headers) + " vs " + _JSON$stringify(otherReq.headers));
+        return false;
+      }
+
+      var headersSame = true;
+      _Object$keys(req.headers).forEach(function (k) {
+        var entryHeader = req.headers[k];
+        var header = otherReq.headers[k];
+
+        headersSame = headersSame && entryHeader === header;
+      });
+      if (!headersSame) {
+        this.options.logger.debug("Not same HEADERS values " + _JSON$stringify(req.headers) + " vs " + _JSON$stringify(otherReq.headers));
+        return false;
+      }
+
+      if (!this.options.ignoreBody) {
+        var sameBody = req.body.equals(otherReq.body);
+        if (!sameBody) {
+          if (!this.options.bodyMatcher) {
+            this.options.logger.debug("Not same BODY " + req.body + " vs " + otherReq.body);
+            return false;
+          }
+
+          var bodyMatches = this.options.bodyMatcher(this.tape, otherReq);
+          if (!bodyMatches) {
+            this.options.logger.debug("Not same bodyMatcher " + req.body + " vs " + otherReq.body);
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+  }]);
+
+  return TapeMatcher;
+}();
+
 var fs = require("fs");
 var path = require("path");
 var JSON5 = require("json5");
@@ -265,7 +287,7 @@ var TapeStore = function () {
 
       var foundTape = this.tapes.find(function (t) {
         _this.options.logger.debug("Comparing against tape " + t.path);
-        return newTape.sameRequestAs(t);
+        return new TapeMatcher(t, _this.options).sameAs(newTape);
       });
       if (foundTape) {
         foundTape.used = true;
@@ -541,9 +563,7 @@ var TalkbackServer = function () {
 }();
 
 var Logger = function () {
-  function Logger() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
+  function Logger(options) {
     _classCallCheck(this, Logger);
 
     this.options = options;
@@ -575,6 +595,7 @@ var defaultOptions = {
   ignoreHeaders: [],
   ignoreQueryParams: [],
   ignoreBody: false,
+  bodyMatcher: null,
   path: "./tapes/",
   port: 8080,
   record: true,
@@ -584,11 +605,30 @@ var defaultOptions = {
   debug: false
 };
 
-var talkback = function talkback(usrOpts) {
-  var opts = _extends({}, defaultOptions, usrOpts);
+var Options = function () {
+  function Options() {
+    _classCallCheck(this, Options);
+  }
 
-  var logger = new Logger(opts);
-  opts.logger = logger;
+  _createClass(Options, null, [{
+    key: "prepare",
+    value: function prepare(usrOpts) {
+      var opts = _extends({}, defaultOptions, usrOpts);
+
+      if (opts.bodyMatcher) {
+        opts.ignoreHeaders.push("content-length");
+      }
+
+      return opts;
+    }
+  }]);
+
+  return Options;
+}();
+
+var talkback = function talkback(usrOpts) {
+  var opts = Options.prepare(usrOpts);
+  opts.logger = new Logger(opts);
 
   return new TalkbackServer(opts);
 };

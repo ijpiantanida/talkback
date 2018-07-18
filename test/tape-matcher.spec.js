@@ -53,7 +53,7 @@ describe("TapeMatcher", () => {
       }
 
       const newTape = Tape.fromStore(raw, newOpts)
-      const tape2 = new Tape({...req, body: "XYZ"}, newOpts)
+      const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
       expect(new TapeMatcher(newTape, newOpts).sameAs(tape2)).to.be.true
     })
 
@@ -148,6 +148,26 @@ describe("TapeMatcher", () => {
         headers
       }, opts)
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
+    })
+
+    it("returns true when just the bodies are different but the bodyMatcher says they match", () => {
+      const newOpts = {
+        ...opts,
+        bodyMatcher: (_tape, _otherReq) => true
+      }
+
+      const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
+      expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.true
+    })
+
+    it("returns false when just the bodies are different and the bodyMatcher says they don't match", () => {
+      const newOpts = {
+        ...opts,
+        bodyMatcher: (_tape, otherReq) => false
+      }
+
+      const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
+      expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.false
     })
   })
 })

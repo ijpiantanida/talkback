@@ -152,12 +152,14 @@ describe("talkback", async () => {
   })
 
   describe("error handling", async () => {
-    afterEach(() => td.reset());
+    afterEach(() => td.reset())
 
     it("returns a 500 if anything goes wrong", async () => {
       talkback = await startTalkback({record: false})
       td.replace(talkback, "tapeStore", {
-        find: () => {throw "Test error"}
+        find: () => {
+          throw "Test error"
+        }
       })
 
       const res = await fetch("http://localhost:8899/test/1", {compress: false})
@@ -166,12 +168,12 @@ describe("talkback", async () => {
   })
 
   describe("summary printing", async () => {
-    let log;
+    let log
     beforeEach(() => {
-      log = td.replace(console, 'log');
-    });
+      log = td.replace(console, 'log')
+    })
 
-    afterEach(() => td.reset());
+    afterEach(() => td.reset())
 
     it("prints the summary when enabled", async () => {
       talkback = await startTalkback({summary: true})
@@ -186,5 +188,5 @@ describe("talkback", async () => {
 
       td.verify(log("===== SUMMARY ====="), {times: 0})
     })
-  });
+  })
 })

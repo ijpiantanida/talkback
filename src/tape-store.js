@@ -39,7 +39,7 @@ export default class TapeStore {
   find(newTape) {
     const foundTape = this.tapes.find(t => {
       this.options.logger.debug(`Comparing against tape ${t.path}`)
-      return new TapeMatcher(newTape, this.options).sameAs(t);
+      return new TapeMatcher(t, this.options).sameAs(newTape);
     });
     if (foundTape) {
       foundTape.used = true;

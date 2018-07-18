@@ -1,5 +1,3 @@
-// Tapes can have comments because they are JSON5
-// You can edit both req and res, but probably not meta unless you know what you're doing
 {
     meta: {
         createdAt: "2017-09-13T23:38:04.538Z",

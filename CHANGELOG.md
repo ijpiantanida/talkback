@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.0
+- Add `bodyMatcher` option to customize how the request body is matched against saved tapes.
+
 ## v1.4.0
 - Add `ignoreBody` option (thanks **[@meop](https://github.com/meop)**)
 - Add `fallbackMode` option to allow to proxy unknown requests if no tape exists. Defaults to 404 error. (thanks **[@meop](https://github.com/meop)**)

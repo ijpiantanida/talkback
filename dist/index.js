@@ -544,6 +544,20 @@ var TalkbackServer = function () {
       return this.server;
     }
   }, {
+    key: "hasTapeBeenUsed",
+    value: function hasTapeBeenUsed(tapeName) {
+      return this.tapeStore.tapes.some(function (t) {
+        return t.used && t.path === tapeName;
+      });
+    }
+  }, {
+    key: "resetTapeUsage",
+    value: function resetTapeUsage() {
+      this.tapeStore.tapes.forEach(function (t) {
+        return t.used = false;
+      });
+    }
+  }, {
     key: "close",
     value: function close() {
       if (this.closed) {

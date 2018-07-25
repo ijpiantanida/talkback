@@ -195,4 +195,24 @@ describe("talkback", async () => {
       td.verify(log("===== SUMMARY ====="), {times: 0})
     })
   })
+
+  describe("tape usage information", async () => {
+    it("should indicate that a tape has been used after usage", async () => {
+      talkbackServer = await startTalkback({record: false})
+
+      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
+
+      const res = await fetch("http://localhost:8899/test/3", {compress: false})
+      expect(res.status).to.eq(200)
+
+      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(true)
+
+      talkbackServer.resetTapeUsage()
+
+      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
+
+      const body = await res.json()
+      expect(body).to.eql({ok: true})
+    })
+  })
 })

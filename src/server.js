@@ -95,6 +95,14 @@ export default class TalkbackServer {
     return this.server
   }
 
+  hasTapeBeenUsed(tapeName) {
+    return this.tapeStore.hasTapeBeenUsed(tapeName);
+  }
+
+  resetTapeUsage() {
+    this.tapeStore.resetTapeUsage();
+  }
+
   close() {
     if (this.closed) {
       return

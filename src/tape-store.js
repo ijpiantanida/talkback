@@ -44,6 +44,9 @@ export default class TapeStore {
     if (foundTape) {
       foundTape.used = true;
       this.options.logger.log(`Serving cached request for ${newTape.req.url} from tape ${foundTape.path}`);
+      if (this.options.bodyUpdater) {
+        return this.options.bodyUpdater(foundTape, newTape).res
+      }
       return foundTape.res;
     }
   }

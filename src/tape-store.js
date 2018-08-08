@@ -78,6 +78,14 @@ export default class TapeStore {
     fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
   }
 
+  hasTapeBeenUsed(tapeName) {
+    return this.tapes.some(t => t.used && t.path === tapeName);
+  }
+
+  resetTapeUsage() {
+    return this.tapes.forEach(t => t.used = false);
+  }
+
   bodyFor(reqResHtml, tape, metaProp) {
     const mediaType = new MediaType(reqResHtml);
     if (mediaType.isHumanReadable()) {

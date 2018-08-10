@@ -5,44 +5,50 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var _classCallCheck = _interopDefault(require('babel-runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('babel-runtime/helpers/createClass'));
 var _extends = _interopDefault(require('babel-runtime/helpers/extends'));
-var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
-var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
 var _regeneratorRuntime = _interopDefault(require('babel-runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('babel-runtime/helpers/asyncToGenerator'));
+var _JSON$stringify = _interopDefault(require('babel-runtime/core-js/json/stringify'));
+var _Object$keys = _interopDefault(require('babel-runtime/core-js/object/keys'));
 
-var Sumary = function () {
-  function Sumary(tapes) {
-    _classCallCheck(this, Sumary);
+var contentTypeParser = require("content-type");
 
-    this.tapes = tapes;
+var humanReadableContentTypes = ["application/javascript", "application/json", "text/css", "text/html", "text/javascript", "text/plain"];
+
+var MediaType = function () {
+  function MediaType(htmlReqRes) {
+    _classCallCheck(this, MediaType);
+
+    this.htmlReqRes = htmlReqRes;
   }
 
-  _createClass(Sumary, [{
-    key: "print",
-    value: function print() {
-      console.log("===== SUMMARY =====");
-      var newTapes = this.tapes.filter(function (t) {
-        return t.new;
-      });
-      if (newTapes.length > 0) {
-        console.log("New tapes:");
-        newTapes.forEach(function (t) {
-          return console.log("- " + t.path);
-        });
+  _createClass(MediaType, [{
+    key: "isHumanReadable",
+    value: function isHumanReadable() {
+      var headers = this.htmlReqRes.headers;
+      var contentEncoding = this.getHeader(headers, "content-encoding");
+      var contentType = this.getHeader(headers, "content-type");
+      var notCompressed = !contentEncoding || contentEncoding === "identity";
+
+      if (!contentType) {
+        return false;
       }
-      var unusedTapes = this.tapes.filter(function (t) {
-        return !t.used;
-      });
-      if (unusedTapes.length > 0) {
-        console.log("Unused tapes:");
-        unusedTapes.forEach(function (t) {
-          return console.log("- " + t.path);
-        });
+      contentType = contentTypeParser.parse(contentType);
+
+      return notCompressed && humanReadableContentTypes.indexOf(contentType.type) >= 0;
+    }
+  }, {
+    key: "getHeader",
+    value: function getHeader(headers, headerName) {
+      var value = headers[headerName];
+      if (Array.isArray(value)) {
+        return value[0];
+      } else {
+        return value;
       }
     }
   }]);
 
-  return Sumary;
+  return MediaType;
 }();
 
 var URL = require("url");
@@ -110,6 +116,38 @@ var Tape = function () {
       }
       this.req.url = URL.format(url);
     }
+  }, {
+    key: "toRaw",
+    value: function toRaw() {
+      var reqBody = this.bodyFor(this.req, "reqHumanReadable");
+      var resBody = this.bodyFor(this.res, "resHumanReadable");
+      return {
+        meta: this.meta,
+        req: _extends({}, this.req, {
+          body: reqBody
+        }),
+        res: _extends({}, this.res, {
+          body: resBody
+        })
+      };
+    }
+  }, {
+    key: "bodyFor",
+    value: function bodyFor(reqResObj, metaProp) {
+      var mediaType = new MediaType(reqResObj);
+      if (mediaType.isHumanReadable()) {
+        this.meta[metaProp] = true;
+        return reqResObj.body.toString("utf8");
+      } else {
+        return reqResObj.body.toString("base64");
+      }
+    }
+  }, {
+    key: "clone",
+    value: function clone() {
+      var raw = this.toRaw();
+      return Tape.fromStore(raw, this.options);
+    }
   }], [{
     key: "fromStore",
     value: function fromStore(raw, options) {
@@ -135,45 +173,224 @@ var Tape = function () {
   return Tape;
 }();
 
-var contentTypeParser = require("content-type");
+var fetch = require("node-fetch");
 
-var humanReadableContentTypes = ["application/javascript", "application/json", "text/css", "text/html", "text/javascript", "text/plain"];
+var RequestHandler = function () {
+  function RequestHandler(tapeStore, options) {
+    _classCallCheck(this, RequestHandler);
 
-var MediaType = function () {
-  function MediaType(htmlReqRes) {
-    _classCallCheck(this, MediaType);
-
-    this.htmlReqRes = htmlReqRes;
+    this.tapeStore = tapeStore;
+    this.options = options;
   }
 
-  _createClass(MediaType, [{
-    key: "isHumanReadable",
-    value: function isHumanReadable() {
-      var headers = this.htmlReqRes.headers;
-      var contentEncoding = this.getHeader(headers, "content-encoding");
-      var contentType = this.getHeader(headers, "content-type");
-      var notCompressed = !contentEncoding || contentEncoding === "identity";
+  _createClass(RequestHandler, [{
+    key: "handle",
+    value: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(req) {
+        var reqTape, resTape, resObj;
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                reqTape = new Tape(req, this.options);
+                resTape = this.tapeStore.find(reqTape);
+                resObj = void 0;
 
-      if (!contentType) {
-        return false;
+                if (!resTape) {
+                  _context.next = 8;
+                  break;
+                }
+
+                if (this.options.responseDecorator) {
+                  resTape = this.options.responseDecorator(resTape.clone(), req);
+
+                  if (resTape.res.headers["content-length"]) {
+                    resTape.res.headers["content-length"] = resTape.res.body.length;
+                  }
+                }
+                resObj = resTape.res;
+                _context.next = 19;
+                break;
+
+              case 8:
+                if (!this.options.record) {
+                  _context.next = 16;
+                  break;
+                }
+
+                _context.next = 11;
+                return this.makeRealRequest(req);
+
+              case 11:
+                resObj = _context.sent;
+
+                reqTape.res = _extends({}, resObj);
+                this.tapeStore.save(reqTape);
+                _context.next = 19;
+                break;
+
+              case 16:
+                _context.next = 18;
+                return this.onNoRecord(req);
+
+              case 18:
+                resObj = _context.sent;
+
+              case 19:
+                return _context.abrupt("return", resObj);
+
+              case 20:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function handle(_x) {
+        return _ref.apply(this, arguments);
       }
-      contentType = contentTypeParser.parse(contentType);
 
-      return notCompressed && humanReadableContentTypes.indexOf(contentType.type) >= 0;
-    }
+      return handle;
+    }()
   }, {
-    key: "getHeader",
-    value: function getHeader(headers, headerName) {
-      var value = headers[headerName];
-      if (Array.isArray(value)) {
-        return value[0];
-      } else {
-        return value;
+    key: "onNoRecord",
+    value: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(req) {
+        var fallbackMode;
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                fallbackMode = this.options.fallbackMode;
+
+                this.options.logger.log("Tape for " + req.url + " not found and recording is disabled (fallbackMode: " + fallbackMode + ")");
+                this.options.logger.log({
+                  url: req.url,
+                  headers: req.headers
+                });
+
+                if (!(fallbackMode === "proxy")) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                _context2.next = 6;
+                return this.makeRealRequest(req);
+
+              case 6:
+                return _context2.abrupt("return", _context2.sent);
+
+              case 7:
+                return _context2.abrupt("return", {
+                  status: 404,
+                  body: "talkback - tape not found"
+                });
+
+              case 8:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function onNoRecord(_x2) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return onNoRecord;
+    }()
+  }, {
+    key: "makeRealRequest",
+    value: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3(req) {
+        var method, url, body, headers, host, fRes, buff;
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                method = req.method, url = req.url, body = req.body;
+                headers = _extends({}, req.headers);
+
+                delete headers.host;
+
+                host = this.options.host;
+
+                this.options.logger.log("Making real request to " + host + url);
+
+                if (method === "GET" || method === "HEAD") {
+                  body = null;
+                }
+
+                _context3.next = 8;
+                return fetch(host + url, { method: method, headers: headers, body: body, compress: false });
+
+              case 8:
+                fRes = _context3.sent;
+                _context3.next = 11;
+                return fRes.buffer();
+
+              case 11:
+                buff = _context3.sent;
+                return _context3.abrupt("return", {
+                  status: fRes.status,
+                  headers: fRes.headers.raw(),
+                  body: buff
+                });
+
+              case 13:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function makeRealRequest(_x3) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return makeRealRequest;
+    }()
+  }]);
+
+  return RequestHandler;
+}();
+
+var Sumary = function () {
+  function Sumary(tapes) {
+    _classCallCheck(this, Sumary);
+
+    this.tapes = tapes;
+  }
+
+  _createClass(Sumary, [{
+    key: "print",
+    value: function print() {
+      console.log("===== SUMMARY =====");
+      var newTapes = this.tapes.filter(function (t) {
+        return t.new;
+      });
+      if (newTapes.length > 0) {
+        console.log("New tapes:");
+        newTapes.forEach(function (t) {
+          return console.log("- " + t.path);
+        });
+      }
+      var unusedTapes = this.tapes.filter(function (t) {
+        return !t.used;
+      });
+      if (unusedTapes.length > 0) {
+        console.log("Unused tapes:");
+        unusedTapes.forEach(function (t) {
+          return console.log("- " + t.path);
+        });
       }
     }
   }]);
 
-  return MediaType;
+  return Sumary;
 }();
 
 var TapeMatcher = function () {
@@ -289,39 +506,21 @@ var TapeStore = function () {
         _this.options.logger.debug("Comparing against tape " + t.path);
         return new TapeMatcher(t, _this.options).sameAs(newTape);
       });
+
       if (foundTape) {
         foundTape.used = true;
         this.options.logger.log("Serving cached request for " + newTape.req.url + " from tape " + foundTape.path);
-        return foundTape.res;
+        return foundTape;
       }
     }
   }, {
     key: "save",
     value: function save(tape) {
-      var _tape$req = tape.req,
-          url = _tape$req.url,
-          method = _tape$req.method,
-          headers = _tape$req.headers;
-
-      var reqBody = this.bodyFor(tape.req, tape, "reqHumanReadable");
-      var resBody = this.bodyFor(tape.res, tape, "resHumanReadable");
-
       tape.new = true;
       tape.used = true;
       this.tapes.push(tape);
 
-      var toSave = {
-        meta: tape.meta,
-        req: {
-          url: url,
-          method: method,
-          headers: headers,
-          body: reqBody
-        },
-        res: _extends({}, tape.res, {
-          body: resBody
-        })
-      };
+      var toSave = tape.toRaw();
 
       var tapeName = "unnamed-" + this.tapes.length + ".json5";
       tape.path = tapeName;
@@ -330,15 +529,18 @@ var TapeStore = function () {
       fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
   }, {
-    key: "bodyFor",
-    value: function bodyFor(reqResHtml, tape, metaProp) {
-      var mediaType = new MediaType(reqResHtml);
-      if (mediaType.isHumanReadable()) {
-        tape.meta[metaProp] = true;
-        return reqResHtml.body.toString("utf8");
-      } else {
-        return reqResHtml.body.toString("base64");
-      }
+    key: "hasTapeBeenUsed",
+    value: function hasTapeBeenUsed(tapeName) {
+      return this.tapes.some(function (t) {
+        return t.used && t.path === tapeName;
+      });
+    }
+  }, {
+    key: "resetTapeUsage",
+    value: function resetTapeUsage() {
+      return this.tapes.forEach(function (t) {
+        return t.used = false;
+      });
     }
   }]);
 
@@ -346,7 +548,6 @@ var TapeStore = function () {
 }();
 
 var http = require("http");
-var fetch = require("node-fetch");
 
 var TalkbackServer = function () {
   function TalkbackServer(options) {
@@ -357,106 +558,6 @@ var TalkbackServer = function () {
   }
 
   _createClass(TalkbackServer, [{
-    key: "onNoRecord",
-    value: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(req) {
-        var fallbackMode;
-        return _regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                fallbackMode = this.options.fallbackMode;
-
-                this.options.logger.log("Tape for " + req.url + " not found and recording is disabled (fallbackMode: " + fallbackMode + ")");
-                this.options.logger.log({
-                  url: req.url,
-                  headers: req.headers
-                });
-
-                if (!(fallbackMode == "proxy")) {
-                  _context.next = 7;
-                  break;
-                }
-
-                _context.next = 6;
-                return this.makeRealRequest(req);
-
-              case 6:
-                return _context.abrupt("return", _context.sent);
-
-              case 7:
-                return _context.abrupt("return", {
-                  status: 404,
-                  body: "talkback - tape not found"
-                });
-
-              case 8:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function onNoRecord(_x) {
-        return _ref.apply(this, arguments);
-      }
-
-      return onNoRecord;
-    }()
-  }, {
-    key: "makeRealRequest",
-    value: function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(req) {
-        var method, url, body, headers, host, fRes, buff;
-        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                method = req.method, url = req.url, body = req.body;
-                headers = _extends({}, req.headers);
-
-                delete headers.host;
-
-                host = this.options.host;
-
-                this.options.logger.log("Making real request to " + host + url);
-
-                if (method === "GET" || method === "HEAD") {
-                  body = null;
-                }
-
-                _context2.next = 8;
-                return fetch(host + url, { method: method, headers: headers, body: body, compress: false });
-
-              case 8:
-                fRes = _context2.sent;
-                _context2.next = 11;
-                return fRes.buffer();
-
-              case 11:
-                buff = _context2.sent;
-                return _context2.abrupt("return", {
-                  status: fRes.status,
-                  headers: fRes.headers.raw(),
-                  body: buff
-                });
-
-              case 13:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function makeRealRequest(_x2) {
-        return _ref2.apply(this, arguments);
-      }
-
-      return makeRealRequest;
-    }()
-  }, {
     key: "handleRequest",
     value: function handleRequest(req, res) {
       var _this = this;
@@ -464,68 +565,43 @@ var TalkbackServer = function () {
       var reqBody = [];
       req.on("data", function (chunk) {
         reqBody.push(chunk);
-      }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
-        var tape, fRes;
-        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+      }).on("end", _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
+        var requestHandler, fRes;
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context.prev = _context.next) {
               case 0:
-                _context3.prev = 0;
+                _context.prev = 0;
 
                 reqBody = Buffer.concat(reqBody);
                 req.body = reqBody;
-                tape = new Tape(req, _this.options);
-                fRes = _this.tapeStore.find(tape);
+                requestHandler = new RequestHandler(_this.tapeStore, _this.options);
+                _context.next = 6;
+                return requestHandler.handle(req);
 
-                if (fRes) {
-                  _context3.next = 17;
-                  break;
-                }
+              case 6:
+                fRes = _context.sent;
 
-                if (!_this.options.record) {
-                  _context3.next = 14;
-                  break;
-                }
-
-                _context3.next = 9;
-                return _this.makeRealRequest(req);
-
-              case 9:
-                fRes = _context3.sent;
-
-                tape.res = _extends({}, fRes);
-                _this.tapeStore.save(tape);
-                _context3.next = 17;
-                break;
-
-              case 14:
-                _context3.next = 16;
-                return _this.onNoRecord(req);
-
-              case 16:
-                fRes = _context3.sent;
-
-              case 17:
 
                 res.writeHead(fRes.status, fRes.headers);
                 res.end(fRes.body);
-                _context3.next = 26;
+                _context.next = 16;
                 break;
 
-              case 21:
-                _context3.prev = 21;
-                _context3.t0 = _context3["catch"](0);
+              case 11:
+                _context.prev = 11;
+                _context.t0 = _context["catch"](0);
 
-                console.error("Error handling request", _context3.t0);
+                console.error("Error handling request", _context.t0);
                 res.statusCode = 500;
                 res.end();
 
-              case 26:
+              case 16:
               case "end":
-                return _context3.stop();
+                return _context.stop();
             }
           }
-        }, _callee3, _this, [[0, 21]]);
+        }, _callee, _this, [[0, 11]]);
       })));
     }
   }, {
@@ -546,25 +622,21 @@ var TalkbackServer = function () {
   }, {
     key: "hasTapeBeenUsed",
     value: function hasTapeBeenUsed(tapeName) {
-      return this.tapeStore.tapes.some(function (t) {
-        return t.used && t.path === tapeName;
-      });
+      return this.tapeStore.hasTapeBeenUsed(tapeName);
     }
   }, {
     key: "resetTapeUsage",
     value: function resetTapeUsage() {
-      this.tapeStore.tapes.forEach(function (t) {
-        return t.used = false;
-      });
+      this.tapeStore.resetTapeUsage();
     }
   }, {
     key: "close",
-    value: function close() {
+    value: function close(callback) {
       if (this.closed) {
         return;
       }
       this.closed = true;
-      this.server.close();
+      this.server.close(callback);
 
       if (this.options.summary) {
         var summary = new Sumary(this.tapeStore.tapes);
@@ -610,6 +682,7 @@ var defaultOptions = {
   ignoreQueryParams: [],
   ignoreBody: false,
   bodyMatcher: null,
+  responseDecorator: null,
   path: "./tapes/",
   port: 8080,
   record: true,
@@ -633,6 +706,8 @@ var Options = function () {
         opts.ignoreHeaders.push("content-length");
       }
 
+      opts.logger = new Logger(opts);
+
       return opts;
     }
   }]);
@@ -642,7 +717,6 @@ var Options = function () {
 
 var talkback = function talkback(usrOpts) {
   var opts = Options.prepare(usrOpts);
-  opts.logger = new Logger(opts);
 
   return new TalkbackServer(opts);
 };

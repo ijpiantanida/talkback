@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.0
+- Add `responseDecorator` option to add dynamism to saved tapes responses.
+- Add `hasTapeBeenUsed` and `resetTapeUsage` methods to the server interface. (thanks **[@sjaakieb](https://github.com/sjaakieb)**)
+
 ## v1.5.0
 - Add `bodyMatcher` option to customize how the request body is matched against saved tapes.
 

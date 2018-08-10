@@ -1,5 +1,6 @@
 import Tape from "../src/tape"
 import Logger from "../src/logger"
+import Options from "../src/options"
 
 const raw = {
   meta: {
@@ -17,19 +18,19 @@ const raw = {
     body: "ABC"
   },
   res: {
+    status: 200,
     headers: {
       "accept": ["application/json"],
       "x-ignored": ["2"]
     },
-    body: "SGVsbG8="
+    body: Buffer.from("Hello").toString("base64")
   }
 }
 
-const opts = {
+const opts = Options.prepare({
   ignoreHeaders: ["x-ignored"],
   ignoreQueryParams: ["ignored1", "ignored2"],
-  logger: new Logger({debug: true})
-}
+})
 
 const tape = Tape.fromStore(raw, opts)
 

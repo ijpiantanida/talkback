@@ -50,7 +50,8 @@ Options:
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps. | `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes. | `false` |
-| **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info.](#custom-request-body-matcher) | `null` |  
+| **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info.](#custom-request-body-matcher) | `null` |
+| **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info.](#custom-response-decorator) | `null` |  
 | **record** | `Boolean` | Whether talkback should proxy and record unknown requests. | `true` |
 | **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
 | **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
@@ -115,9 +116,37 @@ function bodyMatcher(tape, req) {
 }
 ```
 
-In this case we are adding our own `tag` property to the saved tape `meta` property. This way, we are only using the custom matching logic on some specific requests, and can even have different logic for different categories of requests.   
+In this case we are adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom matching logic on some specific requests, and can even have different logic for different categories of requests.   
 Note that both the tape's and the request's bodies are `Buffer` objects.
   
+## Custom response decorator
+If you want to add a little bit of dynamism to the response coming from a matching existing tape, you can do so by using the `responseDecorator` option.      
+This can be useful for example if your response needs to contain an ID that gets sent on the request, or if your response has a time dependent field.     
+
+The function will receive a copy of the matching tape and the in-flight request object, and it has to return the modified tape. Note that since you're receiving a copy of the matching tape, modifications that you do to it won't persist between different requests.   
+Talkback will also update the `Content-Length` header if it was present in the original response.   
+
+### Example:
+We're going to hit an `/auth` endpoint, and update just the `expiration` field of the JSON response that was saved in the tape to be a day from now.      
+
+```javascript
+function responseDecorator(tape, req) {
+  if (tape.meta.tag === "auth") {
+    const tapeBody = JSON.parse(tape.res.body.toString())
+    const expiration = new Date()
+    expiration.setDate(expiration.getDate() + 1)
+    const expirationEpoch = Math.floor(expiration.getTime() / 1000)
+    tapeBody.expiration = expirationEpoch
+
+    const newBody = JSON.stringify(tapeBody)
+    tape.res.body = Buffer.from(newBody)
+  }
+  return tape
+}
+```
+
+In this example we are also adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom logic on some specific requests, and can even have different logic for different categories of requests.   
+Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
 
 ## Exit summary
 If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   

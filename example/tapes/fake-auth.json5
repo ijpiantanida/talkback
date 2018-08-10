@@ -1,0 +1,92 @@
+// Tapes can have comments because they are JSON5
+{
+    meta: {
+        createdAt: "2017-09-13T23:36:27.952Z",
+        host: "https://api.github.com",
+        resHumanReadable: true,
+        reqHumanReadable: true,
+        tag: "auth"
+    },
+    req: {
+        url: "/auth",
+        method: "POST",
+        headers: {
+            "user-agent": "curl/7.54.0",
+            "content-type": "application/json",
+            accept: "*/*"
+        },
+        body: "{\"username\": \"james\", \"password\": \"moriarty\"}"
+    },
+    res: {
+        status: 200,
+        headers: {
+            server: [
+                "GitHub.com"
+            ],
+            date: [
+                "Wed, 13 Sep 2017 23:36:28 GMT"
+            ],
+            "content-type": [
+                "application/json; charset=utf-8"
+            ],
+            connection: [
+                "close"
+            ],
+            status: [
+                "200 OK"
+            ],
+            "x-ratelimit-limit": [
+                "60"
+            ],
+            "x-ratelimit-remaining": [
+                "59"
+            ],
+            "x-ratelimit-reset": [
+                "1505349388"
+            ],
+            "cache-control": [
+                "public, max-age=60, s-maxage=60"
+            ],
+            vary: [
+                "Accept"
+            ],
+            etag: [
+                "\"052de87e9283eccfa78a9f70e5cf4830\""
+            ],
+            "last-modified": [
+                "Fri, 25 Aug 2017 04:10:24 GMT"
+            ],
+            "x-github-media-type": [
+                "github.v3; format=json"
+            ],
+            "access-control-expose-headers": [
+                "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+            ],
+            "access-control-allow-origin": [
+                "*"
+            ],
+            "content-security-policy": [
+                "default-src 'none'"
+            ],
+            "strict-transport-security": [
+                "max-age=31536000; includeSubdomains; preload"
+            ],
+            "x-content-type-options": [
+                "nosniff"
+            ],
+            "x-frame-options": [
+                "deny"
+            ],
+            "x-xss-protection": [
+                "1; mode=block"
+            ],
+            "x-runtime-rack": [
+                "0.033883"
+            ],
+            "x-github-request-id": [
+                "CE64:309E:255CC6F:4E0823D:59B9C0FC"
+            ]
+        },
+        body: "{\"token\": \"abcdefg\", \"expiration\": 1533942696}"
+    }
+}

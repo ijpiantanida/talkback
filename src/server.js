@@ -1,53 +1,13 @@
 const http = require("http")
-const fetch = require("node-fetch")
 
+import RequestHandler from "./request-handler"
 import Summary from "./summary"
-import Tape from "./tape"
 import TapeStore from "./tape-store"
 
 export default class TalkbackServer {
   constructor(options) {
     this.options = options
     this.tapeStore = new TapeStore(this.options)
-  }
-
-  async onNoRecord(req) {
-    const fallbackMode = this.options.fallbackMode;
-    this.options.logger.log(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
-    this.options.logger.log({
-      url: req.url,
-      headers: req.headers
-    })
-
-    if (fallbackMode == "proxy") {
-      return await this.makeRealRequest(req)
-    }
-
-    return {
-      status: 404,
-      body: "talkback - tape not found"
-    }
-  }
-
-  async makeRealRequest(req) {
-    let {method, url, body} = req
-    const headers = {...req.headers}
-    delete headers.host
-
-    const host = this.options.host
-    this.options.logger.log(`Making real request to ${host}${url}`)
-
-    if (method === "GET" || method === "HEAD") {
-      body = null
-    }
-
-    const fRes = await fetch(host + url, {method, headers, body, compress: false})
-    const buff = await fRes.buffer()
-    return {
-      status: fRes.status,
-      headers: fRes.headers.raw(),
-      body: buff
-    }
   }
 
   handleRequest(req, res) {
@@ -58,18 +18,8 @@ export default class TalkbackServer {
       try {
         reqBody = Buffer.concat(reqBody)
         req.body = reqBody
-        const tape = new Tape(req, this.options)
-        let fRes = this.tapeStore.find(tape)
-
-        if (!fRes) {
-          if (this.options.record) {
-            fRes = await this.makeRealRequest(req)
-            tape.res = {...fRes}
-            this.tapeStore.save(tape)
-          } else {
-            fRes = await this.onNoRecord(req)
-          }
-        }
+        const requestHandler = new RequestHandler(this.tapeStore, this.options)
+        const fRes = await requestHandler.handle(req)
 
         res.writeHead(fRes.status, fRes.headers)
         res.end(fRes.body)
@@ -103,12 +53,12 @@ export default class TalkbackServer {
     this.tapeStore.resetTapeUsage();
   }
 
-  close() {
+  close(callback) {
     if (this.closed) {
       return
     }
     this.closed = true
-    this.server.close()
+    this.server.close(callback)
 
     if (this.options.summary) {
       const summary = new Summary(this.tapeStore.tapes)

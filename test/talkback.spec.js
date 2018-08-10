@@ -23,6 +23,15 @@ const startTalkback = async (opts) => {
       host: proxiedHost,
       record: true,
       silent: true,
+      bodyMatcher: (tape, req) => {
+        return tape.meta.tag === "echo"
+      },
+      responseDecorator: (tape, req) => {
+        if (tape.meta.tag === "echo") {
+          tape.res.body = req.body
+        }
+        return tape
+      },
       ...opts
     }
   )
@@ -68,7 +77,7 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -85,7 +94,7 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
       expect(tape.meta.reqHumanReadable).to.eq(undefined)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -104,7 +113,7 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -117,7 +126,7 @@ describe("talkback", async () => {
       const res = await fetch("http://localhost:8899/test/3")
       expect(res.status).to.eq(500)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-2.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
       expect(tape.req.url).to.eql("/test/3")
       expect(tape.res.status).to.eql(500)
     })
@@ -130,6 +139,24 @@ describe("talkback", async () => {
 
       const body = await res.json()
       expect(body).to.eql({ok: true})
+    })
+
+    it("decorates the response of an existing tape", async () => {
+      talkbackServer = await startTalkback({record: false})
+
+      const headers = {"content-type": "application/json"}
+      const body = JSON.stringify({text: "my-test"})
+
+      const res = await fetch("http://localhost:8899/test/echo", {
+        compress: false,
+        method: "POST",
+        headers,
+        body
+      })
+      expect(res.status).to.eq(200)
+
+      const resBody = await res.json()
+      expect(resBody).to.eql({text: "my-test"})
     })
   })
 
@@ -153,7 +180,7 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      expect(fs.existsSync(tapesPath + "/unnamed-2.json5")).to.eq(false)
+      expect(fs.existsSync(tapesPath + "/unnamed-3.json5")).to.eq(false)
     })
   })
 

@@ -1,8 +1,11 @@
+import Logger from "./logger"
+
 const defaultOptions = {
   ignoreHeaders: [],
   ignoreQueryParams: [],
   ignoreBody: false,
   bodyMatcher: null,
+  responseDecorator: null,
   path: "./tapes/",
   port: 8080,
   record: true,
@@ -22,6 +25,8 @@ export default class Options {
     if (opts.bodyMatcher) {
       opts.ignoreHeaders.push("content-length")
     }
+
+    opts.logger = new Logger(opts)
 
     return opts;
   }

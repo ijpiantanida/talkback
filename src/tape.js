@@ -1,3 +1,5 @@
+import MediaType from "./media-type"
+
 const URL = require("url")
 const querystring = require("querystring")
 const bufferShim = require("buffer-shims")
@@ -73,5 +75,36 @@ export default class Tape {
       url.search = null
     }
     this.req.url = URL.format(url)
+  }
+
+  toRaw() {
+    const reqBody = this.bodyFor(this.req, "reqHumanReadable");
+    const resBody = this.bodyFor(this.res, "resHumanReadable");
+    return {
+      meta: this.meta,
+      req: {
+        ...this.req,
+        body: reqBody
+      },
+      res: {
+        ...this.res,
+        body: resBody
+      }
+    };
+  }
+
+  bodyFor(reqResObj, metaProp) {
+    const mediaType = new MediaType(reqResObj);
+    if (mediaType.isHumanReadable()) {
+      this.meta[metaProp] = true;
+      return reqResObj.body.toString("utf8");
+    } else {
+      return reqResObj.body.toString("base64");
+    }
+  }
+
+  clone() {
+    const raw = this.toRaw()
+    return Tape.fromStore(raw, this.options)
   }
 }

@@ -1,6 +1,7 @@
 import TapeMatcher from "../src/tape-matcher"
 import Tape from "../src/tape"
 import Logger from "../src/logger"
+import Options from "../src/options"
 
 const raw = {
   meta: {
@@ -26,11 +27,10 @@ const raw = {
   }
 }
 
-const opts = {
+const opts = Options.prepare({
   ignoreHeaders: ["x-ignored"],
-  ignoreQueryParams: ["ignored1", "ignored2"],
-  logger: new Logger({debug: true})
-}
+  ignoreQueryParams: ["ignored1", "ignored2"]
+})
 
 const tape = Tape.fromStore(raw, opts)
 

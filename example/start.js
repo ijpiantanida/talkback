@@ -12,6 +12,13 @@ function bodyMatcher(tape, req) {
   return false
 }
 
+function urlMatcher(tape, req) {
+  if (tape.meta.tag === "orgs-wildcard") {
+    return !!req.url.match(/\/orgs\/[a-zA-Z0-9]/)
+  }
+  return false
+}
+
 function responseDecorator(tape, req) {
   if (tape.meta.tag === "auth") {
     var tapeBody = JSON.parse(tape.res.body.toString())
@@ -29,10 +36,11 @@ function responseDecorator(tape, req) {
 var server = talkback({
   host: host,
   path: __dirname + "/tapes",
-  record: true,
+  record: false,
   debug: false,
   ignoreQueryParams: ["t"],
   bodyMatcher: bodyMatcher,
+  urlMatcher: urlMatcher,
   responseDecorator: responseDecorator,
   https: {
     enabled: false,

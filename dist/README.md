@@ -53,6 +53,7 @@ Returns an unstarted talkback server instance.
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
+| **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
 | **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info](#custom-response-decorator) | `null` |  
 | **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
 | **silent** | `Boolean` | Enable requests information console messages in the middle of requests | `false` |
@@ -104,7 +105,7 @@ By default, in order for a request to match against a saved tape, both request a
 There might be cases were this rule is too strict (for example, if your body contains time dependent bits) but enabling `ignoreBody` is too lax.
 
 Talkback lets you pass a custom matching function as the `bodyMatcher` option.   
-The function will receive a saved tape and the current request, and it has to return whether they should be considered a match or not.   
+The function will receive a saved tape and the current request, and it has to return whether they should be considered a match on their body.   
 Body matching is the last step when matching a tape. In order for this function to be called, everything else about the request should match the tape too (url, method, headers).   
 The `bodyMatcher` is not called if tape and request bodies are already the same. 
    
@@ -126,6 +127,21 @@ function bodyMatcher(tape, req) {
 
 In this case we are adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom matching logic on some specific requests, and can even have different logic for different categories of requests.   
 Note that both the tape's and the request's bodies are `Buffer` objects.
+
+## Custom request URL matcher
+Similar to the [`bodyMatcher`](#custom-request-body-matcher), there's the `urlMatcher` option, which will let you customize how a request and a tape are matched on their URL.
+
+### Example:
+
+```javascript
+function urlMatcher(tape, req) {
+    if (tape.meta.tag === "user-info") {
+      // Match if URL is of type /users/{username}
+      return !!req.url.match(/\/users\/[a-zA-Z-0-9]+/);
+    }
+    return false;
+}
+```
   
 ## Custom response decorator
 If you want to add a little bit of dynamism to the response coming from a matching existing tape, you can do so by using the `responseDecorator` option.      

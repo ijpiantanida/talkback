@@ -5,6 +5,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var _regeneratorRuntime = _interopDefault(require('@babel/runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('@babel/runtime/helpers/asyncToGenerator'));
 var _objectSpread = _interopDefault(require('@babel/runtime/helpers/objectSpread'));
+var _defineProperty = _interopDefault(require('@babel/runtime/helpers/defineProperty'));
 var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('@babel/runtime/helpers/createClass'));
 
@@ -431,8 +432,17 @@ function () {
       var sameURL = req.url === otherReq.url;
 
       if (!sameURL) {
-        this.options.logger.debug("Not same URL ".concat(req.url, " vs ").concat(otherReq.url));
-        return false;
+        if (!this.options.urlMatcher) {
+          this.options.logger.debug("Not same URL ".concat(req.url, " vs ").concat(otherReq.url));
+          return false;
+        }
+
+        var urlMatches = this.options.urlMatcher(this.tape, otherReq);
+
+        if (!urlMatches) {
+          this.options.logger.debug("Not same urlMatcher ".concat(req.url, " vs ").concat(otherReq.url));
+          return false;
+        }
       }
 
       var sameMethod = req.method === otherReq.method;
@@ -732,25 +742,30 @@ function () {
   return Logger;
 }();
 
-var defaultOptions = {
-  ignoreHeaders: [],
-  ignoreQueryParams: [],
-  ignoreBody: false,
-  bodyMatcher: null,
-  responseDecorator: null,
-  path: "./tapes/",
+var defaultOptions = _defineProperty({
   port: 8080,
+  path: "./tapes/",
   record: true,
-  fallbackMode: "404",
-  silent: false,
-  summary: true,
-  debug: false,
   https: {
     enabled: false,
     keyPath: null,
     certPath: null
-  }
-};
+  },
+  ignoreHeaders: [],
+  ignoreQueryParams: [],
+  ignoreBody: false,
+  bodyMatcher: null,
+  urlMatcher: null,
+  responseDecorator: null,
+  fallbackMode: "404",
+  silent: false,
+  summary: true,
+  debug: false
+}, "https", {
+  enabled: false,
+  keyPath: null,
+  certPath: null
+});
 
 var Options =
 /*#__PURE__*/

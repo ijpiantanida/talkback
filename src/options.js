@@ -1,14 +1,20 @@
 import Logger from "./logger"
 
 const defaultOptions = {
+  port: 8080,
+  path: "./tapes/",
+  record: true,
+  https: {
+    enabled: false,
+    keyPath: null,
+    certPath: null
+  },
   ignoreHeaders: [],
   ignoreQueryParams: [],
   ignoreBody: false,
   bodyMatcher: null,
+  urlMatcher: null,
   responseDecorator: null,
-  path: "./tapes/",
-  port: 8080,
-  record: true,
   fallbackMode: "404",
   silent: false,
   summary: true,

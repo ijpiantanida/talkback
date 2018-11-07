@@ -2,6 +2,7 @@
 
 ## v1.7.0
 - Add `https` server option.
+- Add `urlMatcher` option to customize how the request URL is matched against saved tapes.
 
 ## v1.6.0
 - Add `responseDecorator` option to add dynamism to saved tapes responses.

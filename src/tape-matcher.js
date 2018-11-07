@@ -9,9 +9,18 @@ export default class TapeMatcher {
     const req = this.tape.req
     const sameURL = req.url === otherReq.url
     if (!sameURL) {
-      this.options.logger.debug(`Not same URL ${req.url} vs ${otherReq.url}`)
-      return false
+      if (!this.options.urlMatcher) {
+        this.options.logger.debug(`Not same URL ${req.url} vs ${otherReq.url}`)
+        return false
+      }
+
+      const urlMatches = this.options.urlMatcher(this.tape, otherReq)
+      if(!urlMatches) {
+        this.options.logger.debug(`Not same urlMatcher ${req.url} vs ${otherReq.url}`)
+        return false
+      }
     }
+    
     const sameMethod = req.method === otherReq.method
     if (!sameMethod) {
       this.options.logger.debug(`Not same METHOD ${req.method} vs ${otherReq.method}`)

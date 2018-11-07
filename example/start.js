@@ -29,7 +29,7 @@ function responseDecorator(tape, req) {
 var server = talkback({
   host: host,
   path: __dirname + "/tapes",
-  record: false,
+  record: true,
   debug: false,
   ignoreQueryParams: ["t"],
   bodyMatcher: bodyMatcher,

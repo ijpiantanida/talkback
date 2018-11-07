@@ -5,32 +5,33 @@
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
-    "babel-runtime": "^6.26.0",
+    "@babel/runtime": "^7.0.0",
     "buffer-shims": "^1.0.0",
     "content-type": "^1.0.4",
-    "json5": "^1.0.1",
+    "json5": "^2.1.0",
     "mkdirp": "^0.5.1",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.2.1"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-istanbul": "^4.1.5",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
+    "@babel/core": "^7.1.5",
+    "@babel/register": "^7.0.0",
+    "@babel/plugin-external-helpers": "^7.0.0",
+    "babel-plugin-istanbul": "^5.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
     "chai": "^4.1.2",
     "cross-env": "^5.2.0",
     "del": "^3.0.0",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
-    "rollup": "^0.63.0",
-    "rollup-plugin-babel": "^3.0.4",
+    "nyc": "^13.1.0",
+    "rollup": "^0.67.0",
+    "rollup-plugin-babel": "^4.0.3",
     "testdouble": "^3.3.0"
   },
   "nyc": {
     "require": [
-      "babel-register"
+      "@babel/register"
     ],
     "sourceMap": false,
     "instrument": false
@@ -48,6 +49,7 @@
   "author": "Ignacio Piantanida",
   "scripts": {
     "build": "node tools/build.js",
+    "ci": "yarn test && yarn build && USE_DIST=1 yarn test",
     "start": "node ./example/start.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js test"
   }

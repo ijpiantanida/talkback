@@ -16,7 +16,7 @@ promise = promise.then(() => rollup.rollup({
     exclude: "node_modules/**",
     runtimeHelpers: true,
     presets: [
-      ["env", {
+      ["@babel/env", {
         targets: {
           node: "0.12"
         },
@@ -24,9 +24,9 @@ promise = promise.then(() => rollup.rollup({
       }]
     ],
     plugins: [
-      "external-helpers",
-      "transform-object-rest-spread",
-      "transform-runtime"
+      "@babel/external-helpers",
+      "@babel/plugin-proposal-object-rest-spread",
+      "@babel/plugin-transform-runtime"
     ]
   })],
 }).then(bundle => bundle.write({

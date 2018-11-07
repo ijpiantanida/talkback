@@ -2,4 +2,4 @@ language: node_js
 node_js:
   - "8"
 cache: yarn
-script: yarn test && yarn build && USE_DIST=1 yarn test
+script: yarn ci

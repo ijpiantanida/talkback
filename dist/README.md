@@ -40,23 +40,31 @@ server.close();
 ### talkback(opts)
 Returns an unstarted talkback server instance.   
 
-Options:
+**Options:**
 
-| Name | Type | Description | Default|   
-|------|------|-------------|--------|
+| Name | Type | Description | Default |   
+|------|------|-------------|---------|
 | **host** | `String` | Where to proxy unknown requests| |
 | **port** | `String` | Talkback port | 8080 |
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
-| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids. | `[]` |
-| **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps. | `[]` |
-| **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes. | `false` |
-| **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info.](#custom-request-body-matcher) | `null` |
-| **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info.](#custom-response-decorator) | `null` |  
-| **record** | `Boolean` | Whether talkback should proxy and record unknown requests. | `true` |
+| **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
+| **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `[]` |
+| **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
+| **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
+| **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
+| **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info](#custom-response-decorator) | `null` |  
 | **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
-| **silent** | `Boolean` | Whether to print information console messages in the middle of requests | `false` |
-| **summary** | `Boolean` | Whether to print a summary of new and unused tapes at exit | `true` |
-| **debug** | `Boolean` | Whether to print verbose debug information | `false` |
+| **silent** | `Boolean` | Enable requests information console messages in the middle of requests | `false` |
+| **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
+| **debug** | `Boolean` | Enable verbose debug information | `false` |
+
+### HTTPS options
+| Name | Type | Description | Default |
+|------|------|-------------|---------|
+| enabled | `Boolean` | Enables HTTPS server | `false` |
+| keyPath | `String` | Path to the key file | `null` | 
+| certPath | `String` | Path to the cert file | `null` | 
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.

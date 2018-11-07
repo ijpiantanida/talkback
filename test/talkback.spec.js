@@ -57,11 +57,17 @@ describe("talkback", async () => {
   })
 
   after(() => {
-    proxiedServer.close()
+    if(proxiedServer) {
+      proxiedServer.close()
+      proxiedServer = null
+    }
   })
 
   afterEach(() => {
-    talkbackServer.close()
+    if(talkbackServer) {
+      talkbackServer.close()
+      talkbackServer = null
+    }
   })
 
   describe("## recording enabled", async () => {
@@ -240,6 +246,29 @@ describe("talkback", async () => {
 
       const body = await res.json()
       expect(body).to.eql({ok: true})
+    })
+  })
+
+  describe("https", async () => {
+    it("should be able to run a https server", async () => {
+      const options = {
+        record: false,
+        https: {
+          enabled: true,
+          keyPath: "./example/httpsCert/localhost.key",
+          certPath: "./example/httpsCert/localhost.crt"
+        }
+      }
+      talkbackServer = await startTalkback(options)
+
+      // Disable self-signed certificate check
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+      const reqBody = JSON.stringify({foo: "bar"})
+      const headers = {"content-type": "application/json"}
+      const res = await fetch("https://localhost:8899/test/3", {compress: false})
+
+      expect(res.status).to.eq(200)
     })
   })
 })

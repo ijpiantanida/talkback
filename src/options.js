@@ -13,6 +13,11 @@ const defaultOptions = {
   silent: false,
   summary: true,
   debug: false,
+  https: {
+    enabled: false,
+    keyPath: null,
+    certPath: null
+  }
 }
 
 export default class Options {

@@ -1,4 +1,6 @@
 const http = require("http")
+const https = require("https")
+const fs = require("fs");
 
 import RequestHandler from "./request-handler"
 import Summary from "./summary"
@@ -33,7 +35,17 @@ export default class TalkbackServer {
 
   start(callback) {
     this.tapeStore.load()
-    this.server = http.createServer(this.handleRequest.bind(this))
+    const app = this.handleRequest.bind(this);
+
+    const serverFactory = this.options.https.enabled ? () => {
+      const httpsOpts = {
+        key: fs.readFileSync(this.options.https.keyPath),
+        cert: fs.readFileSync(this.options.https.certPath)
+      };
+      return https.createServer(httpsOpts, app);
+    }  : () => http.createServer(app);
+    
+    this.server = serverFactory();
     console.log(`Starting talkback on ${this.options.port}`)
     this.server.listen(this.options.port, callback)
 

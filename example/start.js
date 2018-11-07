@@ -33,7 +33,12 @@ var server = talkback({
   debug: false,
   ignoreQueryParams: ["t"],
   bodyMatcher: bodyMatcher,
-  responseDecorator: responseDecorator
+  responseDecorator: responseDecorator,
+  https: {
+    enabled: false,
+    keyPath: __dirname + "/httpsCert/localhost.key",
+    certPath: __dirname + "/httpsCert/localhost.crt"
+  }
 })
 
 server.start()

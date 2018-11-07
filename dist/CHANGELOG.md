@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.7.0
+- Add `https` server option.
+
 ## v1.6.0
 - Add `responseDecorator` option to add dynamism to saved tapes responses.
 - Add `hasTapeBeenUsed` and `resetTapeUsage` methods to the server interface. (thanks **[@sjaakieb](https://github.com/sjaakieb)**)

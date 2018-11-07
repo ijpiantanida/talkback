@@ -584,6 +584,10 @@ function () {
 
 var http = require("http");
 
+var https = require("https");
+
+var fs$1 = require("fs");
+
 var TalkbackServer =
 /*#__PURE__*/
 function () {
@@ -644,8 +648,20 @@ function () {
   }, {
     key: "start",
     value: function start(callback) {
+      var _this2 = this;
+
       this.tapeStore.load();
-      this.server = http.createServer(this.handleRequest.bind(this));
+      var app = this.handleRequest.bind(this);
+      var serverFactory = this.options.https.enabled ? function () {
+        var httpsOpts = {
+          key: fs$1.readFileSync(_this2.options.https.keyPath),
+          cert: fs$1.readFileSync(_this2.options.https.certPath)
+        };
+        return https.createServer(httpsOpts, app);
+      } : function () {
+        return http.createServer(app);
+      };
+      this.server = serverFactory();
       console.log("Starting talkback on ".concat(this.options.port));
       this.server.listen(this.options.port, callback);
       var closeSignalHandler = this.close.bind(this);
@@ -728,7 +744,12 @@ var defaultOptions = {
   fallbackMode: "404",
   silent: false,
   summary: true,
-  debug: false
+  debug: false,
+  https: {
+    enabled: false,
+    keyPath: null,
+    certPath: null
+  }
 };
 
 var Options =

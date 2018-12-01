@@ -63,9 +63,9 @@ Returns an unstarted talkback server instance.
 ### HTTPS options
 | Name | Type | Description | Default |
 |------|------|-------------|---------|
-| enabled | `Boolean` | Enables HTTPS server | `false` |
-| keyPath | `String` | Path to the key file | `null` | 
-| certPath | `String` | Path to the cert file | `null` | 
+| *enabled* | `Boolean` | Enables HTTPS server | `false` |
+| *keyPath* | `String` | Path to the key file | `null` | 
+| *certPath* | `String` | Path to the cert file | `null` | 
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.

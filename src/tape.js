@@ -1,8 +1,7 @@
-import MediaType from "./media-type"
+import TapeRenderer from "./tape-renderer"
 
 const URL = require("url")
 const querystring = require("querystring")
-const bufferShim = require("buffer-shims")
 
 export default class Tape {
   constructor(req, options) {
@@ -25,23 +24,8 @@ export default class Tape {
     }
   }
 
-  static fromStore(raw, options) {
-    const req = {...raw.req}
-    if (raw.meta.reqHumanReadable) {
-      req.body = bufferShim.from(raw.req.body)
-    } else {
-      req.body = bufferShim.from(raw.req.body, "base64")
-    }
-
-    const tape = new Tape(req, options)
-    tape.meta = raw.meta
-    tape.res = {...raw.res}
-    if (tape.meta.resHumanReadable) {
-      tape.res.body = bufferShim.from(tape.res.body)
-    } else {
-      tape.res.body = bufferShim.from(raw.res.body, "base64")
-    }
-    return tape
+  static fromStore(...args) {
+    return TapeRenderer.fromStore(...args)
   }
 
   cleanupHeaders() {
@@ -77,34 +61,8 @@ export default class Tape {
     this.req.url = URL.format(url)
   }
 
-  toRaw() {
-    const reqBody = this.bodyFor(this.req, "reqHumanReadable");
-    const resBody = this.bodyFor(this.res, "resHumanReadable");
-    return {
-      meta: this.meta,
-      req: {
-        ...this.req,
-        body: reqBody
-      },
-      res: {
-        ...this.res,
-        body: resBody
-      }
-    };
-  }
-
-  bodyFor(reqResObj, metaProp) {
-    const mediaType = new MediaType(reqResObj);
-    if (mediaType.isHumanReadable()) {
-      this.meta[metaProp] = true;
-      return reqResObj.body.toString("utf8");
-    } else {
-      return reqResObj.body.toString("base64");
-    }
-  }
-
   clone() {
-    const raw = this.toRaw()
+    const raw = new TapeRenderer(this).render()
     return Tape.fromStore(raw, this.options)
   }
 }

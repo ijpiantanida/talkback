@@ -2,8 +2,10 @@ const fs = require("fs")
 const path = require("path")
 const JSON5 = require("json5")
 const mkdirp = require("mkdirp")
+
 import Tape from "./tape"
 import TapeMatcher from "./tape-matcher"
+import TapeRenderer from "./tape-renderer"
 
 export default class TapeStore {
   constructor(options) {
@@ -53,7 +55,7 @@ export default class TapeStore {
     tape.used = true
     this.tapes.push(tape)
 
-    const toSave = tape.toRaw()
+    const toSave = new TapeRenderer(tape).render()
 
     const tapeName = `unnamed-${this.tapes.length}.json5`
     tape.path = tapeName

@@ -1,3 +1,4 @@
+import MediaType from "./utils/media-type"
 import TapeRenderer from "./tape-renderer"
 
 const URL = require("url")
@@ -12,11 +13,12 @@ export default class Tape {
       body: req.body
     }
     this.options = options
-    this.headersToIgnore = ["host"].concat(this.options.ignoreHeaders)
     this.cleanupHeaders()
 
     this.queryParamsToIgnore = this.options.ignoreQueryParams
     this.cleanupQueryParams()
+
+    this.normalizeBody()
 
     this.meta = {
       createdAt: new Date(),
@@ -30,7 +32,7 @@ export default class Tape {
 
   cleanupHeaders() {
     const newHeaders = {...this.req.headers}
-    this.headersToIgnore.forEach(h => delete newHeaders[h])
+    this.options.ignoreHeaders.forEach(h => delete newHeaders[h])
     this.req = {
       ...this.req,
       headers: newHeaders
@@ -59,6 +61,13 @@ export default class Tape {
       url.search = null
     }
     this.req.url = URL.format(url)
+  }
+
+  normalizeBody() {
+    const mediaType = new MediaType(this.req)
+    if(mediaType.isJSON()) {
+      this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2))
+    }
   }
 
   clone() {

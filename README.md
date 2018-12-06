@@ -94,6 +94,10 @@ Tapes can be renamed at will, for example to give some meaning to the scenario t
 If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
 Otherwise, the body will be saved as a Base64 string, allowing to save binary content.
 
+##### Pretty Printing
+If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   
+This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost. 
+ 
 ## No recording
 Talkback proxying and recording can be disabled through the `record` option.      
 When recording is disabled and an unknown requests arrives, talkback will just log an error message, and return a 404 response without proxying the request to `host`.   

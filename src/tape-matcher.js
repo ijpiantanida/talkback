@@ -1,3 +1,5 @@
+import MediaType from "./utils/media-type"
+
 export default class TapeMatcher {
   constructor(tape, options) {
     this.tape = tape
@@ -20,7 +22,7 @@ export default class TapeMatcher {
         return false
       }
     }
-    
+
     const sameMethod = req.method === otherReq.method
     if (!sameMethod) {
       this.options.logger.debug(`Not same METHOD ${req.method} vs ${otherReq.method}`)
@@ -48,7 +50,15 @@ export default class TapeMatcher {
     }
 
     if (!this.options.ignoreBody) {
-      const sameBody = req.body.equals(otherReq.body)
+      const mediaType = new MediaType(req)
+
+      let sameBody = false
+      if(mediaType.isJSON()) {
+        sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()))
+      } else {
+        sameBody = req.body.equals(otherReq.body)
+      }
+
       if (!sameBody) {
         if (!this.options.bodyMatcher) {
           this.options.logger.debug(`Not same BODY ${req.body} vs ${otherReq.body}`)

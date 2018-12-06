@@ -36,9 +36,10 @@ function responseDecorator(tape, req) {
 var server = talkback({
   host: host,
   path: __dirname + "/tapes",
-  record: false,
+  record: process.env.RECORD === "true",
   debug: false,
   ignoreQueryParams: ["t"],
+  ignoreHeaders: ["user-agent"],
   bodyMatcher: bodyMatcher,
   urlMatcher: urlMatcher,
   responseDecorator: responseDecorator,

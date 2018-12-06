@@ -15,7 +15,10 @@
             "content-type": "application/json",
             accept: "*/*"
         },
-        body: "{\"username\": \"james\", \"ignore\": 3}"
+        body: {
+            username: "james",
+            ignore: 3,
+        }
     },
     res: {
         status: 200,

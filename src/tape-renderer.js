@@ -1,4 +1,5 @@
-import MediaType from "./media-type"
+import Headers from "./utils/headers"
+import MediaType from "./utils/media-type"
 import Tape from "./tape"
 
 const bufferShim = require("buffer-shims")
@@ -10,26 +11,39 @@ export default class TapeRenderer {
 
   static fromStore(raw, options) {
     const req = {...raw.req}
-    if (raw.meta.reqHumanReadable) {
-      req.body = bufferShim.from(raw.req.body)
-    } else {
-      req.body = bufferShim.from(raw.req.body, "base64")
-    }
+
+    req.body = this.prepareBody(raw, req, "req")
 
     const tape = new Tape(req, options)
     tape.meta = raw.meta
     tape.res = {...raw.res}
-    if (tape.meta.resHumanReadable) {
-      tape.res.body = bufferShim.from(tape.res.body)
-    } else {
-      tape.res.body = bufferShim.from(raw.res.body, "base64")
-    }
+
+    tape.res.body = this.prepareBody(tape, tape.res, "res")
+
     return tape
   }
-  
+
+  static prepareBody(tape, reqResObj, metaPrefix) {
+    if (tape.meta[metaPrefix + "HumanReadable"]) {
+      const mediaType = new MediaType(reqResObj)
+      const isResAnObject = typeof(reqResObj.body) === "object"
+      if (isResAnObject && mediaType.isJSON()) {
+        const json = JSON.stringify(reqResObj.body, null, 2)
+        if (Headers.read(reqResObj.headers, "content-length")) {
+          Headers.write(reqResObj.headers, "content-length", json.length, metaPrefix)
+        }
+        return bufferShim.from(json)
+      } else {
+        return bufferShim.from(reqResObj.body)
+      }
+    } else {
+      return bufferShim.from(reqResObj.body, "base64")
+    }
+  }
+
   render() {
-    const reqBody = this.bodyFor(this.tape.req, "reqHumanReadable");
-    const resBody = this.bodyFor(this.tape.res, "resHumanReadable");
+    const reqBody = this.bodyFor(this.tape.req, "req")
+    const resBody = this.bodyFor(this.tape.res, "res")
     return {
       meta: this.tape.meta,
       req: {
@@ -40,17 +54,24 @@ export default class TapeRenderer {
         ...this.tape.res,
         body: resBody
       }
-    };
-  }
-
-  bodyFor(reqResObj, metaProp) {
-    const mediaType = new MediaType(reqResObj);
-
-    if (mediaType.isHumanReadable()) {
-      this.tape.meta[metaProp] = true;
-      return reqResObj.body.toString("utf8");
-    } else {
-      return reqResObj.body.toString("base64");
     }
   }
+
+  bodyFor(reqResObj, metaPrefix) {
+    const mediaType = new MediaType(reqResObj)
+
+    if (mediaType.isHumanReadable()) {
+      this.tape.meta[metaPrefix + "HumanReadable"] = true
+      const rawBody = reqResObj.body.toString("utf8")
+
+      if (mediaType.isJSON() && reqResObj.body.length > 0) {
+        return JSON.parse(reqResObj.body)
+      } else {
+        return rawBody
+      }
+    } else {
+      return reqResObj.body.toString("base64")
+    }
+  }
+
 }

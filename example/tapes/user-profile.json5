@@ -1,91 +1,122 @@
 {
     meta: {
-        createdAt: "2017-09-13T23:36:27.952Z",
-        host: "https://api.github.com",
-        resHumanReadable: true
+        createdAt: '2018-12-07T02:49:53.859Z',
+        host: 'https://api.github.com',
+        resHumanReadable: true,
     },
     req: {
-        url: "/users/ijpiantanida",
-        method: "GET",
+        url: '/users/ijpiantanida',
+        method: 'GET',
         headers: {
-            "user-agent": "curl/7.54.0",
-            accept: "*/*"
+            accept: '*/*',
         },
-        body: ""
+        body: '',
     },
     res: {
         status: 200,
         headers: {
-            server: [
-                "GitHub.com"
-            ],
             date: [
-                "Wed, 13 Sep 2017 23:36:28 GMT"
+                'Fri, 07 Dec 2018 02:49:54 GMT',
             ],
-            "content-type": [
-                "application/json; charset=utf-8"
+            'content-type': [
+                'application/json; charset=utf-8',
             ],
-            "content-length": [
-                "1376"
+            'content-length': [
+                '1406',
             ],
             connection: [
-                "close"
+                'close',
+            ],
+            server: [
+                'GitHub.com',
             ],
             status: [
-                "200 OK"
+                '200 OK',
             ],
-            "x-ratelimit-limit": [
-                "60"
+            'x-ratelimit-limit': [
+                '60',
             ],
-            "x-ratelimit-remaining": [
-                "59"
+            'x-ratelimit-remaining': [
+                '59',
             ],
-            "x-ratelimit-reset": [
-                "1505349388"
+            'x-ratelimit-reset': [
+                '1544154594',
             ],
-            "cache-control": [
-                "public, max-age=60, s-maxage=60"
+            'cache-control': [
+                'public, max-age=60, s-maxage=60',
             ],
             vary: [
-                "Accept"
+                'Accept, Accept-Encoding',
             ],
             etag: [
-                "\"052de87e9283eccfa78a9f70e5cf4830\""
+                '"a48a728f30a0018189890a0a23b624c7"',
             ],
-            "last-modified": [
-                "Fri, 25 Aug 2017 04:10:24 GMT"
+            'last-modified': [
+                'Mon, 26 Nov 2018 16:07:02 GMT',
             ],
-            "x-github-media-type": [
-                "github.v3; format=json"
+            'x-github-media-type': [
+                'github.v3; format=json',
             ],
-            "access-control-expose-headers": [
-                "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval"
+            'access-control-expose-headers': [
+                'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type',
             ],
-            "access-control-allow-origin": [
-                "*"
+            'access-control-allow-origin': [
+                '*',
             ],
-            "content-security-policy": [
-                "default-src 'none'"
+            'strict-transport-security': [
+                'max-age=31536000; includeSubdomains; preload',
             ],
-            "strict-transport-security": [
-                "max-age=31536000; includeSubdomains; preload"
+            'x-frame-options': [
+                'deny',
             ],
-            "x-content-type-options": [
-                "nosniff"
+            'x-content-type-options': [
+                'nosniff',
             ],
-            "x-frame-options": [
-                "deny"
+            'x-xss-protection': [
+                '1; mode=block',
             ],
-            "x-xss-protection": [
-                "1; mode=block"
+            'referrer-policy': [
+                'origin-when-cross-origin, strict-origin-when-cross-origin',
             ],
-            "x-runtime-rack": [
-                "0.033883"
+            'content-security-policy': [
+                "default-src 'none'",
             ],
-            "x-github-request-id": [
-                "CE64:309E:255CC6F:4E0823D:59B9C0FC"
-            ]
+            'x-github-request-id': [
+                'E618:9C7A:47565B5:575490A:5C09DFD1',
+            ],
         },
-        body: "{\n  \"login\": \"ijpiantanida\",\n  \"id\": 1858238,\n  \"avatar_url\": \"https://avatars3.githubusercontent.com/u/1858238?v=4\",\n  \"gravatar_id\": \"\",\n  \"url\": \"https://api.github.com/users/ijpiantanida\",\n  \"html_url\": \"https://github.com/ijpiantanida\",\n  \"followers_url\": \"https://api.github.com/users/ijpiantanida/followers\",\n  \"following_url\": \"https://api.github.com/users/ijpiantanida/following{/other_user}\",\n  \"gists_url\": \"https://api.github.com/users/ijpiantanida/gists{/gist_id}\",\n  \"starred_url\": \"https://api.github.com/users/ijpiantanida/starred{/owner}{/repo}\",\n  \"subscriptions_url\": \"https://api.github.com/users/ijpiantanida/subscriptions\",\n  \"organizations_url\": \"https://api.github.com/users/ijpiantanida/orgs\",\n  \"repos_url\": \"https://api.github.com/users/ijpiantanida/repos\",\n  \"events_url\": \"https://api.github.com/users/ijpiantanida/events{/privacy}\",\n  \"received_events_url\": \"https://api.github.com/users/ijpiantanida/received_events\",\n  \"type\": \"User\",\n  \"site_admin\": false,\n  \"name\": \"Ignacio Piantanida\",\n  \"company\": \"@10Pines \",\n  \"blog\": \"https://www.10pines.com\",\n  \"location\": \"Buenos Aires, Argentina\",\n  \"email\": null,\n  \"hireable\": true,\n  \"bio\": \"Coding stuff is fun. Let's code!\\r\\n\\r\\n\",\n  \"public_repos\": 19,\n  \"public_gists\": 1,\n  \"followers\": 3,\n  \"following\": 0,\n  \"created_at\": \"2012-06-17T04:39:06Z\",\n  \"updated_at\": \"2017-08-25T04:10:24Z\"\n}\n"
-    }
+        body: {
+            login: 'ijpiantanida',
+            id: 1858238,
+            node_id: 'MDQ6VXNlcjE4NTgyMzg=',
+            avatar_url: 'https://avatars3.githubusercontent.com/u/1858238?v=4',
+            gravatar_id: '',
+            url: 'https://api.github.com/users/ijpiantanida',
+            html_url: 'https://github.com/ijpiantanida',
+            followers_url: 'https://api.github.com/users/ijpiantanida/followers',
+            following_url: 'https://api.github.com/users/ijpiantanida/following{/other_user}',
+            gists_url: 'https://api.github.com/users/ijpiantanida/gists{/gist_id}',
+            starred_url: 'https://api.github.com/users/ijpiantanida/starred{/owner}{/repo}',
+            subscriptions_url: 'https://api.github.com/users/ijpiantanida/subscriptions',
+            organizations_url: 'https://api.github.com/users/ijpiantanida/orgs',
+            repos_url: 'https://api.github.com/users/ijpiantanida/repos',
+            events_url: 'https://api.github.com/users/ijpiantanida/events{/privacy}',
+            received_events_url: 'https://api.github.com/users/ijpiantanida/received_events',
+            type: 'User',
+            site_admin: false,
+            name: 'Ignacio Piantanida',
+            company: '@10Pines ',
+            blog: 'https://www.10pines.com',
+            location: 'Los Angeles, USA',
+            email: null,
+            hireable: true,
+            bio: "Coding stuff is fun. Let's code!\r\n\r\n",
+            public_repos: 16,
+            public_gists: 1,
+            followers: 8,
+            following: 0,
+            created_at: '2012-06-17T04:39:06Z',
+            updated_at: '2018-11-26T16:07:02Z',
+        },
+    },
 }

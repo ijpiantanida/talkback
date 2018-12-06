@@ -57,11 +57,15 @@ export default class TapeStore {
 
     const toSave = new TapeRenderer(tape).render()
 
-    const tapeName = `unnamed-${this.tapes.length}.json5`
+    const tapeName = `unnamed-${this.currentTapeId()}.json5`
     tape.path = tapeName
     const filename = this.path + tapeName
     this.options.logger.log(`Saving request ${tape.req.url} at ${filename}`)
     fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4))
+  }
+
+  currentTapeId() {
+    return this.tapes.length
   }
 
   hasTapeBeenUsed(tapeName) {

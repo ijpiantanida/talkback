@@ -4,14 +4,30 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var _regeneratorRuntime = _interopDefault(require('@babel/runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('@babel/runtime/helpers/asyncToGenerator'));
+var _toConsumableArray = _interopDefault(require('@babel/runtime/helpers/toConsumableArray'));
 var _objectSpread = _interopDefault(require('@babel/runtime/helpers/objectSpread'));
-var _defineProperty = _interopDefault(require('@babel/runtime/helpers/defineProperty'));
 var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('@babel/runtime/helpers/createClass'));
 
-var contentTypeParser = require("content-type");
+var Headers = {
+  read: function read(headers, headerName) {
+    var value = headers[headerName];
 
-var humanReadableContentTypes = ["application/javascript", "application/json", "text/css", "text/html", "text/javascript", "text/plain"];
+    if (Array.isArray(value)) {
+      return value[0];
+    } else {
+      return value;
+    }
+  },
+  write: function write(headers, headerName, value, type) {
+    var writeValue = type === "req" ? value : [value];
+    headers[headerName] = writeValue;
+  }
+};
+
+var contentTypeParser = require("content-type");
+var jsonTypes = ["application/json"];
+var humanReadableContentTypes = ["application/javascript", "text/css", "text/html", "text/javascript", "text/plain"].concat(jsonTypes);
 
 var MediaType =
 /*#__PURE__*/
@@ -25,39 +41,134 @@ function () {
   _createClass(MediaType, [{
     key: "isHumanReadable",
     value: function isHumanReadable() {
-      var headers = this.htmlReqRes.headers;
-      var contentEncoding = this.getHeader(headers, "content-encoding");
-      var contentType = this.getHeader(headers, "content-type");
+      var contentEncoding = Headers.read(this.headers(), "content-encoding");
       var notCompressed = !contentEncoding || contentEncoding === "identity";
+      var contentType = this.contentType();
 
       if (!contentType) {
         return false;
       }
 
-      contentType = contentTypeParser.parse(contentType);
       return notCompressed && humanReadableContentTypes.indexOf(contentType.type) >= 0;
     }
   }, {
-    key: "getHeader",
-    value: function getHeader(headers, headerName) {
-      var value = headers[headerName];
+    key: "isJSON",
+    value: function isJSON() {
+      var contentType = this.contentType();
 
-      if (Array.isArray(value)) {
-        return value[0];
-      } else {
-        return value;
+      if (!contentType) {
+        return false;
       }
+
+      return jsonTypes.indexOf(contentType.type) >= 0;
+    }
+  }, {
+    key: "contentType",
+    value: function contentType() {
+      var contentType = Headers.read(this.headers(), "content-type");
+
+      if (!contentType) {
+        return null;
+      }
+
+      return contentTypeParser.parse(contentType);
+    }
+  }, {
+    key: "headers",
+    value: function headers() {
+      return this.htmlReqRes.headers;
     }
   }]);
 
   return MediaType;
 }();
 
+var bufferShim = require("buffer-shims");
+
+var TapeRenderer =
+/*#__PURE__*/
+function () {
+  function TapeRenderer(tape) {
+    _classCallCheck(this, TapeRenderer);
+
+    this.tape = tape;
+  }
+
+  _createClass(TapeRenderer, [{
+    key: "render",
+    value: function render() {
+      var reqBody = this.bodyFor(this.tape.req, "req");
+      var resBody = this.bodyFor(this.tape.res, "res");
+      return {
+        meta: this.tape.meta,
+        req: _objectSpread({}, this.tape.req, {
+          body: reqBody
+        }),
+        res: _objectSpread({}, this.tape.res, {
+          body: resBody
+        })
+      };
+    }
+  }, {
+    key: "bodyFor",
+    value: function bodyFor(reqResObj, metaPrefix) {
+      var mediaType = new MediaType(reqResObj);
+
+      if (mediaType.isHumanReadable()) {
+        this.tape.meta[metaPrefix + "HumanReadable"] = true;
+        var rawBody = reqResObj.body.toString("utf8");
+
+        if (mediaType.isJSON() && reqResObj.body.length > 0) {
+          return JSON.parse(reqResObj.body);
+        } else {
+          return rawBody;
+        }
+      } else {
+        return reqResObj.body.toString("base64");
+      }
+    }
+  }], [{
+    key: "fromStore",
+    value: function fromStore(raw, options) {
+      var req = _objectSpread({}, raw.req);
+
+      req.body = this.prepareBody(raw, req, "req");
+      var tape = new Tape(req, options);
+      tape.meta = raw.meta;
+      tape.res = _objectSpread({}, raw.res);
+      tape.res.body = this.prepareBody(tape, tape.res, "res");
+      return tape;
+    }
+  }, {
+    key: "prepareBody",
+    value: function prepareBody(tape, reqResObj, metaPrefix) {
+      if (tape.meta[metaPrefix + "HumanReadable"]) {
+        var mediaType = new MediaType(reqResObj);
+        var isResAnObject = typeof reqResObj.body === "object";
+
+        if (isResAnObject && mediaType.isJSON()) {
+          var json = JSON.stringify(reqResObj.body, null, 2);
+
+          if (Headers.read(reqResObj.headers, "content-length")) {
+            Headers.write(reqResObj.headers, "content-length", json.length, metaPrefix);
+          }
+
+          return bufferShim.from(json);
+        } else {
+          return bufferShim.from(reqResObj.body);
+        }
+      } else {
+        return bufferShim.from(reqResObj.body, "base64");
+      }
+    }
+  }]);
+
+  return TapeRenderer;
+}();
+
 var URL = require("url");
 
 var querystring = require("querystring");
-
-var bufferShim = require("buffer-shims");
 
 var Tape =
 /*#__PURE__*/
@@ -72,10 +183,10 @@ function () {
       body: req.body
     };
     this.options = options;
-    this.headersToIgnore = ["host"].concat(this.options.ignoreHeaders);
     this.cleanupHeaders();
     this.queryParamsToIgnore = this.options.ignoreQueryParams;
     this.cleanupQueryParams();
+    this.normalizeBody();
     this.meta = {
       createdAt: new Date(),
       host: this.options.host
@@ -87,7 +198,7 @@ function () {
     value: function cleanupHeaders() {
       var newHeaders = _objectSpread({}, this.req.headers);
 
-      this.headersToIgnore.forEach(function (h) {
+      this.options.ignoreHeaders.forEach(function (h) {
         return delete newHeaders[h];
       });
       this.req = _objectSpread({}, this.req, {
@@ -127,60 +238,24 @@ function () {
       this.req.url = URL.format(url);
     }
   }, {
-    key: "toRaw",
-    value: function toRaw() {
-      var reqBody = this.bodyFor(this.req, "reqHumanReadable");
-      var resBody = this.bodyFor(this.res, "resHumanReadable");
-      return {
-        meta: this.meta,
-        req: _objectSpread({}, this.req, {
-          body: reqBody
-        }),
-        res: _objectSpread({}, this.res, {
-          body: resBody
-        })
-      };
-    }
-  }, {
-    key: "bodyFor",
-    value: function bodyFor(reqResObj, metaProp) {
-      var mediaType = new MediaType(reqResObj);
+    key: "normalizeBody",
+    value: function normalizeBody() {
+      var mediaType = new MediaType(this.req);
 
-      if (mediaType.isHumanReadable()) {
-        this.meta[metaProp] = true;
-        return reqResObj.body.toString("utf8");
-      } else {
-        return reqResObj.body.toString("base64");
+      if (mediaType.isJSON()) {
+        this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2));
       }
     }
   }, {
     key: "clone",
     value: function clone() {
-      var raw = this.toRaw();
+      var raw = new TapeRenderer(this).render();
       return Tape.fromStore(raw, this.options);
     }
   }], [{
     key: "fromStore",
-    value: function fromStore(raw, options) {
-      var req = _objectSpread({}, raw.req);
-
-      if (raw.meta.reqHumanReadable) {
-        req.body = bufferShim.from(raw.req.body);
-      } else {
-        req.body = bufferShim.from(raw.req.body, "base64");
-      }
-
-      var tape = new Tape(req, options);
-      tape.meta = raw.meta;
-      tape.res = _objectSpread({}, raw.res);
-
-      if (tape.meta.resHumanReadable) {
-        tape.res.body = bufferShim.from(tape.res.body);
-      } else {
-        tape.res.body = bufferShim.from(raw.res.body, "base64");
-      }
-
-      return tape;
+    value: function fromStore() {
+      return TapeRenderer.fromStore.apply(TapeRenderer, arguments);
     }
   }]);
 
@@ -474,7 +549,14 @@ function () {
       }
 
       if (!this.options.ignoreBody) {
-        var sameBody = req.body.equals(otherReq.body);
+        var mediaType = new MediaType(req);
+        var sameBody = false;
+
+        if (mediaType.isJSON()) {
+          sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()));
+        } else {
+          sameBody = req.body.equals(otherReq.body);
+        }
 
         if (!sameBody) {
           if (!this.options.bodyMatcher) {
@@ -566,12 +648,17 @@ function () {
       tape.new = true;
       tape.used = true;
       this.tapes.push(tape);
-      var toSave = tape.toRaw();
-      var tapeName = "unnamed-".concat(this.tapes.length, ".json5");
+      var toSave = new TapeRenderer(tape).render();
+      var tapeName = "unnamed-".concat(this.currentTapeId(), ".json5");
       tape.path = tapeName;
       var filename = this.path + tapeName;
       this.options.logger.log("Saving request ".concat(tape.req.url, " at ").concat(filename));
       fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
+    }
+  }, {
+    key: "currentTapeId",
+    value: function currentTapeId() {
+      return this.tapes.length;
     }
   }, {
     key: "hasTapeBeenUsed",
@@ -742,7 +829,7 @@ function () {
   return Logger;
 }();
 
-var defaultOptions = _defineProperty({
+var defaultOptions = {
   port: 8080,
   path: "./tapes/",
   record: true,
@@ -751,7 +838,7 @@ var defaultOptions = _defineProperty({
     keyPath: null,
     certPath: null
   },
-  ignoreHeaders: [],
+  ignoreHeaders: ["content-length", "host"],
   ignoreQueryParams: [],
   ignoreBody: false,
   bodyMatcher: null,
@@ -761,11 +848,7 @@ var defaultOptions = _defineProperty({
   silent: false,
   summary: true,
   debug: false
-}, "https", {
-  enabled: false,
-  keyPath: null,
-  certPath: null
-});
+};
 
 var Options =
 /*#__PURE__*/
@@ -776,12 +859,12 @@ function () {
 
   _createClass(Options, null, [{
     key: "prepare",
-    value: function prepare(usrOpts) {
-      var opts = _objectSpread({}, defaultOptions, usrOpts);
+    value: function prepare() {
+      var usrOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      if (opts.bodyMatcher) {
-        opts.ignoreHeaders.push("content-length");
-      }
+      var opts = _objectSpread({}, defaultOptions, usrOpts, {
+        ignoreHeaders: _toConsumableArray(defaultOptions.ignoreHeaders).concat(_toConsumableArray(usrOpts.ignoreHeaders || []))
+      });
 
       opts.logger = new Logger(opts);
       return opts;

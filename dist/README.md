@@ -49,7 +49,7 @@ Returns an unstarted talkback server instance.
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
-| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `[]` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
@@ -63,9 +63,9 @@ Returns an unstarted talkback server instance.
 ### HTTPS options
 | Name | Type | Description | Default |
 |------|------|-------------|---------|
-| enabled | `Boolean` | Enables HTTPS server | `false` |
-| keyPath | `String` | Path to the key file | `null` | 
-| certPath | `String` | Path to the cert file | `null` | 
+| *enabled* | `Boolean` | Enables HTTPS server | `false` |
+| *keyPath* | `String` | Path to the key file | `null` | 
+| *certPath* | `String` | Path to the cert file | `null` | 
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.
@@ -94,6 +94,10 @@ Tapes can be renamed at will, for example to give some meaning to the scenario t
 If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
 Otherwise, the body will be saved as a Base64 string, allowing to save binary content.
 
+##### Pretty Printing
+If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   
+This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost. 
+ 
 ## No recording
 Talkback proxying and recording can be disabled through the `record` option.      
 When recording is disabled and an unknown requests arrives, talkback will just log an error message, and return a 404 response without proxying the request to `host`.   
@@ -108,8 +112,6 @@ Talkback lets you pass a custom matching function as the `bodyMatcher` option.
 The function will receive a saved tape and the current request, and it has to return whether they should be considered a match on their body.   
 Body matching is the last step when matching a tape. In order for this function to be called, everything else about the request should match the tape too (url, method, headers).   
 The `bodyMatcher` is not called if tape and request bodies are already the same. 
-   
-When passing a `bodyMatcher`, `Content-Length` is automatically added to the `ignoreHeaders` list, since you will probably be matching bodies with different sizes.
 
 ### Example:
 

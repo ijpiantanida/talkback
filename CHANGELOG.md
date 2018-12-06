@@ -1,6 +1,7 @@
 # Changelog
 
 ## v1.8.0
+- Pretty print JSON requests & responses in saved tapes
 - Always ignore `content-length` header for tape matching 
 
 ## v1.7.0

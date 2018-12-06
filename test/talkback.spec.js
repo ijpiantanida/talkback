@@ -11,7 +11,7 @@ const JSON5 = require("json5")
 const fs = require("fs")
 const fetch = require("node-fetch")
 
-let talkbackServer, proxiedServer
+let talkbackServer, proxiedServer, currentTapeId
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = __dirname + "/tapes"
@@ -36,6 +36,8 @@ const startTalkback = async (opts) => {
     }
   )
   await talkbackServer.start()
+
+  currentTapeId = talkbackServer.tapeStore.currentTapeId() + 1
   return talkbackServer
 }
 
@@ -83,11 +85,11 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
-      expect(JSON.parse(tape.res.body)).to.eql(expectedResBody)
+      expect(tape.res.body).to.eql(expectedResBody)
     })
 
     it("proxies and creates a new tape when the GET request is unknown", async () => {
@@ -100,11 +102,11 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(undefined)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
-      expect(JSON.parse(tape.res.body)).to.eql(expectedResBody)
+      expect(tape.res.body).to.eql(expectedResBody)
     })
 
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
@@ -119,11 +121,11 @@ describe("talkback", async () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
-      expect(JSON.parse(tape.res.body)).to.eql(expectedResBody)
+      expect(tape.res.body).to.eql(expectedResBody)
     })
 
     it("handles when the proxied server returns a 500", async () => {
@@ -132,7 +134,7 @@ describe("talkback", async () => {
       const res = await fetch("http://localhost:8899/test/3")
       expect(res.status).to.eq(500)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + "/unnamed-3.json5"))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/3")
       expect(tape.res.status).to.eql(500)
     })
@@ -145,6 +147,57 @@ describe("talkback", async () => {
 
       const body = await res.json()
       expect(body).to.eql({ok: true})
+    })
+
+    it("matches and returns pretty printed tapes", async () => {
+      talkbackServer = await startTalkback({record: false})
+
+      const headers = {"content-type": "application/json"}
+      const body = JSON.stringify({param1: 3, param2: {subParam: 1}})
+
+      const res = await fetch("http://localhost:8899/test/pretty", {
+        compress: false,
+        method: "POST",
+        headers,
+        body
+      })
+      expect(res.status).to.eq(200)
+
+      const resClone = res.clone()
+
+      const resBody = await res.json()
+      expect(resBody).to.eql({ok: true, foo: {bar: 3}})
+
+      const resBodyAsText = await resClone.text()
+      expect(resBodyAsText).to.eql("{\n  \"ok\": true,\n  \"foo\": {\n    \"bar\": 3\n  }\n}")
+    })
+
+    it("doesn't match pretty printed tapes with different body", async () => {
+      const makeRequest = async (body) => {
+        let res = await fetch("http://localhost:8899/test/pretty", {
+          compress: false,
+          method: "POST",
+          headers,
+          body
+        })
+        expect(res.status).to.eq(404)
+      }
+
+      talkbackServer = await startTalkback({record: false})
+
+      const headers = {"content-type": "application/json"}
+
+      // Different nested object
+      let body = JSON.stringify({param1: 3, param2: {subParam: 2}})
+      await makeRequest(body)
+
+      // Different key order
+      body = JSON.stringify({param2: {subParam: 1}, param1: 3})
+      await makeRequest(body)
+
+      // Extra key
+      body = JSON.stringify({param1: 3, param2: {subParam: 1}, param3: false})
+      await makeRequest(body)
     })
 
     it("decorates the response of an existing tape", async () => {

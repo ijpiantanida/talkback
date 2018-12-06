@@ -3,17 +3,24 @@
     "meta": {
         "createdAt": "2017-09-10T23:19:27.010Z",
         "host": "http://localhost:8898",
+        "reqHumanReadable": true,
         "resHumanReadable": true
     },
     "req": {
-        "url": "/test/3",
-        "method": "GET",
+        "url": "/test/pretty",
+        "method": "POST",
         "headers": {
             "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
             "connection": "close",
+            "content-type": "application/json",
             "accept": "*/*"
         },
-        "body": ""
+        "body": {
+            param1: 3,
+            param2: {
+                subParam: 1
+            }
+        }
     },
     "res": {
         "status": 200,
@@ -31,6 +38,11 @@
                 "chunked"
             ]
         },
-        "body": "{\"ok\":true}"
+        "body": {
+            "ok": true,
+            "foo": {
+                "bar": 3
+            }
+        }
     },
 }

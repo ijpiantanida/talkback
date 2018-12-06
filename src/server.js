@@ -44,7 +44,7 @@ export default class TalkbackServer {
       };
       return https.createServer(httpsOpts, app);
     }  : () => http.createServer(app);
-    
+
     this.server = serverFactory();
     console.log(`Starting talkback on ${this.options.port}`)
     this.server.listen(this.options.port, callback)

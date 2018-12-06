@@ -4,41 +4,41 @@ const defaultOptions = {
   port: 8080,
   path: "./tapes/",
   record: true,
+
   https: {
     enabled: false,
     keyPath: null,
     certPath: null
   },
-  ignoreHeaders: [],
+  ignoreHeaders: ["content-length", "host"],
   ignoreQueryParams: [],
   ignoreBody: false,
+
   bodyMatcher: null,
   urlMatcher: null,
+
   responseDecorator: null,
+
   fallbackMode: "404",
+
   silent: false,
   summary: true,
-  debug: false,
-  https: {
-    enabled: false,
-    keyPath: null,
-    certPath: null
-  }
+  debug: false
 }
 
 export default class Options {
-  static prepare(usrOpts) {
+  static prepare(usrOpts = {}) {
     const opts = {
       ...defaultOptions,
-      ...usrOpts
-    }
-
-    if (opts.bodyMatcher) {
-      opts.ignoreHeaders.push("content-length")
+      ...usrOpts,
+      ignoreHeaders: [
+        ...defaultOptions.ignoreHeaders,
+        ...(usrOpts.ignoreHeaders || [])
+      ]
     }
 
     opts.logger = new Logger(opts)
 
-    return opts;
+    return opts
   }
 }

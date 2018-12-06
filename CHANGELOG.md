@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8.0
+- Always ignore `content-length` header for tape matching 
+
 ## v1.7.0
 - Add `https` server option.
 - Add `urlMatcher` option to customize how the request URL is matched against saved tapes.

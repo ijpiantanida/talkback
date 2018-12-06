@@ -8,12 +8,14 @@ describe("Options", () => {
     expect(opts.debug).to.be.false
   })
 
-  it("adds content-length to ignoreHeaders if bodyMatcher is provided", () => {
-    let opts = Options.prepare({bodyMatcher: () => {}})
-    expect(opts.ignoreHeaders).to.eql(["content-length"])
+  it("concats ignoreHeaders to default ones provided", () => {
+    let opts = Options.prepare({ignoreHeaders: ['user-agent']})
+    console.log("opts.ignoreHeaders", opts.ignoreHeaders)
+    expect(opts.ignoreHeaders.length >= 1).to.eql(true)
+    expect(opts.ignoreHeaders.includes('user-agent')).to.eql(true)
 
-    opts = Options.prepare({ignoreHeaders: ["foo"], bodyMatcher: () => {}})
-
-    expect(opts.ignoreHeaders).to.eql(["foo", "content-length"])
+    // Check that it's there
+    opts = Options.prepare()
+    expect(opts.ignoreHeaders.length >= 0).to.eql(true)
   })
 })

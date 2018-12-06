@@ -49,7 +49,7 @@ Returns an unstarted talkback server instance.
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
-| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `[]` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
@@ -108,8 +108,6 @@ Talkback lets you pass a custom matching function as the `bodyMatcher` option.
 The function will receive a saved tape and the current request, and it has to return whether they should be considered a match on their body.   
 Body matching is the last step when matching a tape. In order for this function to be called, everything else about the request should match the tape too (url, method, headers).   
 The `bodyMatcher` is not called if tape and request bodies are already the same. 
-   
-When passing a `bodyMatcher`, `Content-Length` is automatically added to the `ignoreHeaders` list, since you will probably be matching bodies with different sizes.
 
 ### Example:
 

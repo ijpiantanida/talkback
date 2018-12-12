@@ -452,16 +452,17 @@ function () {
 var Sumary =
 /*#__PURE__*/
 function () {
-  function Sumary(tapes) {
+  function Sumary(tapes, opts) {
     _classCallCheck(this, Sumary);
 
     this.tapes = tapes;
+    this.opts = opts;
   }
 
   _createClass(Sumary, [{
     key: "print",
     value: function print() {
-      console.log("===== SUMMARY =====");
+      console.log("===== SUMMARY (".concat(this.opts.name, ") ====="));
       var newTapes = this.tapes.filter(function (t) {
         return t.new;
       });
@@ -788,7 +789,7 @@ function () {
       this.server.close(callback);
 
       if (this.options.summary) {
-        var summary = new Sumary(this.tapeStore.tapes);
+        var summary = new Sumary(this.tapeStore.tapes, this.options);
         summary.print();
       }
     }
@@ -833,6 +834,7 @@ var defaultOptions = {
   port: 8080,
   path: "./tapes/",
   record: true,
+  name: "unnamed",
   https: {
     enabled: false,
     keyPath: null,
@@ -862,7 +864,9 @@ function () {
     value: function prepare() {
       var usrOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      var opts = _objectSpread({}, defaultOptions, usrOpts, {
+      var opts = _objectSpread({}, defaultOptions, {
+        name: usrOpts.host
+      }, usrOpts, {
         ignoreHeaders: _toConsumableArray(defaultOptions.ignoreHeaders).concat(_toConsumableArray(usrOpts.ignoreHeaders || []))
       });
 

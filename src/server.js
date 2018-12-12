@@ -73,7 +73,7 @@ export default class TalkbackServer {
     this.server.close(callback)
 
     if (this.options.summary) {
-      const summary = new Summary(this.tapeStore.tapes)
+      const summary = new Summary(this.tapeStore.tapes, this.options)
       summary.print()
     }
   }

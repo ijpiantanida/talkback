@@ -18,4 +18,13 @@ describe("Options", () => {
     opts = Options.prepare()
     expect(opts.ignoreHeaders.length >= 0).to.eql(true)
   })
+
+  it("defaults name to the host", () => {
+    const host = "https://my-api.com"
+    let opts = Options.prepare({host})
+    expect(opts.name).to.eql(host)
+
+    opts = Options.prepare({host, name: "My Server"})
+    expect(opts.name).to.eql("My Server")
+  })
 })

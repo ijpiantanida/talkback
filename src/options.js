@@ -4,6 +4,7 @@ const defaultOptions = {
   port: 8080,
   path: "./tapes/",
   record: true,
+  name: "unnamed",
 
   https: {
     enabled: false,
@@ -30,6 +31,7 @@ export default class Options {
   static prepare(usrOpts = {}) {
     const opts = {
       ...defaultOptions,
+      name: usrOpts.host,
       ...usrOpts,
       ignoreHeaders: [
         ...defaultOptions.ignoreHeaders,

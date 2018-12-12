@@ -271,14 +271,14 @@ describe("talkback", async () => {
       talkbackServer = await startTalkback({summary: true})
       talkbackServer.close()
 
-      td.verify(log("===== SUMMARY ====="))
+      td.verify(log(td.matchers.contains("SUMMARY")))
     })
 
     it("doesn't print the summary when disabled", async () => {
       talkbackServer = await startTalkback({summary: false})
       talkbackServer.close()
 
-      td.verify(log("===== SUMMARY ====="), {times: 0})
+      td.verify(log(td.matchers.contains("SUMMARY")), {times: 0})
     })
   })
 

@@ -3,6 +3,8 @@
 ## v1.8.0
 - Pretty print JSON requests & responses in saved tapes
 - Always ignore `content-length` header for tape matching 
+- Add `name` option
+- Print `name` in Summary title
 
 ## v1.7.0
 - Add `https` server option.

@@ -339,9 +339,11 @@ function () {
         }, _callee, this);
       }));
 
-      return function handle(_x) {
+      function handle(_x) {
         return _handle.apply(this, arguments);
-      };
+      }
+
+      return handle;
     }()
   }, {
     key: "onNoRecord",
@@ -386,9 +388,11 @@ function () {
         }, _callee2, this);
       }));
 
-      return function onNoRecord(_x2) {
+      function onNoRecord(_x2) {
         return _onNoRecord.apply(this, arguments);
-      };
+      }
+
+      return onNoRecord;
     }()
   }, {
     key: "makeRealRequest",
@@ -440,9 +444,11 @@ function () {
         }, _callee3, this);
       }));
 
-      return function makeRealRequest(_x3) {
+      function makeRealRequest(_x3) {
         return _makeRealRequest.apply(this, arguments);
-      };
+      }
+
+      return makeRealRequest;
     }()
   }]);
 

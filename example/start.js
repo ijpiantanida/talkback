@@ -1,4 +1,10 @@
-var talkback = require("../dist/index")
+var talkback
+if (process.env.USE_NPM) {
+  talkback = require("talkback")
+  console.log("Using NPM talkback")
+} else {
+  talkback = require("../dist/index")
+}
 
 var host = "https://api.github.com"
 

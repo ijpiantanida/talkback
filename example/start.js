@@ -38,6 +38,7 @@ var server = talkback({
   path: __dirname + "/tapes",
   record: process.env.RECORD === "true",
   debug: false,
+  name: "Test Server",
   ignoreQueryParams: ["t"],
   ignoreHeaders: ["user-agent"],
   bodyMatcher: bodyMatcher,

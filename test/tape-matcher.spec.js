@@ -117,6 +117,35 @@ describe("TapeMatcher", () => {
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
     })
 
+    it("returns true when both bodies are empty", () => {
+      const rawDup = {
+        ...raw,
+        req: {
+          ...raw.req,
+          method: "HEAD",
+          headers: {
+            ...raw.req.headers,
+            "content-type": "application/json"
+          },
+          body: ""
+        }
+      }
+
+      const reqDup = {
+        ...req,
+        method: "HEAD",
+        headers: {
+          ...req.headers,
+          "content-type": "application/json"
+        },
+        body: Buffer.from("")
+      }
+
+      const newTape = Tape.fromStore(rawDup, opts)
+      const tape2 = new Tape(reqDup, opts)
+      expect(new TapeMatcher(newTape, opts).sameAs(tape2)).to.be.true
+    })
+
     it("returns false when there are more headers", () => {
       const tape2 = new Tape({
         ...req,

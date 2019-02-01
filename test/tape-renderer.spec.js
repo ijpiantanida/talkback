@@ -176,5 +176,32 @@ describe("TapeRenderer", () => {
       delete newRaw.req.headers["x-ignored"]
       expect(new TapeRenderer(newTape).render()).to.eql(newRaw)
     })
+
+    it("renders tapes with empty bodies", () => {
+      const newRaw = {
+        ...raw,
+        req: {
+          ...raw.req,
+          body: "",
+          method: "HEAD",
+          headers: {
+            ...raw.req.headers,
+            "content-type": ["application/json"]
+          }
+        },
+        res: {
+          ...raw.res,
+          headers: {
+            ...raw.res.headers,
+            "content-type": ["application/json"]
+          },
+          body: ""
+        }
+      }
+      const newTape = TapeRenderer.fromStore(newRaw, opts)
+
+      delete newRaw.req.headers["x-ignored"]
+      expect(new TapeRenderer(newTape).render()).to.eql(newRaw)
+    })
   })
 })

@@ -113,12 +113,13 @@ function () {
     key: "bodyFor",
     value: function bodyFor(reqResObj, metaPrefix) {
       var mediaType = new MediaType(reqResObj);
+      var bodyLength = reqResObj.body.length;
 
-      if (mediaType.isHumanReadable()) {
+      if (mediaType.isHumanReadable() && bodyLength > 0) {
         this.tape.meta[metaPrefix + "HumanReadable"] = true;
         var rawBody = reqResObj.body.toString("utf8");
 
-        if (mediaType.isJSON() && reqResObj.body.length > 0) {
+        if (mediaType.isJSON()) {
           return JSON.parse(reqResObj.body);
         } else {
           return rawBody;
@@ -242,7 +243,7 @@ function () {
     value: function normalizeBody() {
       var mediaType = new MediaType(this.req);
 
-      if (mediaType.isJSON()) {
+      if (mediaType.isJSON() && this.req.body.length > 0) {
         this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2));
       }
     }
@@ -559,7 +560,7 @@ function () {
         var mediaType = new MediaType(req);
         var sameBody = false;
 
-        if (mediaType.isJSON()) {
+        if (mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
           sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()));
         } else {
           sameBody = req.body.equals(otherReq.body);

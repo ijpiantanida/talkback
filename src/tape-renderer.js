@@ -59,12 +59,13 @@ export default class TapeRenderer {
 
   bodyFor(reqResObj, metaPrefix) {
     const mediaType = new MediaType(reqResObj)
+    const bodyLength = reqResObj.body.length
 
-    if (mediaType.isHumanReadable()) {
+    if (mediaType.isHumanReadable() && bodyLength > 0) {
       this.tape.meta[metaPrefix + "HumanReadable"] = true
       const rawBody = reqResObj.body.toString("utf8")
 
-      if (mediaType.isJSON() && reqResObj.body.length > 0) {
+      if (mediaType.isJSON()) {
         return JSON.parse(reqResObj.body)
       } else {
         return rawBody

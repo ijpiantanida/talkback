@@ -128,6 +128,21 @@ describe("talkback", async () => {
       expect(tape.res.body).to.eql(expectedResBody)
     })
 
+    it("proxies and creates a new tape when the HEAD request is unknown", async () => {
+      talkbackServer = await startTalkback()
+
+      const headers = {"content-type": "application/json"}
+      const res = await fetch("http://localhost:8899/test/head", {method: "HEAD", headers})
+      expect(res.status).to.eq(200)
+
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      expect(tape.meta.reqHumanReadable).to.eq(undefined)
+      expect(tape.meta.resHumanReadable).to.eq(undefined)
+      expect(tape.req.url).to.eql("/test/head")
+      expect(tape.req.body).to.eql("")
+      expect(tape.res.body).to.eql("")
+    })
+
     it("handles when the proxied server returns a 500", async () => {
       talkbackServer = await startTalkback()
 

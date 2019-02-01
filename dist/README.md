@@ -1,9 +1,8 @@
 # Talkback
 
-Talkback is a standalone HTTP proxy that can record and playback requests.   
-Although built as a node.js library, it can be used to playback requests from any language as you should run it as a separate process.    
-Very useful for integration tests environments or mocking HTTP servers.   
-Heavily inspired by [flickr/yakbak](https://github.com/flickr/yakbak).   
+Record and playback HTTP requests.   
+Talkback is a pure javascript standalone HTTP proxy. As long as you have node.js in your environment, you can run Talkback to record requests from applications written in any language/framework.   
+You can use it to accelerate your integration tests or running your application against a mocked HTTP servers.       
 
 Read more about the reasoning behind **talkback** on [10Pines blog](https://blog.10pines.com/2017/12/18/isolating-integration-tests-from-external-http-services-with-talkback/).   
 
@@ -21,8 +20,8 @@ npm install talkback
 Talkback is pretty easy to setup.   
 Define which host it will be proxying, which port it should listen to and where to find and save tapes.   
 
-When a request arrives to talkback, it will try to match it against an existing tape and return the tape's response.   
-If no tape matches the request, it will forward it to the origin host save the tape to disk for future uses and return the response.   
+When a request arrives to talkback, it will try to match it against a previously saved tape and quickly return the tape's response.   
+If no tape matches the request, it will forward it to the origin host, save the tape to disk for future uses and return the response.   
 
 ```javascript
 const talkback = require("talkback");
@@ -179,7 +178,7 @@ Note that both the tape's and the request's bodies are `Buffer` objects and they
 If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   
 To help, when talkback exits, it will print a list of all the tapes that have NOT been used and a list of all the new tapes. If your test suite is green, you can safely delete anything that hasn't been used.
 ```
-===== SUMMARY =====
+===== SUMMARY (My Server) =====
 New tapes:
 - unnamed-4.json5
 Unused tapes:

@@ -37,6 +37,11 @@ const testServer = () => {
           res.end()
           return
         }
+        case "/test/head": {
+          res.writeHead(200)
+          res.end()
+          return
+        }
         default: {
           res.writeHead(404)
           res.end()

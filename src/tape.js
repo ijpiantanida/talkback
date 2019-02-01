@@ -65,7 +65,7 @@ export default class Tape {
 
   normalizeBody() {
     const mediaType = new MediaType(this.req)
-    if(mediaType.isJSON()) {
+    if(mediaType.isJSON() && this.req.body.length > 0) {
       this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2))
     }
   }

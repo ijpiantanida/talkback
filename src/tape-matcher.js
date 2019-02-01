@@ -53,7 +53,7 @@ export default class TapeMatcher {
       const mediaType = new MediaType(req)
 
       let sameBody = false
-      if(mediaType.isJSON()) {
+      if(mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
         sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()))
       } else {
         sameBody = req.body.equals(otherReq.body)

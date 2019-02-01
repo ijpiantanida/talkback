@@ -4,8 +4,7 @@
   "main": "start.js",
   "license": "MIT",
   "description": "Talkback Example",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "talkback": "*"
   },

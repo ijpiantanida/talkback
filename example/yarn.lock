@@ -3,9 +3,9 @@
 
 
 "@babel/runtime@^7.0.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.2.0.tgz#b03e42eeddf5898e00646e4c840fa07ba8dcad7f"
-  integrity sha512-oouEibCbHMVdZSDlJBO6bZmID/zA/G/Qx3H1d3rSNPTD+L8UNKvCat7aKWSJ74zYbm5zWGh0GQN0hKj8zYFTCg==
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.3.1.tgz#574b03e8e8a9898eaf4a872a92ea20b7846f6f2a"
+  integrity sha512-7jGW8ppV0ant637pIqAcFfQDDH1orEPGJb8aXfUozuCU3QqX7rX4DA8iwrbPrR1hcH0FTTHz47yQnk+bl5xHQA==
   dependencies:
     regenerator-runtime "^0.12.0"
 
@@ -54,9 +54,9 @@ regenerator-runtime@^0.12.0:
   integrity sha512-odxIc1/vDlo4iZcfXqRYFj0vpXFNoGdKMAUieAlFYO6m/nl5e9KR/beGf41z4a1FI+aQgtjhuaSlDxQ0hmkrHg==
 
 talkback@*:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-1.8.0.tgz#ff7687232b9d7049f9625d0de8f73438f18b60ae"
-  integrity sha512-1piZmQSPN3MV4xSQ9vcbHgaQySLDzxtK9ysfC3fGl2vZV828FrxlBd15nifZBIhLr1tA873dt4UiWC1T3OUBBw==
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-1.8.1.tgz#f35408dffb3fc0e1ce38233ea4619a40d8a3db73"
+  integrity sha512-kBjzijyrEBpSorEnh5WIjAFqc6mM71cIx8s1MQzs3hnfU9W1LWa4Wi1gVVMbr55/dTYQOrESZPr9WWTPqQVaIA==
   dependencies:
     "@babel/runtime" "^7.0.0"
     buffer-shims "^1.0.0"

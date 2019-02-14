@@ -177,7 +177,7 @@ In this example we are also adding our own `tag` property to the saved tape `met
 Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
 
 ## Custom request decorator
-If you need to change the original request before it's stored as tape, you can use the `requestDecorator`.
+If you need to change the original request before it's returned and stored in a tape, you can use the `requestDecorator`.
 
 ### Example:
 We're following the `Location` header in a sequence of requests. As this header directs the client away from the Talkback server, we want to edit this header before returning it to the client and storing it in a tape.

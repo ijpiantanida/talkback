@@ -51,21 +51,22 @@ Returns an unstarted talkback server instance.
 | **name** | `String` | Server name | Defaults to `host` value |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
-| **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
+| **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
 | **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info](#custom-response-decorator) | `null` |  
+| **requestDecorator** | `Function` | Customize the real request before it's returned. [More info](#custom-request-decorator) | `null` |  
 | **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
-| **silent** | `Boolean` | Enable requests information console messages in the middle of requests | `false` |
+| **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |
 
 ### HTTPS options
 | Name | Type | Description | Default |
 |------|------|-------------|---------|
-| *enabled* | `Boolean` | Enables HTTPS server | `false` |
-| *keyPath* | `String` | Path to the key file | `null` | 
-| *certPath* | `String` | Path to the cert file | `null` | 
+| **enabled** | `Boolean` | Enables HTTPS server | `false` |
+| **keyPath** | `String` | Path to the key file | `null` | 
+| **certPath** | `String` | Path to the cert file | `null` | 
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.
@@ -100,7 +101,8 @@ This means differences in formatting are ignored when comparing tapes, and any s
  
 ## No recording
 Talkback proxying and recording can be disabled through the `record` option.      
-When recording is disabled and an unknown requests arrives, talkback will just log an error message, and return a 404 response without proxying the request to `host`.   
+When recording is disabled and an unknown requests arrives, talkback will just log an error message and return a 404 response without proxying the request to `host`.   
+The `fallbackMode` option lets you choose whether you want this default behavior, or you would rather proxy the request to `host` returning its response but without creating any new tapes.    
 
 It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.
 
@@ -173,6 +175,23 @@ function responseDecorator(tape, req) {
 
 In this example we are also adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom logic on some specific requests, and can even have different logic for different categories of requests.   
 Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
+
+## Custom request decorator
+If you need to change the original request before it's stored as tape, you can use the `requestDecorator`.
+
+### Example:
+We're following the `Location` header in a sequence of requests. As this header directs the client away from the Talkback server, we want to edit this header before returning it to the client and storing it in a tape.
+
+```javascript
+function requestDecorator(req) {
+  const locationHeader = req.headers.location;
+  if (locationHeader) {
+    const talkbackLocationHeader = locationHeader[0].replace('https://myredirectedlocation', 'http://localhost:8010');
+    req.headers.location = [talkbackLocationHeader];
+  }
+  return req;
+}
+```
 
 ## Exit summary
 If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   

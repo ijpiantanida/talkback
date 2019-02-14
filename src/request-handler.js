@@ -67,10 +67,14 @@ export default class RequestHandler {
 
     const fRes = await fetch(host + url, {method, headers, body, compress: false})
     const buff = await fRes.buffer()
-    return {
+    const result = {
       status: fRes.status,
       headers: fRes.headers.raw(),
       body: buff
+    };
+    if (this.options.requestDecorator) {
+      return this.options.requestDecorator(result);
     }
+    return result;
   }
 }

@@ -401,7 +401,7 @@ function () {
       var _makeRealRequest = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee3(req) {
-        var method, url, body, headers, host, fRes, buff;
+        var method, url, body, headers, host, fRes, buff, result;
         return _regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -431,13 +431,23 @@ function () {
 
               case 11:
                 buff = _context3.sent;
-                return _context3.abrupt("return", {
+                result = {
                   status: fRes.status,
                   headers: fRes.headers.raw(),
                   body: buff
-                });
+                };
 
-              case 13:
+                if (!this.options.requestDecorator) {
+                  _context3.next = 15;
+                  break;
+                }
+
+                return _context3.abrupt("return", this.options.requestDecorator(result));
+
+              case 15:
+                return _context3.abrupt("return", result);
+
+              case 16:
               case "end":
                 return _context3.stop();
             }
@@ -853,6 +863,7 @@ var defaultOptions = {
   bodyMatcher: null,
   urlMatcher: null,
   responseDecorator: null,
+  requestDecorator: null,
   fallbackMode: "404",
   silent: false,
   summary: true,

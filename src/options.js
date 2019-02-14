@@ -19,6 +19,7 @@ const defaultOptions = {
   urlMatcher: null,
 
   responseDecorator: null,
+  requestDecorator: null,
 
   fallbackMode: "404",
 

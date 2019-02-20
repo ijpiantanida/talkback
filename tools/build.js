@@ -10,7 +10,7 @@ promise = promise.then(() => del(["dist/*"]));
 
 promise = promise.then(() => rollup.rollup({
   input: "src/index.js",
-  external: Object.keys(pkg.dependencies),
+  external: (id) => id.indexOf("@babel/runtime") === 0,
   plugins: [babel({
     babelrc: false,
     exclude: "node_modules/**",

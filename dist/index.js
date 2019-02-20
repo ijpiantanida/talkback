@@ -4,10 +4,10 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var _regeneratorRuntime = _interopDefault(require('@babel/runtime/regenerator'));
 var _asyncToGenerator = _interopDefault(require('@babel/runtime/helpers/asyncToGenerator'));
-var _toConsumableArray = _interopDefault(require('@babel/runtime/helpers/toConsumableArray'));
-var _objectSpread = _interopDefault(require('@babel/runtime/helpers/objectSpread'));
 var _classCallCheck = _interopDefault(require('@babel/runtime/helpers/classCallCheck'));
 var _createClass = _interopDefault(require('@babel/runtime/helpers/createClass'));
+var _objectSpread = _interopDefault(require('@babel/runtime/helpers/objectSpread'));
+var _toConsumableArray = _interopDefault(require('@babel/runtime/helpers/toConsumableArray'));
 
 var Headers = {
   read: function read(headers, headerName) {
@@ -884,7 +884,7 @@ function () {
       var opts = _objectSpread({}, defaultOptions, {
         name: usrOpts.host
       }, usrOpts, {
-        ignoreHeaders: _toConsumableArray(defaultOptions.ignoreHeaders).concat(_toConsumableArray(usrOpts.ignoreHeaders || []))
+        ignoreHeaders: [].concat(_toConsumableArray(defaultOptions.ignoreHeaders), _toConsumableArray(usrOpts.ignoreHeaders || []))
       });
 
       opts.logger = new Logger(opts);

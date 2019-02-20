@@ -62,7 +62,7 @@ const cleanupTapes = () => {
   }
 }
 
-describe("talkback", async () => {
+describe("talkback", () => {
   beforeEach(() => cleanupTapes())
 
   before(async () => {
@@ -84,7 +84,7 @@ describe("talkback", async () => {
     }
   })
 
-  describe("## recording enabled", async () => {
+  describe("## recording enabled", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
       talkbackServer = await startTalkback()
 
@@ -256,7 +256,7 @@ describe("talkback", async () => {
     })
   })
 
-  describe("## recording disabled", async () => {
+  describe("## recording disabled", () => {
     it("returns a 404 on unkwown request with fallbackMode 404 (default)", async () => {
       talkbackServer = await startTalkback({record: false})
 
@@ -280,7 +280,7 @@ describe("talkback", async () => {
     })
   })
 
-  describe("error handling", async () => {
+  describe("error handling", () => {
     afterEach(() => td.reset())
 
     it("returns a 500 if anything goes wrong", async () => {
@@ -296,7 +296,7 @@ describe("talkback", async () => {
     })
   })
 
-  describe("summary printing", async () => {
+  describe("summary printing", () => {
     let log
     beforeEach(() => {
       log = td.replace(console, 'log')
@@ -319,7 +319,7 @@ describe("talkback", async () => {
     })
   })
 
-  describe("tape usage information", async () => {
+  describe("tape usage information", () => {
     it("should indicate that a tape has been used after usage", async () => {
       talkbackServer = await startTalkback({record: false})
 
@@ -339,7 +339,7 @@ describe("talkback", async () => {
     })
   })
 
-  describe("https", async () => {
+  describe("https", () => {
     it("should be able to run a https server", async () => {
       const options = {
         record: false,

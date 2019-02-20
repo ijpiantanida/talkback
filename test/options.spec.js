@@ -10,7 +10,6 @@ describe("Options", () => {
 
   it("concats ignoreHeaders to default ones provided", () => {
     let opts = Options.prepare({ignoreHeaders: ['user-agent']})
-    console.log("opts.ignoreHeaders", opts.ignoreHeaders)
     expect(opts.ignoreHeaders.length >= 1).to.eql(true)
     expect(opts.ignoreHeaders.includes('user-agent')).to.eql(true)
 

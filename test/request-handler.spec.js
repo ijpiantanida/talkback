@@ -30,7 +30,7 @@ const rawTape = {
   }
 }
 
-describe("RequestHandler", async () => {
+describe("RequestHandler", () => {
   beforeEach(() => {
     opts = Options.prepare({debug: false})
     tapeStore = new TapeStore(opts)
@@ -38,8 +38,8 @@ describe("RequestHandler", async () => {
     reqHandler = new RequestHandler(tapeStore, opts)
   })
 
-  describe("#handle", async () => {
-    context("when the request matches a tape", async () => {
+  describe("#handle", () => {
+    context("when the request matches a tape", () => {
       beforeEach(() => {
         tapeStore.tapes = [savedTape]
       })
@@ -50,7 +50,7 @@ describe("RequestHandler", async () => {
         expect(resObj.body).to.eql(Buffer.from("Hello"))
       })
 
-      context("when there's a responseDecorator", async () => {
+      context("when there's a responseDecorator", () => {
         beforeEach(() => {
           opts.responseDecorator = (tape, req) => {
             tape.res.body = req.body
@@ -82,7 +82,7 @@ describe("RequestHandler", async () => {
       })
     })
 
-    context("when the request doesn't match a tape", async () => {
+    context("when the request doesn't match a tape", () => {
       beforeEach(() => {
         const fakeMakeRealRequest = td.function()
         td.when(fakeMakeRealRequest(td.matchers.anything())).thenReturn(savedTape.res)
@@ -99,7 +99,7 @@ describe("RequestHandler", async () => {
         expect(resObj.body).to.eql(Buffer.from("Hello"))
       })
 
-      context("when there's a responseDecorator", async () => {
+      context("when there's a responseDecorator", () => {
         beforeEach(() => {
           opts.responseDecorator = (tape, req) => {
             tape.res.body = req.body

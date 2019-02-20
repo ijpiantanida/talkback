@@ -779,10 +779,10 @@ function () {
       this.server = serverFactory();
       console.log("Starting talkback on ".concat(this.options.port));
       this.server.listen(this.options.port, callback);
-      var closeSignalHandler = this.close.bind(this);
-      process.on("exit", closeSignalHandler);
-      process.on("SIGINT", closeSignalHandler);
-      process.on("SIGTERM", closeSignalHandler);
+      this.closeSignalHandler = this.close.bind(this);
+      process.on("exit", this.closeSignalHandler);
+      process.on("SIGINT", this.closeSignalHandler);
+      process.on("SIGTERM", this.closeSignalHandler);
       return this.server;
     }
   }, {
@@ -804,6 +804,9 @@ function () {
 
       this.closed = true;
       this.server.close(callback);
+      process.removeListener("exit", this.closeSignalHandler);
+      process.removeListener("SIGINT", this.closeSignalHandler);
+      process.removeListener("SIGTERM", this.closeSignalHandler);
 
       if (this.options.summary) {
         var summary = new Sumary(this.tapeStore.tapes, this.options);

@@ -49,10 +49,10 @@ export default class TalkbackServer {
     console.log(`Starting talkback on ${this.options.port}`)
     this.server.listen(this.options.port, callback)
 
-    const closeSignalHandler = this.close.bind(this)
-    process.on("exit", closeSignalHandler)
-    process.on("SIGINT", closeSignalHandler)
-    process.on("SIGTERM", closeSignalHandler)
+    this.closeSignalHandler = this.close.bind(this)
+    process.on("exit", this.closeSignalHandler)
+    process.on("SIGINT", this.closeSignalHandler)
+    process.on("SIGTERM", this.closeSignalHandler)
 
     return this.server
   }
@@ -71,6 +71,10 @@ export default class TalkbackServer {
     }
     this.closed = true
     this.server.close(callback)
+
+    process.removeListener("exit", this.closeSignalHandler)
+    process.removeListener("SIGINT", this.closeSignalHandler)
+    process.removeListener("SIGTERM", this.closeSignalHandler)
 
     if (this.options.summary) {
       const summary = new Summary(this.tapeStore.tapes, this.options)

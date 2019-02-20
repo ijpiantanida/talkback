@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.9.0
+- `responseDecorator` is now called for both matched tapes as well as the initial response returned by the proxied server
+
 ## v1.8.1
 - Fix bug with HEAD requests
 

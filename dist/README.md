@@ -51,21 +51,21 @@ Returns an unstarted talkback server instance.
 | **name** | `String` | Server name | Defaults to `host` value |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
-| **ignoreBody** | `Boolean` | Should the request body be considered when matching tapes | `false` |
+| **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
-| **responseDecorator** | `Function` | Customize the response of a matching tape before it's returned. [More info](#custom-response-decorator) | `null` |  
+| **responseDecorator** | `Function` | Modify responses before they're returned. [More info](#custom-response-decorator) | `null` |  
 | **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
-| **silent** | `Boolean` | Enable requests information console messages in the middle of requests | `false` |
+| **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |
 
 ### HTTPS options
 | Name | Type | Description | Default |
 |------|------|-------------|---------|
-| *enabled* | `Boolean` | Enables HTTPS server | `false` |
-| *keyPath* | `String` | Path to the key file | `null` | 
-| *certPath* | `String` | Path to the cert file | `null` | 
+| **enabled** | `Boolean` | Enables HTTPS server | `false` |
+| **keyPath** | `String` | Path to the key file | `null` | 
+| **certPath** | `String` | Path to the cert file | `null` | 
 
 ### start([callback])
 Starts the HTTP server and if provided calls `callback` after the server has successfully started.
@@ -100,7 +100,8 @@ This means differences in formatting are ignored when comparing tapes, and any s
  
 ## No recording
 Talkback proxying and recording can be disabled through the `record` option.      
-When recording is disabled and an unknown requests arrives, talkback will just log an error message, and return a 404 response without proxying the request to `host`.   
+When recording is disabled and an unknown requests arrives, talkback will just log an error message and return a 404 response without proxying the request to `host`.   
+The `fallbackMode` option lets you choose whether you want this default behavior, or you would rather proxy the request to `host` returning its response but without creating any new tapes.    
 
 It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.
 
@@ -146,7 +147,7 @@ function urlMatcher(tape, req) {
 ```
   
 ## Custom response decorator
-If you want to add a little bit of dynamism to the response coming from a matching existing tape, you can do so by using the `responseDecorator` option.      
+If you want to add a little bit of dynamism to the response coming from a matching existing tape or adjust the response that the proxied server returns, you can do so by using the `responseDecorator` option.      
 This can be useful for example if your response needs to contain an ID that gets sent on the request, or if your response has a time dependent field.     
 
 The function will receive a copy of the matching tape and the in-flight request object, and it has to return the modified tape. Note that since you're receiving a copy of the matching tape, modifications that you do to it won't persist between different requests.   

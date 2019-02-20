@@ -35,6 +35,7 @@ describe("RequestHandler", async () => {
     opts = Options.prepare({debug: false})
     tapeStore = new TapeStore(opts)
     savedTape = Tape.fromStore(rawTape, opts)
+    reqHandler = new RequestHandler(tapeStore, opts)
   })
 
   describe("#handle", async () => {
@@ -44,13 +45,10 @@ describe("RequestHandler", async () => {
       })
 
       it("returns the matched tape response", async () => {
-        reqHandler = new RequestHandler(tapeStore, opts)
-
         const resObj = await reqHandler.handle(savedTape.req)
         expect(resObj.status).to.eql(200)
         expect(resObj.body).to.eql(Buffer.from("Hello"))
       })
-
 
       context("when there's a responseDecorator", async () => {
         beforeEach(() => {
@@ -61,7 +59,6 @@ describe("RequestHandler", async () => {
         })
 
         it("returns the decorated response", async () => {
-          reqHandler = new RequestHandler(tapeStore, opts)
           const resObj = await reqHandler.handle(savedTape.req)
 
           expect(resObj.status).to.eql(200)
@@ -70,7 +67,6 @@ describe("RequestHandler", async () => {
         })
 
         it("doesn't add a content-length header if it isn't present in the original response", async () => {
-          reqHandler = new RequestHandler(tapeStore, opts)
           const resObj = await reqHandler.handle(savedTape.req)
 
           expect(resObj.headers["content-length"]).to.be.undefined
@@ -79,10 +75,44 @@ describe("RequestHandler", async () => {
         it("updates the content-length header if it is present in the original response", async () => {
           savedTape.res.headers["content-length"] = [999]
 
-          reqHandler = new RequestHandler(tapeStore, opts)
           const resObj = await reqHandler.handle(savedTape.req)
 
           expect(resObj.headers["content-length"]).to.eq(3)
+        })
+      })
+    })
+
+    context("when the request doesn't match a tape", async () => {
+      beforeEach(() => {
+        const fakeMakeRealRequest = td.function()
+        td.when(fakeMakeRealRequest(td.matchers.anything())).thenReturn(savedTape.res)
+        td.replace(reqHandler, "makeRealRequest", fakeMakeRealRequest)
+
+        td.replace(tapeStore, "save")
+      })
+
+      afterEach(() => td.reset())
+      
+      it("makes the real request and returns the response", async () => {
+        const resObj = await reqHandler.handle(savedTape.req)
+        expect(resObj.status).to.eql(200)
+        expect(resObj.body).to.eql(Buffer.from("Hello"))
+      })
+
+      context("when there's a responseDecorator", async () => {
+        beforeEach(() => {
+          opts.responseDecorator = (tape, req) => {
+            tape.res.body = req.body
+            return tape
+          }
+        })
+
+        it("returns the decorated response", async () => {
+          const resObj = await reqHandler.handle(savedTape.req)
+
+          expect(resObj.status).to.eql(200)
+          expect(resObj.body).to.eql(Buffer.from("ABC"))
+          expect(savedTape.res.body).to.eql(Buffer.from("Hello"))
         })
       })
     })

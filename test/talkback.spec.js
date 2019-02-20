@@ -16,10 +16,13 @@ const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = __dirname + "/tapes"
 
+const talkbackPort = 8899
+const talkbackHost = `http://localhost:${talkbackPort}`
+
 const startTalkback = async (opts) => {
   const talkbackServer = talkback({
       path: tapesPath,
-      port: 8899,
+      port: talkbackPort,
       host: proxiedHost,
       record: true,
       silent: true,
@@ -30,6 +33,13 @@ const startTalkback = async (opts) => {
         if (tape.meta.tag === "echo") {
           tape.res.body = req.body
         }
+
+        let location = tape.res.headers["location"]
+        if (location && location[0]) {
+          location = location[0]
+          tape.res.headers["location"] = [location.replace(proxiedHost, talkbackHost)]
+        }
+
         return tape
       },
       ...opts
@@ -41,17 +51,19 @@ const startTalkback = async (opts) => {
   return talkbackServer
 }
 
-describe("talkback", async () => {
-  beforeEach(async () => {
-    // Delete all unnamed tapes
-    const files = fs.readdirSync(tapesPath)
-    for (let i = 0, len = files.length; i < len; i++) {
-      const match = files[i].match(/unnamed-/)
-      if (match !== null) {
-        fs.unlinkSync(tapesPath + "/" + files[i])
-      }
+const cleanupTapes = () => {
+  // Delete all unnamed tapes
+  const files = fs.readdirSync(tapesPath)
+  for (let i = 0, len = files.length; i < len; i++) {
+    const match = files[i].match(/unnamed-/)
+    if (match !== null) {
+      fs.unlinkSync(tapesPath + "/" + files[i])
     }
-  })
+  }
+}
+
+describe("talkback", async () => {
+  beforeEach(() => cleanupTapes())
 
   before(async () => {
     proxiedServer = testServer()
@@ -78,7 +90,7 @@ describe("talkback", async () => {
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
-      const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "POST", headers, body: reqBody})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
       expect(res.status).to.eq(200)
 
       const expectedResBody = {ok: true, body: {foo: "bar"}}
@@ -95,7 +107,7 @@ describe("talkback", async () => {
     it("proxies and creates a new tape when the GET request is unknown", async () => {
       talkbackServer = await startTalkback()
 
-      const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "GET"})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
       expect(res.status).to.eq(200)
 
       const expectedResBody = {ok: true, body: null}
@@ -114,7 +126,7 @@ describe("talkback", async () => {
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
-      const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "POST", headers, body: reqBody})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
       expect(res.status).to.eq(200)
 
       const expectedResBody = {ok: true, body: {foo: "bar"}}
@@ -132,7 +144,7 @@ describe("talkback", async () => {
       talkbackServer = await startTalkback()
 
       const headers = {"content-type": "application/json"}
-      const res = await fetch("http://localhost:8899/test/head", {method: "HEAD", headers})
+      const res = await fetch(`${talkbackHost}/test/head`, {method: "HEAD", headers})
       expect(res.status).to.eq(200)
 
       const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
@@ -143,10 +155,20 @@ describe("talkback", async () => {
       expect(tape.res.body).to.eql("")
     })
 
+    it("decorates proxied responses", async () => {
+      talkbackServer = await startTalkback()
+
+      const res = await fetch(`${talkbackHost}/test/redirect/1`, {compress: false, method: "GET", redirect: "manual"})
+      expect(res.status).to.eq(302)
+
+      const location = res.headers.get("location")
+      expect(location).to.eql(`${talkbackHost}/test/1`)
+    })
+
     it("handles when the proxied server returns a 500", async () => {
       talkbackServer = await startTalkback()
 
-      const res = await fetch("http://localhost:8899/test/3")
+      const res = await fetch(`${talkbackHost}/test/3`)
       expect(res.status).to.eq(500)
 
       const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
@@ -157,7 +179,7 @@ describe("talkback", async () => {
     it("loads existing tapes and uses them if they match", async () => {
       talkbackServer = await startTalkback({record: false})
 
-      const res = await fetch("http://localhost:8899/test/3", {compress: false})
+      const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
       expect(res.status).to.eq(200)
 
       const body = await res.json()
@@ -170,7 +192,7 @@ describe("talkback", async () => {
       const headers = {"content-type": "application/json"}
       const body = JSON.stringify({param1: 3, param2: {subParam: 1}})
 
-      const res = await fetch("http://localhost:8899/test/pretty", {
+      const res = await fetch(`${talkbackHost}/test/pretty`, {
         compress: false,
         method: "POST",
         headers,
@@ -189,7 +211,7 @@ describe("talkback", async () => {
 
     it("doesn't match pretty printed tapes with different body", async () => {
       const makeRequest = async (body) => {
-        let res = await fetch("http://localhost:8899/test/pretty", {
+        let res = await fetch(`${talkbackHost}/test/pretty`, {
           compress: false,
           method: "POST",
           headers,
@@ -221,7 +243,7 @@ describe("talkback", async () => {
       const headers = {"content-type": "application/json"}
       const body = JSON.stringify({text: "my-test"})
 
-      const res = await fetch("http://localhost:8899/test/echo", {
+      const res = await fetch(`${talkbackHost}/test/echo`, {
         compress: false,
         method: "POST",
         headers,
@@ -238,7 +260,7 @@ describe("talkback", async () => {
     it("returns a 404 on unkwown request with fallbackMode 404 (default)", async () => {
       talkbackServer = await startTalkback({record: false})
 
-      const res = await fetch("http://localhost:8899/test/1", {compress: false})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
       expect(res.status).to.eq(404)
     })
 
@@ -247,7 +269,7 @@ describe("talkback", async () => {
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
-      const res = await fetch("http://localhost:8899/test/1", {compress: false, method: "POST", headers, body: reqBody})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
       expect(res.status).to.eq(200)
 
       const expectedResBody = {ok: true, body: {foo: "bar"}}
@@ -269,7 +291,7 @@ describe("talkback", async () => {
         }
       })
 
-      const res = await fetch("http://localhost:8899/test/1", {compress: false})
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
       expect(res.status).to.eq(500)
     })
   })
@@ -303,7 +325,7 @@ describe("talkback", async () => {
 
       expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
 
-      const res = await fetch("http://localhost:8899/test/3", {compress: false})
+      const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
       expect(res.status).to.eq(200)
 
       expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(true)
@@ -332,9 +354,7 @@ describe("talkback", async () => {
       // Disable self-signed certificate check
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-      const reqBody = JSON.stringify({foo: "bar"})
-      const headers = {"content-type": "application/json"}
-      const res = await fetch("https://localhost:8899/test/3", {compress: false})
+      const res = await fetch(`https://localhost:${talkbackPort}/test/3`, {compress: false})
 
       expect(res.status).to.eq(200)
     })

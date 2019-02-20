@@ -42,6 +42,13 @@ const testServer = () => {
           res.end()
           return
         }
+        case "/test/redirect/1": {
+          res.writeHead(302, {
+            'Location': '/test/1'
+          })
+          res.end()
+          return
+        }
         default: {
           res.writeHead(404)
           res.end()

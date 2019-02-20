@@ -281,58 +281,66 @@ function () {
       var _handle = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee(req) {
-        var reqTape, resTape, resObj;
+        var newTape, matchingTape, resObj, responseTape, resTape;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                reqTape = new Tape(req, this.options);
-                resTape = this.tapeStore.find(reqTape);
+                newTape = new Tape(req, this.options);
+                matchingTape = this.tapeStore.find(newTape);
 
-                if (!resTape) {
-                  _context.next = 7;
+                if (!matchingTape) {
+                  _context.next = 6;
                   break;
                 }
 
+                responseTape = matchingTape;
+                _context.next = 19;
+                break;
+
+              case 6:
+                if (!this.options.record) {
+                  _context.next = 14;
+                  break;
+                }
+
+                _context.next = 9;
+                return this.makeRealRequest(req);
+
+              case 9:
+                resObj = _context.sent;
+                newTape.res = _objectSpread({}, resObj);
+                this.tapeStore.save(newTape);
+                _context.next = 18;
+                break;
+
+              case 14:
+                _context.next = 16;
+                return this.onNoRecord(req);
+
+              case 16:
+                resObj = _context.sent;
+                newTape.res = _objectSpread({}, resObj);
+
+              case 18:
+                responseTape = newTape;
+
+              case 19:
+                resObj = responseTape.res;
+
                 if (this.options.responseDecorator) {
-                  resTape = this.options.responseDecorator(resTape.clone(), req);
+                  resTape = this.options.responseDecorator(responseTape.clone(), req);
 
                   if (resTape.res.headers["content-length"]) {
                     resTape.res.headers["content-length"] = resTape.res.body.length;
                   }
+
+                  resObj = resTape.res;
                 }
 
-                resObj = resTape.res;
-                _context.next = 18;
-                break;
-
-              case 7:
-                if (!this.options.record) {
-                  _context.next = 15;
-                  break;
-                }
-
-                _context.next = 10;
-                return this.makeRealRequest(req);
-
-              case 10:
-                resObj = _context.sent;
-                reqTape.res = _objectSpread({}, resObj);
-                this.tapeStore.save(reqTape);
-                _context.next = 18;
-                break;
-
-              case 15:
-                _context.next = 17;
-                return this.onNoRecord(req);
-
-              case 17:
-                resObj = _context.sent;
-
-              case 18:
                 return _context.abrupt("return", resObj);
 
-              case 19:
+              case 22:
               case "end":
                 return _context.stop();
             }
@@ -378,6 +386,7 @@ function () {
               case 7:
                 return _context2.abrupt("return", {
                   status: 404,
+                  headers: [],
                   body: "talkback - tape not found"
                 });
 
@@ -421,7 +430,8 @@ function () {
                   method: method,
                   headers: headers,
                   body: body,
-                  compress: false
+                  compress: false,
+                  redirect: "manual"
                 });
 
               case 8:

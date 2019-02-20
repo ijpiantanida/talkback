@@ -9,27 +9,33 @@ export default class RequestHandler {
   }
 
   async handle(req) {
-    const reqTape = new Tape(req, this.options)
-    let resTape = this.tapeStore.find(reqTape)
-    let resObj
+    const newTape = new Tape(req, this.options)
+    let matchingTape = this.tapeStore.find(newTape)
+    let resObj, responseTape;
 
-    if (resTape) {
-      if (this.options.responseDecorator) {
-        resTape = this.options.responseDecorator(resTape.clone(), req)
-
-        if (resTape.res.headers["content-length"]) {
-          resTape.res.headers["content-length"] = resTape.res.body.length
-        }
-      }
-      resObj = resTape.res
+    if (matchingTape) {
+      responseTape = matchingTape
     } else {
       if (this.options.record) {
         resObj = await this.makeRealRequest(req)
-        reqTape.res = {...resObj}
-        this.tapeStore.save(reqTape)
+        newTape.res = {...resObj}
+        this.tapeStore.save(newTape)
       } else {
         resObj = await this.onNoRecord(req)
+        newTape.res = {...resObj}
       }
+      responseTape = newTape
+    }
+
+    resObj = responseTape.res
+
+    if (this.options.responseDecorator) {
+      const resTape = this.options.responseDecorator(responseTape.clone(), req)
+
+      if (resTape.res.headers["content-length"]) {
+        resTape.res.headers["content-length"] = resTape.res.body.length
+      }
+      resObj = resTape.res
     }
 
     return resObj
@@ -49,6 +55,7 @@ export default class RequestHandler {
 
     return {
       status: 404,
+      headers: [],
       body: "talkback - tape not found"
     }
   }
@@ -65,7 +72,7 @@ export default class RequestHandler {
       body = null
     }
 
-    const fRes = await fetch(host + url, {method, headers, body, compress: false})
+    const fRes = await fetch(host + url, {method, headers, body, compress: false, redirect: "manual"})
     const buff = await fRes.buffer()
     return {
       status: fRes.status,

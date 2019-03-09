@@ -5,6 +5,7 @@ const defaultOptions = {
   path: "./tapes/",
   record: true,
   name: "unnamed",
+  tapeNameGenerator: null,
 
   https: {
     enabled: false,

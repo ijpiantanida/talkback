@@ -10,7 +10,7 @@ export default class RequestHandler {
 
   async handle(req) {
     const newTape = new Tape(req, this.options)
-    let matchingTape = this.tapeStore.find(newTape)
+    let matchingTape = this.options.cache ? this.tapeStore.find(newTape) : null;
     let resObj, responseTape;
 
     if (matchingTape) {

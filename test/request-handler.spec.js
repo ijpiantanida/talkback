@@ -50,6 +50,29 @@ describe("RequestHandler", () => {
         expect(resObj.body).to.eql(Buffer.from("Hello"))
       })
 
+      context("when cache is disabled", () => {
+        const expectedResponse = {
+          status: 200,
+          body: "test"
+        };
+        beforeEach(() => {
+          opts.cache = false
+          const fakeMakeRealRequest = td.function()
+          td.when(fakeMakeRealRequest(td.matchers.anything())).thenReturn(expectedResponse)
+          td.replace(reqHandler, "makeRealRequest", fakeMakeRealRequest)
+
+          td.replace(tapeStore, "save")
+        })
+
+        afterEach(() => td.reset())
+
+        it("makes the real request and returns the response", async () => {
+          const resObj = await reqHandler.handle(savedTape.req)
+          expect(resObj.status).to.eql(200)
+          expect(resObj.body).to.eql("test")
+        })
+      })
+
       context("when there's a responseDecorator", () => {
         beforeEach(() => {
           opts.responseDecorator = (tape, req) => {
@@ -92,7 +115,7 @@ describe("RequestHandler", () => {
       })
 
       afterEach(() => td.reset())
-      
+
       it("makes the real request and returns the response", async () => {
         const resObj = await reqHandler.handle(savedTape.req)
         expect(resObj.status).to.eql(200)

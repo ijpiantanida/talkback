@@ -63,9 +63,8 @@ export default class TapeStore {
 
     const toSave = new TapeRenderer(tape).render()
 
-    const tapeName = `unnamed-${this.currentTapeId()}.json5`
-    tape.path = tapeName
-    const filename = this.path + tapeName
+    const filename = this.createTapePath(tape)
+    tape.path = path.basename(filename)
     this.options.logger.log(`Saving request ${tape.req.url} at ${filename}`)
     fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4))
   }
@@ -80,5 +79,21 @@ export default class TapeStore {
 
   resetTapeUsage() {
     return this.tapes.forEach(t => t.used = false)
+  }
+
+  createTapePath(tape) {
+    const currentTapeId = this.currentTapeId()
+    let tapePath = `unnamed-${currentTapeId}.json5`
+    if (this.options.tapeNameGenerator) {
+      tapePath = this.options.tapeNameGenerator(currentTapeId, tape)
+    }
+    let result = path.normalize(path.join(this.options.path, tapePath))
+    if (!result.endsWith(".json5")) {
+      result = `${result}.json5`
+    }
+    const dir = path.dirname(result)
+    mkdirp.sync(dir)
+
+    return result
   }
 }

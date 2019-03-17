@@ -673,9 +673,8 @@ function () {
       tape.used = true;
       this.tapes.push(tape);
       var toSave = new TapeRenderer(tape).render();
-      var tapeName = "unnamed-".concat(this.currentTapeId(), ".json5");
-      tape.path = tapeName;
-      var filename = this.path + tapeName;
+      var filename = this.createTapePath(tape);
+      tape.path = path.basename(filename);
       this.options.logger.log("Saving request ".concat(tape.req.url, " at ").concat(filename));
       fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
@@ -697,6 +696,26 @@ function () {
       return this.tapes.forEach(function (t) {
         return t.used = false;
       });
+    }
+  }, {
+    key: "createTapePath",
+    value: function createTapePath(tape) {
+      var currentTapeId = this.currentTapeId();
+      var tapePath = "unnamed-".concat(currentTapeId, ".json5");
+
+      if (this.options.tapeNameGenerator) {
+        tapePath = this.options.tapeNameGenerator(currentTapeId, tape);
+      }
+
+      var result = path.normalize(path.join(this.options.path, tapePath));
+
+      if (!result.endsWith(".json5")) {
+        result = "".concat(result, ".json5");
+      }
+
+      var dir = path.dirname(result);
+      mkdirp.sync(dir);
+      return result;
     }
   }]);
 
@@ -763,7 +782,7 @@ function () {
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 11]]);
+        }, _callee, null, [[0, 11]]);
       })));
     }
   }, {
@@ -861,6 +880,7 @@ var defaultOptions = {
   path: "./tapes/",
   record: true,
   name: "unnamed",
+  tapeNameGenerator: null,
   https: {
     enabled: false,
     keyPath: null,

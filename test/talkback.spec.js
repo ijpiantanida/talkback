@@ -9,6 +9,7 @@ import testServer from "./support/test-server"
 
 const JSON5 = require("json5")
 const fs = require("fs")
+const path = require("path")
 const fetch = require("node-fetch")
 
 let talkbackServer, proxiedServer, currentTapeId
@@ -153,6 +154,39 @@ describe("talkback", () => {
       expect(tape.req.url).to.eql("/test/head")
       expect(tape.req.body).to.eql("")
       expect(tape.res.body).to.eql("")
+    })
+
+    it("proxies and creates a new tape with a custom tape name generator", async () => {
+      talkbackServer = await startTalkback(
+        {
+          tapeNameGenerator: (tapeId, tape) => {
+            const urlParts = tape.req.url.split('/').filter(s => s)
+            let firstPart = "root"
+            let remainder = ""
+            if (urlParts.length > 0) {
+              firstPart = urlParts[0]
+              remainder = urlParts.slice(1, urlParts.length).join("-")
+            }
+            
+            const result = path.join('new-tapes', firstPart, `${tape.req.method}-${remainder}-${tapeId}`)
+
+            return result
+          }
+        }
+      )
+
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
+      
+      expect(res.status).to.eq(200)
+      const expectedResBody = {ok: true, body: null}
+      const body = await res.json()
+      expect(body).to.eql(expectedResBody)
+
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/test/GET-1-${currentTapeId}.json5`))
+      expect(tape.meta.reqHumanReadable).to.eq(undefined)
+      expect(tape.meta.resHumanReadable).to.eq(true)
+      expect(tape.req.url).to.eql("/test/1")
+      expect(tape.res.body).to.eql(expectedResBody)
     })
 
     it("decorates proxied responses", async () => {

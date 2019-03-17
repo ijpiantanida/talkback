@@ -49,6 +49,7 @@ Returns an unstarted talkback server instance.
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
 | **name** | `String` | Server name | Defaults to `host` value |
+| **tapeNameGenerator** | `Function` | Customize how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
@@ -88,7 +89,20 @@ Since tapes are only loaded on startup, any changes to a tape requires a server 
 
 #### File Name
 New tapes will be created under the `path` directory with the name `unnamed-n.json5`, where `n` is the tape number.   
-Tapes can be renamed at will, for example to give some meaning to the scenario the tape represents.
+Tapes can be renamed at will, for example to give some meaning to the scenario the tape represents.  
+If a custom `tapeNameGenerator` is provided, it will be called to produce an alternate file path under `path`
+that can be based on the tape contents.  Note that the file extension `.json5` will be appended automatically.
+
+##### Example:
+```javascript
+function nameGenerator(tapeNumber, tape) {
+  // organize in folders by request method
+  // e.g. tapes/GET/unnamed-1.json5
+  //      tapes/GET/unnamed-3.json5
+  //      tapes/POST/unnamed-2.json5
+  return path.join(`${tape.req.method}`, `unnamed-${tapeNumber}`)
+}
+```
 
 #### Request and Response body
 If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      

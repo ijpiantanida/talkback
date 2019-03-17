@@ -14,7 +14,7 @@
         body: ""
     },
     res: {
-        status: 404,
+        status: 400,
         headers: {
             server: [
                 "GitHub.com"

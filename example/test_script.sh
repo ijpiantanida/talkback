@@ -2,16 +2,32 @@
 
 BASE_URL=http://localhost:8080
 
-curl "$BASE_URL/users/ijpiantanida"
+error=false
 
-curl "$BASE_URL/users/ijpiantanida" -I
+function make_request() {
+  status=$(curl -o /dev/null -s -w "%{http_code}" "${@:1}")
+  if [ "$status" -eq "404" ]; then
+    error=true
+    echo "Request "${@:1}" could not be made"
+  fi
+}
 
-curl "$BASE_URL/auth" -H "content-type: application/json" -d '{"username": "james", "password": "moriarty"}'
+make_request "$BASE_URL/users/ijpiantanida"
 
-curl "$BASE_URL/orgs/test"
+make_request "$BASE_URL/users/ijpiantanida" -I
 
-curl "$BASE_URL/users" -H "content-type: application/json" -d '{"username": "james", "ignore": "abc"}'
+make_request "$BASE_URL/auth" -H "content-type: application/json" -d '{"username": "james", "password": "moriarty"}'
 
-curl "$BASE_URL/repos/not-valid"
+make_request "$BASE_URL/orgs/test"
 
-curl "$BASE_URL/repos/ijpiantanida/talkback"
+make_request "$BASE_URL/users" -H "content-type: application/json" -d '{"username": "james", "ignore": "abc"}'
+
+make_request "$BASE_URL/repos/not-valid"
+
+make_request "$BASE_URL/repos/ijpiantanida/talkback"
+
+if [ "$error" = true ]; then
+  echo "FAILED"
+else
+  echo "SUCCESS"
+fi

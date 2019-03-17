@@ -17,10 +17,15 @@ export default class TapeStore {
   load() {
     mkdirp.sync(this.path)
 
-    const items = fs.readdirSync(this.path)
+    this.loadTapesAtDir(this.path)
+    console.log(`Loaded ${this.tapes.length} tapes`)
+  }
+
+  loadTapesAtDir(directory) {
+    const items = fs.readdirSync(directory)
     for (let i = 0; i < items.length; i++) {
       const filename = items[i]
-      const fullPath = `${this.path}${filename}`
+      const fullPath = `${directory}${filename}`
       const stat = fs.statSync(fullPath)
       if (!stat.isDirectory()) {
         try {
@@ -32,9 +37,10 @@ export default class TapeStore {
         } catch (e) {
           console.log(`Error reading tape ${fullPath}`, e.message)
         }
+      } else {
+        this.loadTapesAtDir(fullPath + "/")
       }
     }
-    console.log(`Loaded ${this.tapes.length} tapes`)
   }
 
   find(newTape) {

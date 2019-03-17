@@ -74,7 +74,7 @@ Starts the HTTP server and if provided calls `callback` after the server has suc
 Stops the HTTP server.
 
 ## Tapes
-Tapes can be freely edited to match new requests or return a different response than the original. They are loaded from the `path` directory at startup.   
+Tapes can be freely edited to match new requests or return a different response than the original. They are loaded recursively from the `path` directory at startup.   
 They use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the JSON format that allows for very neat features like comments, trailing commas and keys without quotes.   
 
 #### Format

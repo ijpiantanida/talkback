@@ -621,11 +621,17 @@ function () {
     key: "load",
     value: function load() {
       mkdirp.sync(this.path);
-      var items = fs.readdirSync(this.path);
+      this.loadTapesAtDir(this.path);
+      console.log("Loaded ".concat(this.tapes.length, " tapes"));
+    }
+  }, {
+    key: "loadTapesAtDir",
+    value: function loadTapesAtDir(directory) {
+      var items = fs.readdirSync(directory);
 
       for (var i = 0; i < items.length; i++) {
         var filename = items[i];
-        var fullPath = "".concat(this.path).concat(filename);
+        var fullPath = "".concat(directory).concat(filename);
         var stat = fs.statSync(fullPath);
 
         if (!stat.isDirectory()) {
@@ -638,10 +644,10 @@ function () {
           } catch (e) {
             console.log("Error reading tape ".concat(fullPath), e.message);
           }
+        } else {
+          this.loadTapesAtDir(fullPath + "/");
         }
       }
-
-      console.log("Loaded ".concat(this.tapes.length, " tapes"));
     }
   }, {
     key: "find",

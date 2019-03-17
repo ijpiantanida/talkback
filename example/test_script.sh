@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-BASE_URL=http://localhost:8080
+BASE_URL=https://localhost:8080
 
 error=false
 
 function make_request() {
-  status=$(curl -o /dev/null -s -w "%{http_code}" "${@:1}")
+  status=$(curl -k -o /dev/null -s -w "%{http_code}" "${@:1}")
   if [ "$status" -eq "404" ]; then
     error=true
     echo "Request "${@:1}" could not be made"

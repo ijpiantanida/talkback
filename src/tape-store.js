@@ -64,7 +64,7 @@ export default class TapeStore {
     const toSave = new TapeRenderer(tape).render()
 
     const filename = this.createTapePath(tape)
-    tape.path = path.basename(filename)
+    tape.path = path.relative(this.path, filename)
     this.options.logger.log(`Saving request ${tape.req.url} at ${filename}`)
     fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4))
   }

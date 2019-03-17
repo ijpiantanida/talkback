@@ -674,7 +674,7 @@ function () {
       this.tapes.push(tape);
       var toSave = new TapeRenderer(tape).render();
       var filename = this.createTapePath(tape);
-      tape.path = path.basename(filename);
+      tape.path = path.relative(this.path, filename);
       this.options.logger.log("Saving request ".concat(tape.req.url, " at ").concat(filename));
       fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
     }
@@ -782,7 +782,7 @@ function () {
                 return _context.stop();
             }
           }
-        }, _callee, null, [[0, 11]]);
+        }, _callee, this, [[0, 11]]);
       })));
     }
   }, {

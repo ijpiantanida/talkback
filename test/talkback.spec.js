@@ -11,6 +11,7 @@ const JSON5 = require("json5")
 const fs = require("fs")
 const path = require("path")
 const fetch = require("node-fetch")
+const del = require("del")
 
 let talkbackServer, proxiedServer, currentTapeId
 const proxiedPort = 8898
@@ -54,13 +55,15 @@ const startTalkback = async (opts) => {
 
 const cleanupTapes = () => {
   // Delete all unnamed tapes
-  const files = fs.readdirSync(tapesPath)
+  let files = fs.readdirSync(tapesPath)
   for (let i = 0, len = files.length; i < len; i++) {
     const match = files[i].match(/unnamed-/)
     if (match !== null) {
-      fs.unlinkSync(tapesPath + "/" + files[i])
+      fs.unlinkSync(path.join(tapesPath, files[i]))
     }
   }
+  const newTapesPath = path.join(tapesPath, 'new-tapes')
+  del.sync(newTapesPath)
 }
 
 describe("talkback", () => {
@@ -159,18 +162,8 @@ describe("talkback", () => {
     it("proxies and creates a new tape with a custom tape name generator", async () => {
       talkbackServer = await startTalkback(
         {
-          tapeNameGenerator: (tapeId, tape) => {
-            const urlParts = tape.req.url.split('/').filter(s => s)
-            let firstPart = "root"
-            let remainder = ""
-            if (urlParts.length > 0) {
-              firstPart = urlParts[0]
-              remainder = urlParts.slice(1, urlParts.length).join("-")
-            }
-            
-            const result = path.join('new-tapes', firstPart, `${tape.req.method}-${remainder}-${tapeId}`)
-
-            return result
+          tapeNameGenerator: (tapeNumber, tape) => {
+            return path.join('new-tapes', `${tape.req.method}`, `my-tape-${tapeNumber}`)
           }
         }
       )
@@ -178,15 +171,9 @@ describe("talkback", () => {
       const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
       
       expect(res.status).to.eq(200)
-      const expectedResBody = {ok: true, body: null}
-      const body = await res.json()
-      expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/test/GET-1-${currentTapeId}.json5`))
-      expect(tape.meta.reqHumanReadable).to.eq(undefined)
-      expect(tape.meta.resHumanReadable).to.eq(true)
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/GET/my-tape-${currentTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
-      expect(tape.res.body).to.eql(expectedResBody)
     })
 
     it("decorates proxied responses", async () => {

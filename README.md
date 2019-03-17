@@ -49,7 +49,7 @@ Returns an unstarted talkback server instance.
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
 | **name** | `String` | Server name | Defaults to `host` value |
-| **tapeNameGenerator** | `Function` | Customize how a tape name is generated for new tapes. | `null` |
+| **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
@@ -90,8 +90,7 @@ Since tapes are only loaded on startup, any changes to a tape requires a server 
 #### File Name
 New tapes will be created under the `path` directory with the name `unnamed-n.json5`, where `n` is the tape number.   
 Tapes can be renamed at will, for example to give some meaning to the scenario the tape represents.  
-If a custom `tapeNameGenerator` is provided, it will be called to produce an alternate file path under `path`
-that can be based on the tape contents.  Note that the file extension `.json5` will be appended automatically.
+If a custom `tapeNameGenerator` is provided, it will be called to produce an alternate file path under `path` that can be based on the tape contents. Note that the file extension `.json5` will be appended automatically.
 
 ##### Example:
 ```javascript

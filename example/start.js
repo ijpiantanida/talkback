@@ -51,7 +51,7 @@ var server = talkback({
   urlMatcher: urlMatcher,
   responseDecorator: responseDecorator,
   https: {
-    enabled: false,
+    enabled: true,
     keyPath: __dirname + "/httpsCert/localhost.key",
     certPath: __dirname + "/httpsCert/localhost.crt"
   }

@@ -30,7 +30,7 @@ export default class TapeRenderer {
       if (isResAnObject && mediaType.isJSON()) {
         const json = JSON.stringify(reqResObj.body, null, 2)
         if (Headers.read(reqResObj.headers, "content-length")) {
-          Headers.write(reqResObj.headers, "content-length", json.length, metaPrefix)
+          Headers.write(reqResObj.headers, "content-length", Buffer.byteLength(json), metaPrefix)
         }
         return bufferShim.from(json)
       } else {

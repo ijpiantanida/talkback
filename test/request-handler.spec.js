@@ -50,13 +50,13 @@ describe("RequestHandler", () => {
         expect(resObj.body).to.eql(Buffer.from("Hello"))
       })
 
-      context("when cache is disabled", () => {
+      context("when cacheMode does not return 'cache'", () => {
         const expectedResponse = {
           status: 200,
           body: "test"
         };
         beforeEach(() => {
-          opts.cache = false
+          opts.cacheMode = () => "no-cache";
           const fakeMakeRealRequest = td.function()
           td.when(fakeMakeRealRequest(td.matchers.anything())).thenReturn(expectedResponse)
           td.replace(reqHandler, "makeRealRequest", fakeMakeRealRequest)
@@ -70,6 +70,33 @@ describe("RequestHandler", () => {
           const resObj = await reqHandler.handle(savedTape.req)
           expect(resObj.status).to.eql(200)
           expect(resObj.body).to.eql("test")
+        })
+      })
+
+      context("when cacheMode returns 'pass-thru'", () => {
+        const expectedResponse = {
+          status: 200,
+          body: "test"
+        };
+        const fakeMakeRealRequest = td.function()
+        const fakeSaveTape = td.function()
+        beforeEach(() => {
+          opts.cacheMode = () => "pass-thru";
+          td.when(fakeMakeRealRequest(td.matchers.anything())).thenReturn(expectedResponse)
+          td.replace(reqHandler, "makeRealRequest", fakeMakeRealRequest)
+
+          td.replace(tapeStore, "save", fakeSaveTape)
+        })
+
+        afterEach(() => td.reset())
+
+        it("makes the real request and returns the response without saving a tape", async () => {
+          const {req} = savedTape;
+          const resObj = await reqHandler.handle(req)
+          expect(resObj.status).to.eql(200)
+          expect(resObj.body).to.eql("test")
+          td.verify(fakeMakeRealRequest(req))
+          td.verify(fakeSaveTape(td.matchers.anything()), {times: 1})
         })
       })
 
@@ -120,6 +147,7 @@ describe("RequestHandler", () => {
         const resObj = await reqHandler.handle(savedTape.req)
         expect(resObj.status).to.eql(200)
         expect(resObj.body).to.eql(Buffer.from("Hello"))
+
       })
 
       context("when there's a responseDecorator", () => {

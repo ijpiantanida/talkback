@@ -10,7 +10,8 @@ export default class RequestHandler {
 
   async handle(req) {
     const newTape = new Tape(req, this.options)
-    let matchingTape = this.options.cache ? this.tapeStore.find(newTape) : null;
+    const cacheBehavior = this.options.cacheMode(req)
+    let matchingTape = cacheBehavior === "cache" ? this.tapeStore.find(newTape) : null;
     let resObj, responseTape;
 
     if (matchingTape) {
@@ -19,7 +20,9 @@ export default class RequestHandler {
       if (this.options.record) {
         resObj = await this.makeRealRequest(req)
         newTape.res = {...resObj}
-        this.tapeStore.save(newTape)
+        if (cacheBehavior !== "pass-through") {
+          this.tapeStore.save(newTape)
+        }
       } else {
         resObj = await this.onNoRecord(req)
         newTape.res = {...resObj}

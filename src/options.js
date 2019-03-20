@@ -5,7 +5,7 @@ const defaultOptions = {
   path: "./tapes/",
   record: true,
   name: "unnamed",
-  cache: true,
+  cacheMode: () => "cache",
 
   https: {
     enabled: false,

@@ -104,7 +104,7 @@ describe("TapeRenderer", () => {
           headers: {
             ...raw.res.headers,
             "content-type": ["application/json"],
-            "content-length": [68]
+            "content-length": [20]
           },
           body: {
             foo: "bar",

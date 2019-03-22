@@ -108,6 +108,7 @@ describe("TapeRenderer", () => {
           },
           body: {
             foo: "bar",
+            utf8: "🔤",
             nested: {
               fuu: 3
             }
@@ -119,7 +120,7 @@ describe("TapeRenderer", () => {
       expect(tape.req.body).to.eql(Buffer.from(JSON.stringify(newRaw.req.body, null, 2)))
 
       expect(tape.res.body).to.eql(Buffer.from(JSON.stringify(newRaw.res.body, null, 2)))
-      expect(tape.res.headers["content-length"]).to.eql([50])
+      expect(tape.res.headers["content-length"]).to.eql([68])
 
       delete newRaw.res.headers["content-length"]
       tape = TapeRenderer.fromStore(newRaw, opts)

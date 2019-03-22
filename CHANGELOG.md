@@ -3,6 +3,7 @@
 ## v1.9.1
 - Load tapes from deep directories
 - Add `tapeNameGenerator` option
+- Bugfix: wrong Content-Length when tapes contain multi-bytes characters
 
 ## v1.9.0
 - `responseDecorator` is now called for both matched tapes as well as the initial response returned by the proxied server

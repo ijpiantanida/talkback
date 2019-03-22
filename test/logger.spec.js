@@ -1,10 +1,11 @@
 import Logger from "../src/logger"
 
-let log, debug
+let log, debug, error
 describe("Logger", () => {
   beforeEach(() => {
     log = td.replace(console, 'log')
     debug = td.replace(console, 'debug')
+    error = td.replace(console, 'error')
   })
 
   afterEach(() => td.reset())
@@ -17,7 +18,7 @@ describe("Logger", () => {
       td.verify(log("Test"), {times: 0})
     })
 
-    it("does nothing if silent option is disabled", () => {
+    it("writes to log console if silent option is disabled", () => {
       const logger = new Logger({silent: false})
       logger.log("Test")
 
@@ -33,11 +34,27 @@ describe("Logger", () => {
       td.verify(debug("Test"), {times: 0})
     })
 
-    it("does nothing if debug option is enabled", () => {
+    it("writes to debug console if debug option is enabled", () => {
       const logger = new Logger({debug: true})
       logger.debug("Test")
 
       td.verify(debug("Test"))
+    })
+  })
+
+  describe("#error", () => {
+    it("writes to error console if silent option is enabled", () => {
+      const logger = new Logger({silent: true})
+      logger.error("Test")
+
+      td.verify(error("Test"))
+    })
+
+    it("writes to error console if silent option is disabled", () => {
+      const logger = new Logger({silent: false})
+      logger.error("Test")
+
+      td.verify(error("Test"))
     })
   })
 })

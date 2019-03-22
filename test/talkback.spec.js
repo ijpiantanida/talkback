@@ -13,6 +13,9 @@ const path = require("path")
 const fetch = require("node-fetch")
 const del = require("del")
 
+const RecordMode = talkback.Options.RecordMode
+const FallbackMode = talkback.Options.FallbackMode
+
 let talkbackServer, proxiedServer, currentTapeId
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
@@ -26,7 +29,7 @@ const startTalkback = async (opts) => {
       path: tapesPath,
       port: talkbackPort,
       host: proxiedHost,
-      record: true,
+      record: RecordMode.NEW,
       silent: true,
       bodyMatcher: (tape, req) => {
         return tape.meta.tag === "echo"
@@ -88,7 +91,7 @@ describe("talkback", () => {
     }
   })
 
-  describe("## recording enabled", () => {
+  describe("## record mode NEW", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
       talkbackServer = await startTalkback()
 
@@ -169,7 +172,7 @@ describe("talkback", () => {
       )
 
       const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
-      
+
       expect(res.status).to.eq(200)
 
       const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/GET/my-tape-${currentTapeId}.json5`))
@@ -198,7 +201,7 @@ describe("talkback", () => {
     })
 
     it("loads existing tapes and uses them if they match", async () => {
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
       expect(res.status).to.eq(200)
@@ -208,7 +211,7 @@ describe("talkback", () => {
     })
 
     it("matches and returns pretty printed tapes", async () => {
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const headers = {"content-type": "application/json"}
       const body = JSON.stringify({param1: 3, param2: {subParam: 1}})
@@ -241,7 +244,7 @@ describe("talkback", () => {
         expect(res.status).to.eq(404)
       }
 
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const headers = {"content-type": "application/json"}
 
@@ -259,7 +262,7 @@ describe("talkback", () => {
     })
 
     it("decorates the response of an existing tape", async () => {
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const headers = {"content-type": "application/json"}
       const body = JSON.stringify({text: "my-test"})
@@ -277,16 +280,53 @@ describe("talkback", () => {
     })
   })
 
-  describe("## recording disabled", () => {
-    it("returns a 404 on unkwown request with fallbackMode 404 (default)", async () => {
-      talkbackServer = await startTalkback({record: false})
+  describe("## record mode OVERWRITE", () => {
+    it("overwrites an existing tape", async () => {
+      talkbackServer = await startTalkback({
+        record: RecordMode.OVERWRITE,
+        ignoreHeaders: ["x-talkback-ping"],
+        silent: false,
+        debug: true
+      })
+
+      const nextTapeId = currentTapeId
+
+      let headers = {"x-talkback-ping": "test1"}
+
+      let res = await fetch(`${talkbackHost}/test/1`, {compress: false, headers})
+      expect(res.status).to.eq(200)
+      let resBody = await res.json()
+      let expectedBody = {ok: true, body: "test1"}
+      expect(resBody).to.eql(expectedBody)
+
+      let tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
+      expect(tape.req.url).to.eql("/test/1")
+      expect(tape.res.body).to.eql(expectedBody)
+
+      headers = {"x-talkback-ping": "test2"}
+
+      res = await fetch(`${talkbackHost}/test/1`, {compress: false, headers})
+      expect(res.status).to.eq(200)
+      resBody = await res.json()
+      expectedBody = {ok: true, body: "test2"}
+      expect(resBody).to.eql(expectedBody)
+
+      tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
+      expect(tape.req.url).to.eql("/test/1")
+      expect(tape.res.body).to.eql(expectedBody)
+    })
+  })
+
+  describe("## record mode DISABLED", () => {
+    it("returns a 404 on unkwown request with fallbackMode NOT_FOUND (default)", async () => {
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
       expect(res.status).to.eq(404)
     })
 
-    it("proxies request to host on unkwown request with fallbackMode proxy", async () => {
-      talkbackServer = await startTalkback({record: false, fallbackMode: "proxy"})
+    it("proxies request to host on unkwown request with fallbackMode PROXY", async () => {
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED, fallbackMode: FallbackMode.PROXY})
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
@@ -305,7 +345,7 @@ describe("talkback", () => {
     afterEach(() => td.reset())
 
     it("returns a 500 if anything goes wrong", async () => {
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
       td.replace(talkbackServer, "tapeStore", {
         find: () => {
           throw "Test error"
@@ -342,7 +382,7 @@ describe("talkback", () => {
 
   describe("tape usage information", () => {
     it("should indicate that a tape has been used after usage", async () => {
-      talkbackServer = await startTalkback({record: false})
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
 
@@ -363,7 +403,7 @@ describe("talkback", () => {
   describe("https", () => {
     it("should be able to run a https server", async () => {
       const options = {
-        record: false,
+        record: RecordMode.DISABLED,
         https: {
           enabled: true,
           keyPath: "./example/httpsCert/localhost.key",

@@ -263,6 +263,163 @@ function () {
   return Tape;
 }();
 
+var Logger =
+/*#__PURE__*/
+function () {
+  function Logger(options) {
+    _classCallCheck(this, Logger);
+
+    this.options = options;
+
+    if (this.options.debug) {
+      console.debug("DEBUG mode active");
+    }
+  }
+
+  _createClass(Logger, [{
+    key: "log",
+    value: function log(message) {
+      if (!this.options.silent) {
+        console.log(message);
+      }
+    }
+  }, {
+    key: "debug",
+    value: function debug(message) {
+      if (this.options.debug) {
+        console.debug(message);
+      }
+    }
+  }, {
+    key: "error",
+    value: function error(message) {
+      console.error(message);
+    }
+  }]);
+
+  return Logger;
+}();
+
+var RecordMode = {
+  NEW: "NEW",
+  // Proxies to host and records tape if the request has never been seen
+  OVERWRITE: "OVERWRITE",
+  // Always proxies to host and records tape, overwriting any existing tape
+  NEVER: "NEVER" // Doesn't record a tape. Response is defined by `fallbackMode` option
+
+};
+RecordMode.ALL = [RecordMode.NEW, RecordMode.OVERWRITE, RecordMode.NEVER];
+var FallbackMode = {
+  NOT_FOUND: "NOT_FOUND",
+  PROXY: "PROXY"
+};
+FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY];
+var defaultOptions = {
+  port: 8080,
+  path: "./tapes/",
+  record: RecordMode.NEW,
+  name: "unnamed",
+  tapeNameGenerator: null,
+  https: {
+    enabled: false,
+    keyPath: null,
+    certPath: null
+  },
+  ignoreHeaders: ["content-length", "host"],
+  ignoreQueryParams: [],
+  ignoreBody: false,
+  bodyMatcher: null,
+  urlMatcher: null,
+  responseDecorator: null,
+  fallbackMode: FallbackMode.NOT_FOUND,
+  silent: false,
+  summary: true,
+  debug: false
+};
+
+var Options =
+/*#__PURE__*/
+function () {
+  function Options() {
+    _classCallCheck(this, Options);
+  }
+
+  _createClass(Options, null, [{
+    key: "prepare",
+    value: function prepare() {
+      var usrOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      // We start with a default logger
+      this.logger = new Logger({});
+      this.checkDeprecated(usrOpts);
+
+      var opts = _objectSpread({}, defaultOptions, {
+        name: usrOpts.host
+      }, usrOpts, {
+        ignoreHeaders: [].concat(_toConsumableArray(defaultOptions.ignoreHeaders), _toConsumableArray(usrOpts.ignoreHeaders || []))
+      });
+
+      this.logger = new Logger(opts);
+      opts.logger = this.logger;
+      this.validateOptions(opts);
+      return opts;
+    }
+  }, {
+    key: "checkDeprecated",
+    value: function checkDeprecated(usrOpts) {
+      this.checkDeprecatedRecord(usrOpts);
+      this.checkDeprecatedFallbackMode(usrOpts);
+    }
+  }, {
+    key: "checkDeprecatedRecord",
+    value: function checkDeprecatedRecord(usrOpts) {
+      var value = usrOpts.record;
+
+      if (typeof value === 'boolean') {
+        var newValue = value ? RecordMode.NEW : RecordMode.NEVER;
+        usrOpts.record = newValue;
+        this.logger.error("DEPRECATION NOTICE: record option will no longer accept boolean values (https://github.com/ijpiantanida/talkback#talkbackopts). Defaulting to '".concat(newValue, "'."));
+      }
+    }
+  }, {
+    key: "checkDeprecatedFallbackMode",
+    value: function checkDeprecatedFallbackMode(usrOpts) {
+      var value = usrOpts.fallbackMode;
+
+      if (value === '404') {
+        usrOpts.fallbackMode = FallbackMode.NOT_FOUND;
+        this.logger.error("DEPRECATION NOTICE: fallbackMode option '404' has been replaced by '".concat(FallbackMode.NOT_FOUND, "'"));
+      }
+
+      if (value === 'proxy') {
+        usrOpts.fallbackMode = FallbackMode.PROXY;
+        this.logger.error("DEPRECATION NOTICE: fallbackMode option 'proxy' has been replaced by '".concat(FallbackMode.PROXY, "'"));
+      }
+    }
+  }, {
+    key: "validateOptions",
+    value: function validateOptions(opts) {
+      this.validateRecord(opts.record);
+      this.validateFallbackMode(opts.fallbackMode);
+    }
+  }, {
+    key: "validateRecord",
+    value: function validateRecord(record) {
+      if (typeof record === 'string' && !RecordMode.ALL.includes(record)) {
+        throw "INVALID OPTION: record has an invalid value of '".concat(record, "'");
+      }
+    }
+  }, {
+    key: "validateFallbackMode",
+    value: function validateFallbackMode(fallbackMode) {
+      if (typeof fallbackMode === 'string' && !FallbackMode.ALL.includes(fallbackMode)) {
+        throw "INVALID OPTION: fallbackMode has an invalid value of '".concat(fallbackMode, "'");
+      }
+    }
+  }]);
+
+  return Options;
+}();
+
 var fetch = require("node-fetch");
 
 var RequestHandler =
@@ -281,51 +438,58 @@ function () {
       var _handle = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee(req) {
-        var newTape, matchingTape, resObj, responseTape, resTape;
+        var recordIsAValue, recordMode, newTape, matchingTape, resObj, responseTape, resTape;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                recordIsAValue = typeof this.options.record === 'string';
+                recordMode = recordIsAValue ? this.options.record : this.options.record(req);
+                Options.validateRecord(recordMode);
                 newTape = new Tape(req, this.options);
                 matchingTape = this.tapeStore.find(newTape);
 
-                if (!matchingTape) {
-                  _context.next = 6;
+                if (!(recordMode !== RecordMode.OVERWRITE && matchingTape)) {
+                  _context.next = 9;
                   break;
                 }
 
                 responseTape = matchingTape;
-                _context.next = 19;
+                _context.next = 23;
                 break;
 
-              case 6:
-                if (!this.options.record) {
-                  _context.next = 14;
+              case 9:
+                if (matchingTape) {
+                  newTape = matchingTape;
+                }
+
+                if (!(recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE)) {
+                  _context.next = 18;
                   break;
                 }
 
-                _context.next = 9;
+                _context.next = 13;
                 return this.makeRealRequest(req);
 
-              case 9:
+              case 13:
                 resObj = _context.sent;
                 newTape.res = _objectSpread({}, resObj);
                 this.tapeStore.save(newTape);
-                _context.next = 18;
+                _context.next = 22;
                 break;
 
-              case 14:
-                _context.next = 16;
+              case 18:
+                _context.next = 20;
                 return this.onNoRecord(req);
 
-              case 16:
+              case 20:
                 resObj = _context.sent;
                 newTape.res = _objectSpread({}, resObj);
 
-              case 18:
+              case 22:
                 responseTape = newTape;
 
-              case 19:
+              case 23:
                 resObj = responseTape.res;
 
                 if (this.options.responseDecorator) {
@@ -340,7 +504,7 @@ function () {
 
                 return _context.abrupt("return", resObj);
 
-              case 22:
+              case 26:
               case "end":
                 return _context.stop();
             }
@@ -360,37 +524,39 @@ function () {
       var _onNoRecord = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee2(req) {
-        var fallbackMode;
+        var fallbackModeIsAValue, fallbackMode;
         return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                fallbackMode = this.options.fallbackMode;
+                fallbackModeIsAValue = typeof this.options.fallbackMode === "string";
+                fallbackMode = fallbackModeIsAValue ? this.options.fallbackMode : this.options.fallbackMode(req);
+                Options.validateFallbackMode(fallbackMode);
                 this.options.logger.log("Tape for ".concat(req.url, " not found and recording is disabled (fallbackMode: ").concat(fallbackMode, ")"));
                 this.options.logger.log({
                   url: req.url,
                   headers: req.headers
                 });
 
-                if (!(fallbackMode === "proxy")) {
-                  _context2.next = 7;
+                if (!(fallbackMode === FallbackMode.PROXY)) {
+                  _context2.next = 9;
                   break;
                 }
 
-                _context2.next = 6;
+                _context2.next = 8;
                 return this.makeRealRequest(req);
 
-              case 6:
+              case 8:
                 return _context2.abrupt("return", _context2.sent);
 
-              case 7:
+              case 9:
                 return _context2.abrupt("return", {
                   status: 404,
                   headers: [],
                   body: "talkback - tape not found"
                 });
 
-              case 8:
+              case 10:
               case "end":
                 return _context2.stop();
             }
@@ -662,7 +828,7 @@ function () {
 
       if (foundTape) {
         foundTape.used = true;
-        this.options.logger.log("Serving cached request for ".concat(newTape.req.url, " from tape ").concat(foundTape.path));
+        this.options.logger.log("Found matching tape for ".concat(newTape.req.url, " at ").concat(foundTape.path));
         return foundTape;
       }
     }
@@ -671,12 +837,21 @@ function () {
     value: function save(tape) {
       tape.new = true;
       tape.used = true;
-      this.tapes.push(tape);
+      var tapePath = tape.path;
+      var fullFilename;
+
+      if (tapePath) {
+        fullFilename = path.join(this.path, tapePath);
+      } else {
+        // If the tape doesn't have a path then it's new
+        this.tapes.push(tape);
+        fullFilename = this.createTapePath(tape);
+        tape.path = path.relative(this.path, fullFilename);
+      }
+
+      this.options.logger.log("Saving request ".concat(tape.req.url, " at ").concat(tape.path));
       var toSave = new TapeRenderer(tape).render();
-      var filename = this.createTapePath(tape);
-      tape.path = path.relative(this.path, filename);
-      this.options.logger.log("Saving request ".concat(tape.req.url, " at ").concat(filename));
-      fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4));
+      fs.writeFileSync(fullFilename, JSON5.stringify(toSave, null, 4));
     }
   }, {
     key: "currentTapeId",
@@ -843,90 +1018,14 @@ function () {
   return TalkbackServer;
 }();
 
-var Logger =
-/*#__PURE__*/
-function () {
-  function Logger(options) {
-    _classCallCheck(this, Logger);
-
-    this.options = options;
-
-    if (this.options.debug) {
-      console.debug("DEBUG mode active");
-    }
-  }
-
-  _createClass(Logger, [{
-    key: "log",
-    value: function log(message) {
-      if (!this.options.silent) {
-        console.log(message);
-      }
-    }
-  }, {
-    key: "debug",
-    value: function debug(message) {
-      if (this.options.debug) {
-        console.debug(message);
-      }
-    }
-  }]);
-
-  return Logger;
-}();
-
-var defaultOptions = {
-  port: 8080,
-  path: "./tapes/",
-  record: true,
-  name: "unnamed",
-  tapeNameGenerator: null,
-  https: {
-    enabled: false,
-    keyPath: null,
-    certPath: null
-  },
-  ignoreHeaders: ["content-length", "host"],
-  ignoreQueryParams: [],
-  ignoreBody: false,
-  bodyMatcher: null,
-  urlMatcher: null,
-  responseDecorator: null,
-  fallbackMode: "404",
-  silent: false,
-  summary: true,
-  debug: false
-};
-
-var Options =
-/*#__PURE__*/
-function () {
-  function Options() {
-    _classCallCheck(this, Options);
-  }
-
-  _createClass(Options, null, [{
-    key: "prepare",
-    value: function prepare() {
-      var usrOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      var opts = _objectSpread({}, defaultOptions, {
-        name: usrOpts.host
-      }, usrOpts, {
-        ignoreHeaders: [].concat(_toConsumableArray(defaultOptions.ignoreHeaders), _toConsumableArray(usrOpts.ignoreHeaders || []))
-      });
-
-      opts.logger = new Logger(opts);
-      return opts;
-    }
-  }]);
-
-  return Options;
-}();
-
 var talkback = function talkback(usrOpts) {
   var opts = Options.prepare(usrOpts);
   return new TalkbackServer(opts);
+};
+
+talkback.Options = {
+  FallbackMode: FallbackMode,
+  RecordMode: RecordMode
 };
 
 module.exports = talkback;

@@ -51,7 +51,7 @@ export default class TapeStore {
 
     if (foundTape) {
       foundTape.used = true
-      this.options.logger.log(`Serving cached request for ${newTape.req.url} from tape ${foundTape.path}`)
+      this.options.logger.log(`Found matching tape for ${newTape.req.url} at ${foundTape.path}`)
       return foundTape
     }
   }
@@ -59,14 +59,23 @@ export default class TapeStore {
   save(tape) {
     tape.new = true
     tape.used = true
-    this.tapes.push(tape)
+
+    const tapePath = tape.path
+    let fullFilename
+
+    if (tapePath) {
+      fullFilename = path.join(this.path, tapePath)
+    } else {
+      // If the tape doesn't have a path then it's new
+      this.tapes.push(tape)
+
+      fullFilename = this.createTapePath(tape)
+      tape.path = path.relative(this.path, fullFilename)
+    }
+    this.options.logger.log(`Saving request ${tape.req.url} at ${tape.path}`)
 
     const toSave = new TapeRenderer(tape).render()
-
-    const filename = this.createTapePath(tape)
-    tape.path = path.relative(this.path, filename)
-    this.options.logger.log(`Saving request ${tape.req.url} at ${filename}`)
-    fs.writeFileSync(filename, JSON5.stringify(toSave, null, 4))
+    fs.writeFileSync(fullFilename, JSON5.stringify(toSave, null, 4))
   }
 
   currentTapeId() {

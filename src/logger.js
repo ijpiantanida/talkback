@@ -8,13 +8,17 @@ export default class Logger {
   
   log(message) {
     if(!this.options.silent) {
-      console.log(message);
+      console.log(message)
     }
   }
 
   debug(message) {
     if(this.options.debug) {
-      console.debug(message);
+      console.debug(message)
     }
+  }
+
+  error(message) {
+    console.error(message)
   }
 }

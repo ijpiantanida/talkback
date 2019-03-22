@@ -22,6 +22,12 @@ const testServer = () => {
           if (bodyAsString) {
             body = JSON.parse(bodyAsString)
           }
+
+          const pingHeader = req.headers["x-talkback-ping"]
+          if (pingHeader) {
+            body = pingHeader
+          }
+
           res.end(JSON.stringify({ok: true, body}))
           return
         }

@@ -1,11 +1,11 @@
-import Options from "../src/options"
+import Options, {RecordMode, FallbackMode} from "../src/options"
 
 describe("Options", () => {
   it("merges user options and default options", () => {
     const opts = Options.prepare({silent: true})
 
-    expect(opts.silent).to.be.true
-    expect(opts.debug).to.be.false
+    expect(opts.silent).to.eql(true)
+    expect(opts.debug).to.eql(false)
   })
 
   it("concats ignoreHeaders to default ones provided", () => {
@@ -25,5 +25,68 @@ describe("Options", () => {
 
     opts = Options.prepare({host, name: "My Server"})
     expect(opts.name).to.eql("My Server")
+  })
+
+  describe("options validation", () => {
+    describe("#record", () => {
+      it("throws an error when record is not a valid value", () => {
+        expect(() => Options.prepare({record: 'invalid'}))
+          .to.throw("INVALID OPTION: record has an invalid value of 'invalid'")
+      })
+    })
+
+    describe("#fallbackMode", () => {
+      it("throws an error when fallbackMode is not a valid value", () => {
+        expect(() => Options.prepare({fallbackMode: 'invalid'}))
+          .to.throw("INVALID OPTION: fallbackMode has an invalid value of 'invalid'")
+      })
+    })
+  })
+
+  describe("deprecated options", () => {
+    let error
+    beforeEach(() => {
+      error = td.replace(console, 'error')
+    })
+
+    afterEach(() => td.reset())
+
+    describe("#record", () => {
+      it("notifies when record is still being used with a boolean", () => {
+        let opts = Options.prepare({record: true})
+        expect(opts.record).to.eql(RecordMode.NEW)
+        td.verify(error(td.matchers.contains("DEPRECATION NOTICE: record option will no longer accept boolean values")))
+
+        opts = Options.prepare({record: false})
+        expect(opts.record).to.eql(RecordMode.DISABLED)
+      })
+
+      it("does not notify when record is a string", () => {
+        Options.prepare({record: RecordMode.NEW})
+        td.verify(error(td.matchers.anything()), {times: 0})
+      })
+
+      it("does not notify when record is a function", () => {
+        Options.prepare({
+          record: () => {
+          }
+        })
+        td.verify(error(td.matchers.anything()), {times: 0})
+      })
+    })
+
+    describe("#fallbackMode", () => {
+      it("notifies when fallbackMode is '404'", () => {
+        let opts = Options.prepare({fallbackMode: "404"})
+        expect(opts.fallbackMode).to.eql(FallbackMode.NOT_FOUND)
+        td.verify(error(td.matchers.contains("DEPRECATION NOTICE: fallbackMode option '404' has been replaced by 'NOT_FOUND'")))
+      })
+
+      it("notifies when fallbackMode is 'proxy'", () => {
+        let opts = Options.prepare({fallbackMode: "proxy"})
+        expect(opts.fallbackMode).to.eql(FallbackMode.PROXY)
+        td.verify(error(td.matchers.contains("DEPRECATION NOTICE: fallbackMode option 'proxy' has been replaced by 'PROXY'")))
+      })
+    })
   })
 })

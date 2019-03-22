@@ -2,7 +2,7 @@
 
 Record and playback HTTP requests.   
 Talkback is a pure javascript standalone HTTP proxy. As long as you have node.js in your environment, you can run Talkback to record requests from applications written in any language/framework.   
-You can use it to accelerate your integration tests or running your application against a mocked HTTP servers.       
+You can use it to accelerate your integration tests or running your application against mocked HTTP servers.       
 
 Read more about the reasoning behind **talkback** on [10Pines blog](https://blog.10pines.com/2017/12/18/isolating-integration-tests-from-external-http-services-with-talkback/).   
 
@@ -28,6 +28,7 @@ const talkback = require("talkback");
 
 const opts = {
   host: "https://api.myapp.com/foo",
+  record: talkback.Options.RecordMode.NEW,
   port: 5544,
   path: "./my-tapes"
 };
@@ -47,7 +48,7 @@ Returns an unstarted talkback server instance.
 | **port** | `String` | Talkback port | 8080 |
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
-| **record** | `Boolean` | Enable record of unknown requests to tapes | `true` |
+| **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
 | **name** | `String` | Server name | Defaults to `host` value |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
@@ -56,7 +57,7 @@ Returns an unstarted talkback server instance.
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
 | **responseDecorator** | `Function` | Modify responses before they're returned. [More info](#custom-response-decorator) | `null` |  
-| **fallbackMode** | `String` | Fallback mode for non-recorded requests<ul><li>**404:** Return a 404 error</li><li>**proxy:** Proxy unkonwn request to host</li></ul> | `"404"` |
+| **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |
@@ -111,12 +112,39 @@ Otherwise, the body will be saved as a Base64 string, allowing to save binary co
 If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   
 This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost. 
  
-## No recording
-Talkback proxying and recording can be disabled through the `record` option.      
-When recording is disabled and an unknown requests arrives, talkback will just log an error message and return a 404 response without proxying the request to `host`.   
-The `fallbackMode` option lets you choose whether you want this default behavior, or you would rather proxy the request to `host` returning its response but without creating any new tapes.    
+## Recording Modes
+Talkback proxying and recording behavior can be controlled through the `record` option.   
+This option accepts either one of the possible recording modes to be used for all requests or a function that takes the request as a parameter and returns a valid recording mode.   
+
+There are 3 possible recording modes:   
+
+|Value| Description|
+|-----|------------|
+|`NEW`| If no tape matches the request, proxy it and save the response to a tape|
+|`OVERWRITE`| Always proxy the request and save the response to a tape, overwriting any existing one|
+|`DISABLED`| If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response|
+            
+The `fallbackMode` option lets you choose what do you want Talkback to do when recording is disabled and an unknown request arrives.  
+Same as with `record`, this option accepts either one of the possible modes values to be used for all requests or a function that takes the request as a parameter and returns a mode.
+
+There are 2 possible fallback modes:   
+
+|Value| Description|
+|-----|------------|
+|`NOT_FOUND`| Log an error and return a 404 response|
+|`PROXY`| Proxy the request to `host` and return its response, but don't create a tape|
 
 It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.
+
+Talkback exports constants for the different options values:
+```javascript
+  const talkback = require("talkback")
+  
+  const opts = {
+    record: talkback.Options.RecordMode.OVERWRITE,
+    fallbackMode: talkback.Options.FallbackMode.PROXY
+  }
+```
 
 ## Custom request body matcher
 By default, in order for a request to match against a saved tape, both request and tape need to have the exact same body.      

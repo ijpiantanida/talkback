@@ -8,6 +8,13 @@ if (process.env.USE_NPM) {
 
 var host = "https://api.github.com"
 
+function fallbackMode(req) {
+  if (req.url.includes("/mytest")) {
+    return talkback.Options.FallbackMode.PROXY
+  }
+  return talkback.Options.FallbackMode.NOT_FOUND
+}
+
 function bodyMatcher(tape, req) {
   if (tape.meta.tag === "fake-post") {
     var tapeBody = JSON.parse(tape.req.body.toString())
@@ -42,7 +49,8 @@ function responseDecorator(tape, req) {
 var server = talkback({
   host: host,
   path: __dirname + "/tapes",
-  record: process.env.RECORD === "true",
+  record: true,
+  fallbackMode: fallbackMode,
   debug: false,
   name: "Test Server",
   ignoreQueryParams: ["t"],

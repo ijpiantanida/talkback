@@ -15,20 +15,20 @@
     res: {
         status: 200,
         headers: {
+            server: [
+                'GitHub.com',
+            ],
             date: [
-                'Fri, 07 Dec 2018 02:49:54 GMT',
+                'Sat, 23 Mar 2019 10:04:25 GMT',
             ],
             'content-type': [
                 'application/json; charset=utf-8',
             ],
             'content-length': [
-                '1406',
+                '1383',
             ],
             connection: [
                 'close',
-            ],
-            server: [
-                'GitHub.com',
             ],
             status: [
                 '200 OK',
@@ -37,22 +37,22 @@
                 '60',
             ],
             'x-ratelimit-remaining': [
-                '59',
+                '50',
             ],
             'x-ratelimit-reset': [
-                '1544154594',
+                '1553339065',
             ],
             'cache-control': [
                 'public, max-age=60, s-maxage=60',
             ],
             vary: [
-                'Accept, Accept-Encoding',
+                'Accept',
             ],
             etag: [
-                '"a48a728f30a0018189890a0a23b624c7"',
+                '"867aa13132df76dac955d0d9870f666c"',
             ],
             'last-modified': [
-                'Mon, 26 Nov 2018 16:07:02 GMT',
+                'Thu, 14 Mar 2019 16:30:46 GMT',
             ],
             'x-github-media-type': [
                 'github.v3; format=json',
@@ -82,7 +82,7 @@
                 "default-src 'none'",
             ],
             'x-github-request-id': [
-                'E618:9C7A:47565B5:575490A:5C09DFD1',
+                '92A3:3C1E:7ACA06:13D6A73:5C9604A8',
             ],
         },
         body: {
@@ -106,17 +106,17 @@
             site_admin: false,
             name: 'Ignacio Piantanida',
             company: '@10Pines ',
-            blog: 'https://www.10pines.com',
+            blog: '',
             location: 'Los Angeles, USA',
             email: null,
             hireable: true,
             bio: "Coding stuff is fun. Let's code!\r\n\r\n",
-            public_repos: 16,
+            public_repos: 15,
             public_gists: 1,
-            followers: 8,
+            followers: 9,
             following: 0,
             created_at: '2012-06-17T04:39:06Z',
-            updated_at: '2018-11-26T16:07:02Z',
+            updated_at: '2019-03-14T16:30:46Z',
         },
     },
 }

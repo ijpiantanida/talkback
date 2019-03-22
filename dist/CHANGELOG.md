@@ -1,9 +1,15 @@
 # Changelog
 
-## v1.9.1
+## v1.10.0
 - Load tapes from deep directories
 - Add `tapeNameGenerator` option
-- Bugfix: wrong Content-Length when tapes contain multi-bytes characters
+- Introduce record modes for `record` option.
+- Allow `record` option to take a function to change recording mode based on the request
+- Allow `fallbackMode` option to take a function to change fallback mode based on the request
+
+- Bugfix: wrong Content-Length when tapes contain multi-bytes characters (thanks **[]()**)
+- **DEPRECATION**: `record` option will no longer take boolean values
+- **DEPRECATION**: `fallbackMode` options `404` and `proxy` have been replaced by `NOT_FOUND` and `PROXY` respectively
 
 ## v1.9.0
 - `responseDecorator` is now called for both matched tapes as well as the initial response returned by the proxied server

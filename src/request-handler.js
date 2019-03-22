@@ -1,6 +1,7 @@
 const fetch = require("node-fetch")
 
 import Tape from "./tape"
+import Options, {RecordMode, FallbackMode} from "./options"
 
 export default class RequestHandler {
   constructor(tapeStore, options) {
@@ -9,22 +10,32 @@ export default class RequestHandler {
   }
 
   async handle(req) {
-    const newTape = new Tape(req, this.options)
-    let matchingTape = this.tapeStore.find(newTape)
-    let resObj, responseTape;
+    const recordIsAValue = typeof (this.options.record) === 'string'
+    const recordMode = recordIsAValue ? this.options.record : this.options.record(req)
 
-    if (matchingTape) {
+    Options.validateRecord(recordMode)
+
+    let newTape = new Tape(req, this.options)
+    let matchingTape = this.tapeStore.find(newTape)
+    let resObj, responseTape
+
+    if (recordMode !== RecordMode.OVERWRITE && matchingTape) {
       responseTape = matchingTape
     } else {
-      if (this.options.record) {
+      if (matchingTape) {
+        responseTape = matchingTape
+      } else {
+        responseTape = newTape
+      }
+
+      if (recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE) {
         resObj = await this.makeRealRequest(req)
-        newTape.res = {...resObj}
-        this.tapeStore.save(newTape)
+        responseTape.res = {...resObj}
+        this.tapeStore.save(responseTape)
       } else {
         resObj = await this.onNoRecord(req)
-        newTape.res = {...resObj}
+        responseTape.res = {...resObj}
       }
-      responseTape = newTape
     }
 
     resObj = responseTape.res
@@ -42,20 +53,24 @@ export default class RequestHandler {
   }
 
   async onNoRecord(req) {
-    const fallbackMode = this.options.fallbackMode
+    const fallbackModeIsAValue = typeof (this.options.fallbackMode) === "string"
+    const fallbackMode = fallbackModeIsAValue ? this.options.fallbackMode : this.options.fallbackMode(req)
+
+    Options.validateFallbackMode(fallbackMode)
+
     this.options.logger.log(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
     this.options.logger.log({
       url: req.url,
       headers: req.headers
     })
 
-    if (fallbackMode === "proxy") {
+    if (fallbackMode === FallbackMode.PROXY) {
       return await this.makeRealRequest(req)
     }
 
     return {
       status: 404,
-      headers: [],
+      headers: {'content-type': ['text/plain']},
       body: "talkback - tape not found"
     }
   }

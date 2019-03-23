@@ -2,12 +2,12 @@
 
 ## v1.10.0
 - Load tapes from deep directories
-- Add `tapeNameGenerator` option
-- Introduce record modes for `record` option.
+- Add `tapeNameGenerator` option. (thanks **[@tartale](https://github.com/tartale)**)
+- Introduce record modes through `record` option. 
 - Allow `record` option to take a function to change recording mode based on the request
 - Allow `fallbackMode` option to take a function to change fallback mode based on the request
 
-- Bugfix: wrong Content-Length when tapes contain multi-bytes characters (thanks **[]()**)
+- Bugfix: wrong Content-Length when tapes contain multi-bytes characters. (thanks **[@sebflipper](https://github.com/sebflipper)**)
 - **DEPRECATION**: `record` option will no longer take boolean values
 - **DEPRECATION**: `fallbackMode` options `404` and `proxy` have been replaced by `NOT_FOUND` and `PROXY` respectively
 

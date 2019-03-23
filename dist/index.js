@@ -302,13 +302,13 @@ function () {
 
 var RecordMode = {
   NEW: "NEW",
-  // Proxies to host and records tape if the request has never been seen
+  // If no tape matches the request, proxy it and save the response to a tape
   OVERWRITE: "OVERWRITE",
-  // Always proxies to host and records tape, overwriting any existing tape
-  NEVER: "NEVER" // Doesn't record a tape. Response is defined by `fallbackMode` option
+  // Always proxy the request and save the response to a tape, overwriting any existing one
+  DISABLED: "DISABLED" // If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response
 
 };
-RecordMode.ALL = [RecordMode.NEW, RecordMode.OVERWRITE, RecordMode.NEVER];
+RecordMode.ALL = [RecordMode.NEW, RecordMode.OVERWRITE, RecordMode.DISABLED];
 var FallbackMode = {
   NOT_FOUND: "NOT_FOUND",
   PROXY: "PROXY"
@@ -375,9 +375,9 @@ function () {
       var value = usrOpts.record;
 
       if (typeof value === 'boolean') {
-        var newValue = value ? RecordMode.NEW : RecordMode.NEVER;
+        var newValue = value ? RecordMode.NEW : RecordMode.DISABLED;
         usrOpts.record = newValue;
-        this.logger.error("DEPRECATION NOTICE: record option will no longer accept boolean values (https://github.com/ijpiantanida/talkback#talkbackopts). Defaulting to '".concat(newValue, "'."));
+        this.logger.error("DEPRECATION NOTICE: record option will no longer accept boolean values. Replace ".concat(value, " with the string '").concat(newValue, "'."));
       }
     }
   }, {
@@ -455,12 +455,14 @@ function () {
                 }
 
                 responseTape = matchingTape;
-                _context.next = 23;
+                _context.next = 22;
                 break;
 
               case 9:
                 if (matchingTape) {
-                  newTape = matchingTape;
+                  responseTape = matchingTape;
+                } else {
+                  responseTape = newTape;
                 }
 
                 if (!(recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE)) {
@@ -473,8 +475,8 @@ function () {
 
               case 13:
                 resObj = _context.sent;
-                newTape.res = _objectSpread({}, resObj);
-                this.tapeStore.save(newTape);
+                responseTape.res = _objectSpread({}, resObj);
+                this.tapeStore.save(responseTape);
                 _context.next = 22;
                 break;
 
@@ -484,12 +486,9 @@ function () {
 
               case 20:
                 resObj = _context.sent;
-                newTape.res = _objectSpread({}, resObj);
+                responseTape.res = _objectSpread({}, resObj);
 
               case 22:
-                responseTape = newTape;
-
-              case 23:
                 resObj = responseTape.res;
 
                 if (this.options.responseDecorator) {
@@ -504,7 +503,7 @@ function () {
 
                 return _context.abrupt("return", resObj);
 
-              case 26:
+              case 25:
               case "end":
                 return _context.stop();
             }
@@ -552,7 +551,9 @@ function () {
               case 9:
                 return _context2.abrupt("return", {
                   status: 404,
-                  headers: [],
+                  headers: {
+                    'content-type': ['text/plain']
+                  },
                   body: "talkback - tape not found"
                 });
 
@@ -957,7 +958,7 @@ function () {
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 11]]);
+        }, _callee, null, [[0, 11]]);
       })));
     }
   }, {

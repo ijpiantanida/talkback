@@ -49,7 +49,7 @@ function responseDecorator(tape, req) {
 var server = talkback({
   host: host,
   path: __dirname + "/tapes",
-  record: true,
+  record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
   fallbackMode: fallbackMode,
   debug: false,
   name: "Test Server",

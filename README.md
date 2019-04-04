@@ -113,8 +113,7 @@ If the request or response have a JSON *content-type*, their body will be pretty
 This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost. 
  
 ## Recording Modes
-Talkback proxying and recording behavior can be controlled through the `record` option.   
-This option accepts either one of the possible recording modes to be used for all requests or a function that takes the request as a parameter and returns a valid recording mode.   
+Talkback proxying and recording behavior can be controlled through the `record` and `fallbackMode` options.   
 
 There are 3 possible recording modes:   
 
@@ -124,8 +123,7 @@ There are 3 possible recording modes:
 |`OVERWRITE`| Always proxy the request and save the response to a tape, overwriting any existing one|
 |`DISABLED`| If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response|
             
-The `fallbackMode` option lets you choose what do you want Talkback to do when recording is disabled and an unknown request arrives.  
-Same as with `record`, this option accepts either one of the possible modes values to be used for all requests or a function that takes the request as a parameter and returns a mode.
+The `fallbackMode` option lets you choose what to do when recording is `DISABLED` and an unknown request arrives.  
 
 There are 2 possible fallback modes:   
 
@@ -134,16 +132,23 @@ There are 2 possible fallback modes:
 |`NOT_FOUND`| Log an error and return a 404 response|
 |`PROXY`| Proxy the request to `host` and return its response, but don't create a tape|
 
-It is recommended to disable recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.
+**It is recommended to `DISABLE` recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.**
 
-Talkback exports constants for the different options values:
+Both options accept either one of the possible modes to be used for all requests or a function that takes the request as a parameter and returns a valid mode.
+
 ```javascript
-  const talkback = require("talkback")
-  
-  const opts = {
-    record: talkback.Options.RecordMode.OVERWRITE,
-    fallbackMode: talkback.Options.FallbackMode.PROXY
-  }
+const talkback = require("talkback")
+
+const opts = {
+  record: talkback.Options.RecordMode.DISABLED,
+  fallbackMode: (req) => {
+    if (req.url.includes("/mytest")) {
+        return talkback.Options.FallbackMode.PROXY
+      }
+      return talkback.Options.FallbackMode.NOT_FOUND
+  } 
+}
+
 ```
 
 ## Custom request body matcher

@@ -4,7 +4,8 @@
         "createdAt": "2017-09-10T23:19:27.010Z",
         "host": "http://localhost:8898",
         "reqHumanReadable": true,
-        "resHumanReadable": true
+        "resHumanReadable": true,
+        "latency": [1, 10]
     },
     "req": {
         "url": "/test/pretty",

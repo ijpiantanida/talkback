@@ -49,7 +49,9 @@ Returns an unstarted talkback server instance.
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
+| **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
+| **latency** | `String \| Array \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
@@ -57,7 +59,6 @@ Returns an unstarted talkback server instance.
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
 | **responseDecorator** | `Function` | Modify responses before they're returned. [More info](#custom-response-decorator) | `null` |  
-| **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |
@@ -220,6 +221,32 @@ function responseDecorator(tape, req) {
 
 In this example we are also adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom logic on some specific requests, and can even have different logic for different categories of requests.   
 Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
+
+## Latency
+By default Talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
+Talkback lets you control response times both at a _global_ or at a _tape level_.   
+
+The `latency` option will apply for all requests that match an existing tape and can take 3 types of values:
+ - A number: Fixed number of milliseconds for all response times.
+ - An array in the form `[min, max]`: Requests will take a random number of milliseconds in the given range.
+ - A function `(req) => latency`: The function will be called for each request and it should return the desired number of milliseconds for the response time.
+
+At the same time, tapes can define their own specific latency by adding a `latency` property to the `meta` object.   
+This property accepts both numbers and ranges.
+
+```json
+{
+  "meta": {
+    "createdAt": "2017-09-10T23:19:27.010Z",
+    "host": "http://localhost:8898",
+    "resHumanReadable": true,
+    "latency": [100, 500]
+  },
+  ...
+}
+```
+ Tape latency will have a higher priority than global latency.
+
 
 ## Exit summary
 If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   

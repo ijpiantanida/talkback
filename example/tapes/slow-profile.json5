@@ -1,0 +1,123 @@
+{
+    meta: {
+        createdAt: '2018-12-07T02:49:53.859Z',
+        host: 'https://api.github.com',
+        resHumanReadable: true,
+        latency: [200, 1000]
+    },
+    req: {
+        url: '/users/slow',
+        method: 'GET',
+        headers: {
+            accept: '*/*',
+        },
+        body: '',
+    },
+    res: {
+        status: 200,
+        headers: {
+            server: [
+                'GitHub.com',
+            ],
+            date: [
+                'Sat, 23 Mar 2019 10:04:25 GMT',
+            ],
+            'content-type': [
+                'application/json; charset=utf-8',
+            ],
+            'content-length': [
+                '1383',
+            ],
+            connection: [
+                'close',
+            ],
+            status: [
+                '200 OK',
+            ],
+            'x-ratelimit-limit': [
+                '60',
+            ],
+            'x-ratelimit-remaining': [
+                '50',
+            ],
+            'x-ratelimit-reset': [
+                '1553339065',
+            ],
+            'cache-control': [
+                'public, max-age=60, s-maxage=60',
+            ],
+            vary: [
+                'Accept',
+            ],
+            etag: [
+                '"867aa13132df76dac955d0d9870f666c"',
+            ],
+            'last-modified': [
+                'Thu, 14 Mar 2019 16:30:46 GMT',
+            ],
+            'x-github-media-type': [
+                'github.v3; format=json',
+            ],
+            'access-control-expose-headers': [
+                'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type',
+            ],
+            'access-control-allow-origin': [
+                '*',
+            ],
+            'strict-transport-security': [
+                'max-age=31536000; includeSubdomains; preload',
+            ],
+            'x-frame-options': [
+                'deny',
+            ],
+            'x-content-type-options': [
+                'nosniff',
+            ],
+            'x-xss-protection': [
+                '1; mode=block',
+            ],
+            'referrer-policy': [
+                'origin-when-cross-origin, strict-origin-when-cross-origin',
+            ],
+            'content-security-policy': [
+                "default-src 'none'",
+            ],
+            'x-github-request-id': [
+                '92A3:3C1E:7ACA06:13D6A73:5C9604A8',
+            ],
+        },
+        body: {
+            login: 'ijpiantanida',
+            id: 1858238,
+            node_id: 'MDQ6VXNlcjE4NTgyMzg=',
+            avatar_url: 'https://avatars3.githubusercontent.com/u/1858238?v=4',
+            gravatar_id: '',
+            url: 'https://api.github.com/users/ijpiantanida',
+            html_url: 'https://github.com/ijpiantanida',
+            followers_url: 'https://api.github.com/users/ijpiantanida/followers',
+            following_url: 'https://api.github.com/users/ijpiantanida/following{/other_user}',
+            gists_url: 'https://api.github.com/users/ijpiantanida/gists{/gist_id}',
+            starred_url: 'https://api.github.com/users/ijpiantanida/starred{/owner}{/repo}',
+            subscriptions_url: 'https://api.github.com/users/ijpiantanida/subscriptions',
+            organizations_url: 'https://api.github.com/users/ijpiantanida/orgs',
+            repos_url: 'https://api.github.com/users/ijpiantanida/repos',
+            events_url: 'https://api.github.com/users/ijpiantanida/events{/privacy}',
+            received_events_url: 'https://api.github.com/users/ijpiantanida/received_events',
+            type: 'User',
+            site_admin: false,
+            name: 'Ignacio Piantanida',
+            company: '@10Pines ',
+            blog: '',
+            location: 'Los Angeles, USA',
+            email: null,
+            hireable: true,
+            bio: "Coding stuff is fun. Let's code!\r\n\r\n",
+            public_repos: 15,
+            public_gists: 1,
+            followers: 9,
+            following: 0,
+            created_at: '2012-06-17T04:39:06Z',
+            updated_at: '2019-03-14T16:30:46Z',
+        },
+    },
+}

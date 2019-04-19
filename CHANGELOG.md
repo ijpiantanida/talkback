@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.11.0
+- Add `latency` option
+
 ## v1.10.0
 - Load tapes from deep directories
 - Add `tapeNameGenerator` option. (thanks **[@tartale](https://github.com/tartale)**)

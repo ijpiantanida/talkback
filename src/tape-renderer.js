@@ -15,7 +15,7 @@ export default class TapeRenderer {
     req.body = this.prepareBody(raw, req, "req")
 
     const tape = new Tape(req, options)
-    tape.meta = raw.meta
+    tape.meta = {...raw.meta}
     tape.res = {...raw.res}
 
     tape.res.body = this.prepareBody(tape, tape.res, "res")

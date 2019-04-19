@@ -16,6 +16,8 @@ make_request "$BASE_URL/users/ijpiantanida"
 
 make_request "$BASE_URL/users/ijpiantanida" -I
 
+make_request "$BASE_URL/users/slow"
+
 make_request "$BASE_URL/auth" -H "content-type: application/json" -d '{"username": "james", "password": "moriarty"}'
 
 make_request "$BASE_URL/orgs/test"

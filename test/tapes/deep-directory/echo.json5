@@ -4,7 +4,8 @@
         "host": "http://localhost:8898",
         "reqHumanReadable": true,
         "resHumanReadable": true,
-        "tag": "echo"
+        "tag": "echo",
+        "latency": 1
     },
     "req": {
         "url": "/test/echo",

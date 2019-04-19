@@ -13,7 +13,7 @@ export const FallbackMode = {
 }
 FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY]
 
-const defaultOptions = {
+export const DefaultOptions = {
   port: 8080,
   path: "./tapes/",
   record: RecordMode.NEW,
@@ -51,11 +51,11 @@ export default class Options {
     this.checkDeprecated(usrOpts)
     
     const opts = {
-      ...defaultOptions,
+      ...DefaultOptions,
       name: usrOpts.host,
       ...usrOpts,
       ignoreHeaders: [
-        ...defaultOptions.ignoreHeaders,
+        ...DefaultOptions.ignoreHeaders,
         ...(usrOpts.ignoreHeaders || [])
       ]
     }

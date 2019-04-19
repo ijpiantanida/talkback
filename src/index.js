@@ -1,5 +1,5 @@
 import Server from "./server"
-import Options, {RecordMode, FallbackMode} from "./options"
+import Options, {DefaultOptions, FallbackMode, RecordMode} from "./options"
 
 const talkback = usrOpts => {
   const opts = Options.prepare(usrOpts)
@@ -8,6 +8,7 @@ const talkback = usrOpts => {
 }
 
 talkback.Options = {
+  Default: DefaultOptions,
   FallbackMode,
   RecordMode
 }

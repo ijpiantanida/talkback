@@ -52,6 +52,7 @@ Returns an unstarted talkback server instance.
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
 | **latency** | `String \| Array \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
+| **errorRate** | `Number \| Function` | Probabilty between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
@@ -226,13 +227,15 @@ Note that both the tape's and the request's bodies are `Buffer` objects and they
 By default Talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
 Talkback lets you control response times both at a _global_ or at a _tape level_.   
 
-The `latency` option will apply for all requests that match an existing tape and can take 3 types of values:
+The `latency` option will apply for all requests that match an existing tape or when using the [`PROXY` fallback mode](#recording-modes).   
+
+There are 3 possible types of values:
  - A number: Fixed number of milliseconds for all response times.
  - An array in the form `[min, max]`: Requests will take a random number of milliseconds in the given range.
  - A function `(req) => latency`: The function will be called for each request and it should return the desired number of milliseconds for the response time.
 
-At the same time, tapes can define their own specific latency by adding a `latency` property to the `meta` object.   
-This property accepts both numbers and ranges.
+At the same time, tapes can define their own specific response times by adding a `latency` property to the [`meta` object](#tapes).   
+This property accepts both numbers and ranges and will take precedence over the global `latency` option.
 
 ```json
 {
@@ -245,8 +248,30 @@ This property accepts both numbers and ranges.
   ...
 }
 ```
- Tape latency will have a higher priority than global latency.
 
+## Error rate
+Similar to what the [latency](#latency) option does, you might want to test how your application behaves when downstream services start failing.   
+Talkback can aid here through the `errorRate` option, by returning synthetic 503 errors back to you application.
+ 
+The `errorRate` option will apply for all requests that match an existing tape or when using the [`PROXY` fallback mode](#recording-modes).   
+
+There are 2 possible types of values:
+ - A number between 0 and 100 that defines the probabilty of returning an error for each request.
+ - A function `(req) => errorRate`: The function will be called for each request and it should return the desired probabilty of error for that specific request.
+
+At the same time, tapes can define their own specific error rates by adding an `errorRate` property to the [`meta` object](#tapes).   
+
+```json
+{
+  "meta": {
+    "createdAt": "2017-09-10T23:19:27.010Z",
+    "host": "http://localhost:8898",
+    "resHumanReadable": true,
+    "errorRate": 50
+  },
+  ...
+}
+```
 
 ## Exit summary
 If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   

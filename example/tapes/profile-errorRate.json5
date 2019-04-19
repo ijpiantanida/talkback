@@ -1,0 +1,21 @@
+{
+    meta: {
+        createdAt: '2018-12-07T02:49:53.859Z',
+        host: 'https://api.github.com',
+        errorRate: 100
+    },
+    req: {
+        url: '/users/errorRate',
+        method: 'GET',
+        headers: {
+            accept: '*/*',
+        },
+        body: '',
+    },
+    res: {
+        status: 200,
+        headers: {
+        },
+        body: ""
+    },
+}

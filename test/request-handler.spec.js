@@ -4,6 +4,7 @@ import TapeStore from "../src/tape-store"
 import Options, {FallbackMode, RecordMode} from "../src/options"
 
 let tapeStore, reqHandler, opts, savedTape, anotherRes
+let setTimeoutTd, setTimeoutCalled
 
 const rawTape = {
   meta: {
@@ -287,9 +288,9 @@ describe("RequestHandler", () => {
     })
 
     describe("latency", () => {
-      let setTimeoutTd
       beforeEach(() => {
         setTimeoutTd = td.function()
+        setTimeoutCalled = false
         td.replace(global, "setTimeout", setTimeoutTd)
       })
 
@@ -302,7 +303,7 @@ describe("RequestHandler", () => {
           const resObj = await reqHandler.handle(savedTape.req)
           expect(resObj.status).to.eql(200)
   
-          td.verify(setTimeoutTd(td.matchers.anything()), {times: 0})
+          expect(setTimeoutCalled).to.eql(false)
         })
 
         context("when latency is set in Options", () => {   
@@ -313,6 +314,8 @@ describe("RequestHandler", () => {
     
             const resObj = await reqHandler.handle(savedTape.req)
             expect(resObj.status).to.eql(200)
+
+            expect(setTimeoutCalled).to.eql(true)
           })
   
           it("waits a number within the range when it is an array", async () => {
@@ -326,6 +329,8 @@ describe("RequestHandler", () => {
     
             const resObj = await reqHandler.handle(savedTape.req)
             expect(resObj.status).to.eql(200)
+
+            expect(setTimeoutCalled).to.eql(true)
           })
   
           it("waits the value returned by a function when it is a function", async () => {
@@ -338,6 +343,8 @@ describe("RequestHandler", () => {
     
             const resObj = await reqHandler.handle(savedTape.req)
             expect(resObj.status).to.eql(200)
+
+            expect(setTimeoutCalled).to.eql(true)
           })
 
           it("tape latency takes precendence when it is set at the tape level", async () => {
@@ -346,6 +353,8 @@ describe("RequestHandler", () => {
             stubSetTimeoutWithValue(setTimeoutTd, 5000)
             const resObj = await reqHandler.handle(savedTape.req)
             expect(resObj.status).to.eql(200)
+
+            expect(setTimeoutCalled).to.eql(true)
           })
         })
 
@@ -359,6 +368,8 @@ describe("RequestHandler", () => {
           stubSetTimeoutWithValue(setTimeoutTd, 3000)
           const resObj = await reqHandler.handle(savedTape.req)
           expect(resObj.status).to.eql(200)
+
+          expect(setTimeoutCalled).to.eql(true)
         })
       })
 
@@ -367,13 +378,88 @@ describe("RequestHandler", () => {
           prepareForExternalRequest()
         })
 
-        it("does not wait to reply", async () => {
-          opts.latency = 1000
+        context("when recording is enabled", () => {
+          it("does not wait to reply", async () => {
+            opts.latency = 1000
+  
+            const resObj = await reqHandler.handle(savedTape.req)
+            expect(resObj.status).to.eql(200)
+    
+            expect(setTimeoutCalled).to.eql(false)
+          })
+        })  
+        
+        context("when recording is disabled", () => {
+          beforeEach(() => {
+            opts.record = RecordMode.DISABLED
+          });
 
+          it("adds latency when the fallback mode is PROXY", async () => {
+            opts.latency = 1000
+            opts.fallbackMode = FallbackMode.PROXY
+            
+            stubSetTimeoutWithValue(setTimeoutTd, 1000)
+            const resObj = await reqHandler.handle(savedTape.req)
+            expect(resObj.status).to.eql(200)
+
+            expect(setTimeoutCalled).to.eql(true)
+          })
+
+          it("doesn't add latency when the fallback mode is NOT_FOUND", async () => {
+            opts.latency = 1000
+            opts.fallbackMode = FallbackMode.NOT_FOUND
+
+            const resObj = await reqHandler.handle(savedTape.req)
+            expect(resObj.status).to.eql(404)
+    
+            expect(setTimeoutCalled).to.eql(false)
+          })
+        })
+      })
+    })
+
+    describe("errorRate", () => {
+      context("when the tape exists", () => {
+        beforeEach(() => {
+          tapeStore.tapes = [savedTape]
+        })
+
+        it("returns an error response when falling inside errorRate", async () => {
+          opts.errorRate = 100
+          
+          const resObj = await reqHandler.handle(savedTape.req)
+          expect(resObj.status).to.eql(503)
+          expect(resObj.body.includes("failure injection")).to.eql(true)
+        })
+
+        it("doesn't return an error response when falling outside errorRate", async () => {
+          opts.errorRate = 0
+  
           const resObj = await reqHandler.handle(savedTape.req)
           expect(resObj.status).to.eql(200)
-  
-          td.verify(setTimeoutTd(td.matchers.anything()), {times: 0})
+          expect(resObj.body.includes("failure injection")).to.eql(false)
+        })
+      })
+
+      context("when recording is disabled", () => {
+        beforeEach(() => {
+          opts.record = RecordMode.DISABLED
+          opts.errorRate = 100
+        });
+
+        it("injects an error when the fallback mode is PROXY", async () => {
+          opts.fallbackMode = FallbackMode.PROXY
+          
+          const resObj = await reqHandler.handle(savedTape.req)
+          expect(resObj.status).to.eql(503)
+          expect(resObj.body.includes("failure injection")).to.eql(true)
+        })
+
+        it("doesn't inject an error when the fallback mode is NOT_FOUND", async () => {
+          opts.fallbackMode = FallbackMode.NOT_FOUND
+
+          const resObj = await reqHandler.handle(savedTape.req)
+          expect(resObj.status).to.eql(404)
         })
       })
     })
@@ -382,6 +468,7 @@ describe("RequestHandler", () => {
 
 function stubSetTimeoutWithValue(setTimeoutTd, expectedValue) {
   td.when(setTimeoutTd(td.matchers.anything(), td.matchers.anything())).thenDo((cb, value) => {
+    setTimeoutCalled = true
     if(value !== expectedValue) {
       throw `Invalid timeout value. Expected ${expectedValue}. Got ${value}`
     }

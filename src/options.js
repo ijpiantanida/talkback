@@ -37,6 +37,7 @@ export const DefaultOptions = {
   responseDecorator: null,
   
   latency: 0,
+  errorRate: 0,
   
   silent: false,
   summary: true,

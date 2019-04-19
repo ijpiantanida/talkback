@@ -2,11 +2,13 @@ const fetch = require("node-fetch")
 
 import Tape from "./tape"
 import Options, {RecordMode, FallbackMode} from "./options"
+import ErrorRate from "./features/error-rate"
 
 export default class RequestHandler {
   constructor(tapeStore, options) {
     this.tapeStore = tapeStore
     this.options = options
+    this.errorRate = new ErrorRate(this.options)
   }
   
   async handle(req) {
@@ -19,16 +21,16 @@ export default class RequestHandler {
     let matchingTape = this.tapeStore.find(newTape)
     let resObj, responseTape
     
-    let latencyGenerator = 0 // Default to no latency. Only if we are matching we use the options/tape value
-    
     if (recordMode !== RecordMode.OVERWRITE && matchingTape) {
       responseTape = matchingTape
-      
-      latencyGenerator = this.options.latency
-      const tapeLatencyGenerator = matchingTape.meta.latency;
-      if( tapeLatencyGenerator !== undefined ) {
-        latencyGenerator = tapeLatencyGenerator
+
+      if(this.errorRate.shouldSimulate(req, matchingTape)) {
+        return this.errorRate.simulate(req)
       }
+
+      const latencyGenerator = matchingTape.meta.latency || this.options.latency
+      await this.applyLatency(req, latencyGenerator)
+
     } else {
       if (matchingTape) {
         responseTape = matchingTape
@@ -57,11 +59,6 @@ export default class RequestHandler {
       resObj = resTape.res
     }
     
-    const latency = this.getLatencyValue(req, latencyGenerator)
-    if(latency > 0) {
-      await new Promise(r => setTimeout(r, latency))
-    }
-    
     return resObj
   }
   
@@ -78,6 +75,11 @@ export default class RequestHandler {
     })
     
     if (fallbackMode === FallbackMode.PROXY) {
+      if(this.errorRate.shouldSimulate(req, undefined)) {
+        return this.errorRate.simulate(req)
+      }
+
+      await this.applyLatency(req, this.options.latency)
       return await this.makeRealRequest(req)
     }
     
@@ -109,19 +111,27 @@ export default class RequestHandler {
     }
   }
   
-  getLatencyValue(req, latencyGenerator) {
+  applyLatency(req, latencyGenerator) {
+    const resolved = Promise.resolve()
+    if(!latencyGenerator) {
+      return resolved
+    }
+
     Options.validateLatency(latencyGenerator)
+
+    let latency = 0
     
     const type = typeof latencyGenerator
     if(type === 'number') {
-      return latencyGenerator
-    }
-    if(Array.isArray(latencyGenerator)) {
+      latency = latencyGenerator
+    } else if(Array.isArray(latencyGenerator)) {
       const high = latencyGenerator[1]
       const low = latencyGenerator[0]
-      return Math.random() * (high - low) + low
+      latency = Math.random() * (high - low) + low
+    } else {
+      latency = latencyGenerator(req)
     }
-    
-    return latencyGenerator(req)
+
+    return new Promise(r => setTimeout(r, latency))
   }
 }

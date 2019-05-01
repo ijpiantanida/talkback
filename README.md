@@ -59,6 +59,7 @@ Returns an unstarted talkback server instance.
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
+| **requestDecorator** | `Function` | Modify requests before they're proxied. [More info](#custom-request-decorator) | `null` |  
 | **responseDecorator** | `Function` | Modify responses before they're returned. [More info](#custom-response-decorator) | `null` |  
 | **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
@@ -196,8 +197,9 @@ function urlMatcher(tape, req) {
 
 ## Custom request decorator
 By default talkback will just proxy requests to the host as they are.   
-If you want to customize requests before they're proxied (or looked up in stored tapes) you can do so through the `requestDecorator` option.
-`requestDecorator` takes an option that will receive the original request as a parameter and should return the modified request.
+If you want to customize requests before they're proxied (or looked up in stored tapes) you can do so through the `requestDecorator` option.   
+
+`requestDecorator` takes an option that will receive the original request as a parameter and should return the modified request.   
 
 ```javascript
 function requestDecorator(req) {

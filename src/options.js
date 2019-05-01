@@ -100,6 +100,7 @@ export default class Options {
     this.validateRecord(opts.record)
     this.validateFallbackMode(opts.fallbackMode)
     this.validateLatency(opts.latency)
+    this.validateErrorRate(opts.errorRate)
   }
   
   static validateRecord(record) {
@@ -117,6 +118,12 @@ export default class Options {
   static validateLatency(latency) {
     if (Array.isArray(latency) && latency.length !== 2) {
       throw `Invalid LATENCY option. If using a range, the array should only have 2 values [min, max]. Current=[${latency}]`
+    }
+  }
+
+  static validateErrorRate(errorRate) {
+    if (typeof (errorRate) !== 'function' && (errorRate < 0 || errorRate > 100)) {
+      throw `Invalid ERRORRATE option. Value should be between 0 and 100. Current=[${errorRate}]`
     }
   }
 }

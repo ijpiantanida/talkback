@@ -50,6 +50,25 @@ describe("Options", () => {
         .to.throw("Invalid LATENCY option. If using a range, the array should only have 2 values [min, max]. Current=[1,2,3]") 
       })
     })
+
+    describe("#errorRate", () => {
+      it("throws an error when errorRate is a number outside the valid range", () => {
+        expect(() => Options.prepare({errorRate: -3}))
+        .to.throw("Invalid ERRORRATE option") 
+        expect(() => Options.prepare({errorRate: 140}))
+        .to.throw("Invalid ERRORRATE option") 
+      })
+
+      it("doesn't throw an error when the value is within range", () => {
+        expect(() => Options.prepare({errorRate: 10}))
+        .to.not.throw()
+      })
+
+      it("doesn't throw an error when the value is a function", () => {
+        expect(() => Options.prepare({errorRate: () => {}}))
+        .to.not.throw()
+      })
+    })
   })
   
   describe("deprecated options", () => {

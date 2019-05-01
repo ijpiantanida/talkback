@@ -1,3 +1,5 @@
+import Options from "../options";
+
 export default class ErrorRate {
   constructor(options) {
     this.options = options
@@ -8,6 +10,9 @@ export default class ErrorRate {
     const globalErrorRate = isErrorRateAValue ? this.options.errorRate : this.options.errorRate(req)
 
     const errorRate = tape && tape.meta.errorRate !== undefined ? tape.meta.errorRate : globalErrorRate
+
+    Options.validateErrorRate(errorRate)
+
     const random = Math.random() * 100
     return random < errorRate
   }

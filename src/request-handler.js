@@ -19,17 +19,21 @@ export default class RequestHandler {
     
     Options.validateRecord(recordMode)
     
+    if(this.options.requestDecorator) {
+      req = this.options.requestDecorator(req)
+    }
+    
     let newTape = new Tape(req, this.options)
     let matchingTape = this.tapeStore.find(newTape)
     let resObj, responseTape
     
     if (recordMode !== RecordMode.OVERWRITE && matchingTape) {
       responseTape = matchingTape
-
+      
       if(this.errorRate.shouldSimulate(req, matchingTape)) {
         return this.errorRate.simulate(req)
       }
-
+      
       await this.latency.simulate(req, matchingTape)
     } else {
       if (matchingTape) {
@@ -78,7 +82,7 @@ export default class RequestHandler {
       if(this.errorRate.shouldSimulate(req, undefined)) {
         return this.errorRate.simulate(req)
       }
-
+      
       await this.latency.simulate(req, undefined)
       return await this.makeRealRequest(req)
     }

@@ -287,6 +287,28 @@ describe("RequestHandler", () => {
       })
     })
 
+    describe("#requestDecorator", () => {
+      it("updates the request before matching", async () => {
+        tapeStore.tapes = [savedTape]
+
+        const req = {...savedTape.req}
+        const originalUrl = req.url
+
+        req.url = "MODIFIED"
+        req.headers["accept"] = "INVALID"
+
+        opts.requestDecorator = (req) => {
+          req.url = originalUrl
+          req.headers["accept"] = "application/json"
+          return req
+        }
+
+        const resObj = await reqHandler.handle(req)
+        expect(resObj.status).to.eql(200)
+        expect(resObj.body).to.eql(Buffer.from("Hello"))
+      })
+    })
+
     describe("latency", () => {
       beforeEach(() => {
         setTimeoutTd = td.function()

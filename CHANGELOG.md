@@ -3,6 +3,7 @@
 ## v1.11.0
 - Add `latency` option
 - Add `errorRate` option
+- Add `requestDecorator` option
 - Expose default options as `talkback.Options.Default`
 
 ## v1.10.0

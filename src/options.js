@@ -34,6 +34,7 @@ export const DefaultOptions = {
   bodyMatcher: null,
   urlMatcher: null,
   
+  requestDecorator: null,
   responseDecorator: null,
   
   latency: 0,

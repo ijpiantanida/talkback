@@ -32,6 +32,11 @@ function urlMatcher(tape, req) {
   return false
 }
 
+function requestDecorator(req) {
+  delete req.headers["accept-encoding"];
+  return req
+}
+
 function responseDecorator(tape, req) {
   if (tape.meta.tag === "auth") {
     var tapeBody = JSON.parse(tape.res.body.toString())
@@ -57,6 +62,7 @@ var server = talkback({
   ignoreHeaders: ["user-agent"],
   bodyMatcher: bodyMatcher,
   urlMatcher: urlMatcher,
+  requestDecorator: requestDecorator,
   responseDecorator: responseDecorator,
   https: {
     enabled: true,

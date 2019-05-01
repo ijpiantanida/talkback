@@ -193,6 +193,19 @@ function urlMatcher(tape, req) {
     return false;
 }
 ```
+
+## Custom request decorator
+By default talkback will just proxy requests to the host as they are.   
+If you want to customize requests before they're proxied (or looked up in stored tapes) you can do so through the `requestDecorator` option.
+`requestDecorator` takes an option that will receive the original request as a parameter and should return the modified request.
+
+```javascript
+function requestDecorator(req) {
+    delete req.headers['accept-encoding'];
+    return req;
+}
+```
+
   
 ## Custom response decorator
 If you want to add a little bit of dynamism to the response coming from a matching existing tape or adjust the response that the proxied server returns, you can do so by using the `responseDecorator` option.      

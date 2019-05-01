@@ -3,12 +3,14 @@ const fetch = require("node-fetch")
 import Tape from "./tape"
 import Options, {RecordMode, FallbackMode} from "./options"
 import ErrorRate from "./features/error-rate"
+import Latency from "./features/latency";
 
 export default class RequestHandler {
   constructor(tapeStore, options) {
     this.tapeStore = tapeStore
     this.options = options
     this.errorRate = new ErrorRate(this.options)
+    this.latency = new Latency(this.options)
   }
   
   async handle(req) {
@@ -28,9 +30,7 @@ export default class RequestHandler {
         return this.errorRate.simulate(req)
       }
 
-      const latencyGenerator = matchingTape.meta.latency || this.options.latency
-      await this.applyLatency(req, latencyGenerator)
-
+      await this.latency.simulate(req, matchingTape)
     } else {
       if (matchingTape) {
         responseTape = matchingTape
@@ -79,7 +79,7 @@ export default class RequestHandler {
         return this.errorRate.simulate(req)
       }
 
-      await this.applyLatency(req, this.options.latency)
+      await this.latency.simulate(req, undefined)
       return await this.makeRealRequest(req)
     }
     
@@ -109,29 +109,5 @@ export default class RequestHandler {
       headers: fRes.headers.raw(),
       body: buff
     }
-  }
-  
-  applyLatency(req, latencyGenerator) {
-    const resolved = Promise.resolve()
-    if(!latencyGenerator) {
-      return resolved
-    }
-
-    Options.validateLatency(latencyGenerator)
-
-    let latency = 0
-    
-    const type = typeof latencyGenerator
-    if(type === 'number') {
-      latency = latencyGenerator
-    } else if(Array.isArray(latencyGenerator)) {
-      const high = latencyGenerator[1]
-      const low = latencyGenerator[0]
-      latency = Math.random() * (high - low) + low
-    } else {
-      latency = latencyGenerator(req)
-    }
-
-    return new Promise(r => setTimeout(r, latency))
   }
 }

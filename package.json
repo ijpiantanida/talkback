@@ -24,7 +24,7 @@
     "cross-env": "^5.2.0",
     "del": "^4.0.0",
     "mocha": "^6.0.0",
-    "nyc": "^13.1.0",
+    "nyc": "^14.0.0",
     "rollup": "^1.2.2",
     "rollup-plugin-babel": "^4.0.3",
     "testdouble": "^3.3.0"

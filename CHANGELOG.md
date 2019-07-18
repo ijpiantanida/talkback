@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.11.1
+- Dependencies updates
+
 ## v1.11.0
 - Add `latency` option
 - Add `errorRate` option

@@ -33,7 +33,10 @@ function urlMatcher(tape, req) {
 }
 
 function requestDecorator(req) {
-  delete req.headers["accept-encoding"];
+  const acceptEncoding = req.headers["accept-encoding"]
+  if(acceptEncoding && acceptEncoding.includes("test")) {
+    delete req.headers["accept-encoding"];
+  }
   return req
 }
 

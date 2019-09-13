@@ -45,18 +45,6 @@ describe("MediaType", () => {
       const mediaType = new MediaType(res)
       expect(mediaType.isHumanReadable()).to.be.true
     })
-
-    it("returns false when the content-type is human readable and the content-encoding is gzip", () => {
-      const res = {
-        headers: {
-          "content-encoding": ["gzip"],
-          "content-type": ["application/json"]
-        }
-      }
-
-      const mediaType = new MediaType(res)
-      expect(mediaType.isHumanReadable()).to.be.false
-    })
   })
 
   describe("#isJSON", () => {

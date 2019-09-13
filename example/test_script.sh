@@ -40,7 +40,13 @@ make_request 200 "$BASE_URL/repos/ijpiantanida/talkback"
 make_request 503 "$BASE_URL/users/errorRate"
 
 # Removed by requestDecorator
+make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip, deflate, br, test"
+
+# Compressed with supported algorithm and saved as plain text
 make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip, deflate, br"
+
+# Compressed with supported algorithm but saved as base64
+make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip"
 
 if [ "$error" = true ]; then
   echo "FAILED"

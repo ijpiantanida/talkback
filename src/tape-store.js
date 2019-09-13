@@ -14,14 +14,14 @@ export default class TapeStore {
     this.tapes = []
   }
 
-  load() {
+  async load() {
     mkdirp.sync(this.path)
 
-    this.loadTapesAtDir(this.path)
+    await this.loadTapesAtDir(this.path)
     console.log(`Loaded ${this.tapes.length} tapes`)
   }
 
-  loadTapesAtDir(directory) {
+  async loadTapesAtDir(directory) {
     const items = fs.readdirSync(directory)
     for (let i = 0; i < items.length; i++) {
       const filename = items[i]
@@ -31,7 +31,7 @@ export default class TapeStore {
         try {
           const data = fs.readFileSync(fullPath, "utf8")
           const raw = JSON5.parse(data)
-          const tape = Tape.fromStore(raw, this.options)
+          const tape = await Tape.fromStore(raw, this.options)
           tape.path = filename
           this.tapes.push(tape)
         } catch (e) {
@@ -56,7 +56,7 @@ export default class TapeStore {
     }
   }
 
-  save(tape) {
+  async save(tape) {
     tape.new = true
     tape.used = true
 
@@ -74,7 +74,8 @@ export default class TapeStore {
     }
     this.options.logger.log(`Saving request ${tape.req.url} at ${tape.path}`)
 
-    const toSave = new TapeRenderer(tape).render()
+    const tapeRenderer = new TapeRenderer(tape)
+    const toSave = await tapeRenderer.render()
     fs.writeFileSync(fullFilename, JSON5.stringify(toSave, null, 4))
   }
 

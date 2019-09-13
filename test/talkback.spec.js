@@ -93,7 +93,7 @@ describe("talkback", () => {
 
   describe("## record mode NEW", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
-      talkbackServer = await startTalkback()
+      talkbackServer = await startTalkback({debug: true, silent: false})
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
@@ -224,7 +224,7 @@ describe("talkback", () => {
       })
       expect(res.status).to.eq(200)
 
-      const resClone = res.clone()
+      const resClone = await res.clone()
 
       const resBody = await res.json()
       expect(resBody).to.eql({ok: true, foo: {bar: 3}})

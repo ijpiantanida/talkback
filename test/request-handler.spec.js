@@ -40,12 +40,12 @@ function prepareForExternalRequest() {
 }
 
 describe("RequestHandler", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     opts = Options.prepare({silent: true, record: RecordMode.NEW})
     tapeStore = new TapeStore(opts)
     reqHandler = new RequestHandler(tapeStore, opts)
 
-    savedTape = Tape.fromStore(rawTape, opts)
+    savedTape = await Tape.fromStore(rawTape, opts)
     anotherRes = {
       ...savedTape.res,
       body: Buffer.from("Foobar")

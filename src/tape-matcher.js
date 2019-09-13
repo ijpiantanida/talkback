@@ -1,3 +1,4 @@
+import ContentEncoding from "./utils/content-encoding"
 import MediaType from "./utils/media-type"
 
 export default class TapeMatcher {
@@ -51,9 +52,10 @@ export default class TapeMatcher {
 
     if (!this.options.ignoreBody) {
       const mediaType = new MediaType(req)
+      const contentEncoding = new ContentEncoding(req)
 
       let sameBody = false
-      if(mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
+      if(contentEncoding.isUncompressed() && mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
         sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()))
       } else {
         sameBody = req.body.equals(otherReq.body)

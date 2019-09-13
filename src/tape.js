@@ -1,5 +1,6 @@
 import MediaType from "./utils/media-type"
 import TapeRenderer from "./tape-renderer"
+import ContentEncoding from "./utils/content-encoding";
 
 const URL = require("url")
 const querystring = require("querystring")
@@ -13,12 +14,15 @@ export default class Tape {
       body: req.body
     }
     this.options = options
+
+    // This needs to happen before we erase headers since we could lose information
+    this.normalizeBody()
+
     this.cleanupHeaders()
 
     this.queryParamsToIgnore = this.options.ignoreQueryParams
     this.cleanupQueryParams()
 
-    this.normalizeBody()
 
     this.meta = {
       createdAt: new Date(),
@@ -26,7 +30,7 @@ export default class Tape {
     }
   }
 
-  static fromStore(...args) {
+  static async fromStore(...args) {
     return TapeRenderer.fromStore(...args)
   }
 
@@ -65,13 +69,15 @@ export default class Tape {
 
   normalizeBody() {
     const mediaType = new MediaType(this.req)
-    if(mediaType.isJSON() && this.req.body.length > 0) {
+    const contentEncoding = new ContentEncoding(this.req)
+    if(contentEncoding.isUncompressed() && mediaType.isJSON() && this.req.body.length > 0) {
       this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2))
     }
   }
 
-  clone() {
-    const raw = new TapeRenderer(this).render()
+  async clone() {
+    const tapeRenderer = new TapeRenderer(this)
+    const raw = await tapeRenderer.render()
     return Tape.fromStore(raw, this.options)
   }
 }

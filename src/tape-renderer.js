@@ -1,6 +1,7 @@
 import Headers from "./utils/headers"
 import MediaType from "./utils/media-type"
 import Tape from "./tape"
+import ContentEncoding from "./utils/content-encoding";
 
 const bufferShim = require("buffer-shims")
 
@@ -9,41 +10,53 @@ export default class TapeRenderer {
     this.tape = tape
   }
 
-  static fromStore(raw, options) {
+  static async fromStore(raw, options) {
     const req = {...raw.req}
 
-    req.body = this.prepareBody(raw, req, "req")
+    req.body = await this.prepareBody(raw, req, "req")
 
     const tape = new Tape(req, options)
     tape.meta = {...raw.meta}
     tape.res = {...raw.res}
 
-    tape.res.body = this.prepareBody(tape, tape.res, "res")
+    tape.res.body = await this.prepareBody(tape, tape.res, "res")
 
     return tape
   }
 
-  static prepareBody(tape, reqResObj, metaPrefix) {
-    if (tape.meta[metaPrefix + "HumanReadable"]) {
+  static async prepareBody(tape, reqResObj, metaPrefix) {
+    const contentEncoding = new ContentEncoding(reqResObj)
+    const isTapeUncompressed = tape.meta[metaPrefix + "Uncompressed"]
+    const isTapeHumanReadable = tape.meta[metaPrefix + "HumanReadable"]
+    const isTapeInPlainText = isTapeUncompressed || contentEncoding.isUncompressed()
+
+    if (isTapeHumanReadable && isTapeInPlainText) {
       const mediaType = new MediaType(reqResObj)
-      const isResAnObject = typeof(reqResObj.body) === "object"
+      let bufferContent = reqResObj.body
+      const isResAnObject = typeof(bufferContent) === "object"
+      
       if (isResAnObject && mediaType.isJSON()) {
-        const json = JSON.stringify(reqResObj.body, null, 2)
-        if (Headers.read(reqResObj.headers, "content-length")) {
-          Headers.write(reqResObj.headers, "content-length", Buffer.byteLength(json), metaPrefix)
-        }
-        return bufferShim.from(json)
-      } else {
-        return bufferShim.from(reqResObj.body)
+        const json = JSON.stringify(bufferContent, null, 2)
+        bufferContent = json
       }
+
+      if (Headers.read(reqResObj.headers, "content-length")) {
+        Headers.write(reqResObj.headers, "content-length", Buffer.byteLength(bufferContent), metaPrefix)
+      }
+
+      if(isTapeUncompressed) {
+        return await contentEncoding.compressedBody(bufferContent)
+      }
+
+      return bufferShim.from(bufferContent)
     } else {
       return bufferShim.from(reqResObj.body, "base64")
     }
   }
 
-  render() {
-    const reqBody = this.bodyFor(this.tape.req, "req")
-    const resBody = this.bodyFor(this.tape.res, "res")
+  async render() {
+    const reqBody = await this.bodyFor(this.tape.req, "req")
+    const resBody = await this.bodyFor(this.tape.res, "res")
     return {
       meta: this.tape.meta,
       req: {
@@ -57,16 +70,28 @@ export default class TapeRenderer {
     }
   }
 
-  bodyFor(reqResObj, metaPrefix) {
+  async bodyFor(reqResObj, metaPrefix) {
     const mediaType = new MediaType(reqResObj)
+    const contentEncoding = new ContentEncoding(reqResObj)
     const bodyLength = reqResObj.body.length
 
-    if (mediaType.isHumanReadable() && bodyLength > 0) {
+    const isUncompressed = contentEncoding.isUncompressed()
+    const contentEncodingSupported = isUncompressed || contentEncoding.supportedAlgorithm()
+
+    if (mediaType.isHumanReadable() && contentEncodingSupported && bodyLength > 0) {
       this.tape.meta[metaPrefix + "HumanReadable"] = true
-      const rawBody = reqResObj.body.toString("utf8")
+
+      let body = reqResObj.body
+
+      if(!isUncompressed) {
+        this.tape.meta[metaPrefix + "Uncompressed"] = true
+        body = await contentEncoding.uncompressedBody(reqResObj.body)
+      }
+
+      const rawBody = body.toString("utf8")
 
       if (mediaType.isJSON()) {
-        return JSON.parse(reqResObj.body)
+        return JSON.parse(rawBody)
       } else {
         return rawBody
       }

@@ -1,0 +1,93 @@
+{
+    meta: {
+        createdAt: '2019-05-07T01:06:38.759Z',
+        host: 'https://api.github.com',
+    },
+    req: {
+        url: '/users/ijpiantanida',
+        method: 'GET',
+        headers: {
+            accept: '*/*',
+            'accept-encoding': 'gzip',
+        },
+        body: '',
+    },
+    res: {
+        status: 200,
+        headers: {
+            date: [
+                'Tue, 07 May 2019 01:06:39 GMT',
+            ],
+            'content-type': [
+                'application/json; charset=utf-8',
+            ],
+            'transfer-encoding': [
+                'chunked',
+            ],
+            connection: [
+                'close',
+            ],
+            server: [
+                'GitHub.com',
+            ],
+            status: [
+                '200 OK',
+            ],
+            'x-ratelimit-limit': [
+                '60',
+            ],
+            'x-ratelimit-remaining': [
+                '55',
+            ],
+            'x-ratelimit-reset': [
+                '1557194095',
+            ],
+            'cache-control': [
+                'public, max-age=60, s-maxage=60',
+            ],
+            vary: [
+                'Accept, Accept-Encoding',
+            ],
+            etag: [
+                'W/"0e371dc37f480264fa014480ee3afa3e"',
+            ],
+            'last-modified': [
+                'Sun, 05 May 2019 23:50:46 GMT',
+            ],
+            'x-github-media-type': [
+                'github.v3; format=json',
+            ],
+            'access-control-expose-headers': [
+                'ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type',
+            ],
+            'access-control-allow-origin': [
+                '*',
+            ],
+            'strict-transport-security': [
+                'max-age=31536000; includeSubdomains; preload',
+            ],
+            'x-frame-options': [
+                'deny',
+            ],
+            'x-content-type-options': [
+                'nosniff',
+            ],
+            'x-xss-protection': [
+                '1; mode=block',
+            ],
+            'referrer-policy': [
+                'origin-when-cross-origin, strict-origin-when-cross-origin',
+            ],
+            'content-security-policy': [
+                "default-src 'none'",
+            ],
+            'content-encoding': [
+                'gzip',
+            ],
+            'x-github-request-id': [
+                '6291:6822:21EF623:2920B81:5CD0DA1F',
+            ],
+        },
+        body: 'H4sIAAAAAAAAA51UUWvbMBB+z68wfm5qJ06y1FBGYXsYtN3G0jH6EmRbla/IkpHklNT0v++kc7fUfRgzGBt9vu+7T3c69bMoiqUWoOI8iuGxBaYcU1Cx+Mz/ggrxxXa9XWbbAChd8X1A45tP3zc/f93K8vHz6nYnjjfP4pJY7MAcM/vOSB9XO9faPEkItdm5AFd3RWe5KbVyXLnzUjdJlwx5Ph4uV6QjzKBECQkcq7YwCJIKqtrk/UZq18ixIfIRaO8JD1pK/YRiYxb7V8LkD5UM0xKUmKqE1D7RruZYUtzey1AcsG6COeFpfeI/2MdBy2K7DK/+3+BARHtPCp31ieGtfhXtClsaaB1oNcGoPaXTlrUReDaf2URFpFsS8i4nWAo0UuAHPLcTJIjXJ62BAyuPQ6kMLzkcsAFTZUcC5NEdW+4H8A4PDSEWHN+zqgnj/sCk5TTUrAmBX4RiJejo2+gWwAlpmTr6kK2ro2sQtSPBAu8OD9NK6jL0xiPX2kZXSnDJ7Vl09+NqKFvDwF8KqpMypK7BcFZIn96ZjuwUoL3CV8UjCfhiLmKRA/QYKG1XSCj31Ay8ndanaDjeyF4E8O8kIpKdQDhSGJQGpEQHDmvPnM+6TBfLebqZLz7s0lWeXeTp5p7ydm31Nu5inq7x2S2zfJ3mK4ybvcx+A3rBHDJSBQAA',
+    },
+}

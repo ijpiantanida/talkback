@@ -2,6 +2,7 @@ import TapeMatcher from "../src/tape-matcher"
 import Tape from "../src/tape"
 import Logger from "../src/logger"
 import Options from "../src/options"
+import ContentEncoding from "../src/utils/content-encoding";
 
 const raw = {
   meta: {
@@ -29,12 +30,17 @@ const raw = {
 
 const opts = Options.prepare({
   ignoreHeaders: ["x-ignored"],
-  ignoreQueryParams: ["ignored1", "ignored2"]
+  ignoreQueryParams: ["ignored1", "ignored2"],
+  debug: true
 })
 
-const tape = Tape.fromStore(raw, opts)
+let tape
 
 describe("TapeMatcher", () => {
+  beforeEach(async () => {
+    tape = await Tape.fromStore(raw, opts)
+  })
+
   describe("#sameAs", () => {
     const req = {
       url: "/foo/bar/1?ignored1=foo&ignored2=bar&real=3",
@@ -46,13 +52,13 @@ describe("TapeMatcher", () => {
       body: Buffer.from("QUJD", "base64")
     }
 
-    it("returns true when the request body is ignored", () => {
+    it("returns true when the request body is ignored", async () => {
       const newOpts = {
         ...opts,
         ignoreBody: true
       }
 
-      const newTape = Tape.fromStore(raw, newOpts)
+      const newTape = await Tape.fromStore(raw, newOpts)
       const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
       expect(new TapeMatcher(newTape, newOpts).sameAs(tape2)).to.be.true
     })
@@ -67,7 +73,7 @@ describe("TapeMatcher", () => {
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.true
     })
 
-    it("returns true when all query params are ignored", () => {
+    it("returns true when all query params are ignored", async () => {
       const newOpts = {
         ...opts,
         ignoreQueryParams: [
@@ -75,7 +81,7 @@ describe("TapeMatcher", () => {
           "real"
         ]
       }
-      const newTape = Tape.fromStore(raw, newOpts)
+      const newTape = await Tape.fromStore(raw, newOpts)
       const tape2 = new Tape({...req, url: "/foo/bar/1?ignored1=diff&real=diff"}, newOpts)
       expect(new TapeMatcher(newTape, newOpts).sameAs(tape2)).to.be.true
     })
@@ -117,7 +123,7 @@ describe("TapeMatcher", () => {
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
     })
 
-    it("returns true when both bodies are empty", () => {
+    it("returns true when both bodies are empty", async () => {
       const rawDup = {
         ...raw,
         req: {
@@ -141,10 +147,42 @@ describe("TapeMatcher", () => {
         body: Buffer.from("")
       }
 
-      const newTape = Tape.fromStore(rawDup, opts)
+      const newTape = await Tape.fromStore(rawDup, opts)
       const tape2 = new Tape(reqDup, opts)
       expect(new TapeMatcher(newTape, opts).sameAs(tape2)).to.be.true
     })
+
+    it("returns true when the request is compressed and are the same", async () => {
+      const contentEncoding = new ContentEncoding({headers: {"content-encoding": "gzip"}})
+      const compressedBody = await contentEncoding.compressedBody(JSON.stringify({foo: "bar"}))
+
+      const rawDup = {
+        ...raw,
+        req: {
+          ...raw.req,
+          headers: {
+            ...raw.req.headers,
+            "content-type": "application/json",
+            "content-encoding": "gzip"
+          },
+          body: Buffer.from(compressedBody)
+        }
+      }
+
+      const newTape = await Tape.fromStore(rawDup, opts)
+
+      const tape2 = new Tape({
+        ...req,
+        headers: {
+          ...req.headers,
+          "content-type": "application/json",
+          "content-encoding": "gzip"
+        },
+        body: compressedBody
+      }, opts)
+
+      expect(new TapeMatcher(newTape, opts).sameAs(tape2)).to.be.true
+    });
 
     it("returns false when there are more headers", () => {
       const tape2 = new Tape({

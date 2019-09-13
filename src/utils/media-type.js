@@ -1,5 +1,4 @@
-const contentTypeParser = require("content-type");
-
+import contentTypeParser from "content-type";
 import Headers from "./headers"
 
 export const jsonTypes = [
@@ -21,15 +20,12 @@ export default class MediaType {
   }
 
   isHumanReadable() {
-    const contentEncoding = Headers.read(this.headers(), "content-encoding")
-    const notCompressed = !contentEncoding || contentEncoding === "identity"
-
     const contentType = this.contentType()
     if (!contentType) {
       return false
     }
 
-    return notCompressed && humanReadableContentTypes.indexOf(contentType.type) >= 0
+    return humanReadableContentTypes.indexOf(contentType.type) >= 0
   }
 
   isJSON() {

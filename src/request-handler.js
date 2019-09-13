@@ -45,7 +45,7 @@ export default class RequestHandler {
       if (recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE) {
         resObj = await this.makeRealRequest(req)
         responseTape.res = {...resObj}
-        this.tapeStore.save(responseTape)
+        await this.tapeStore.save(responseTape)
       } else {
         resObj = await this.onNoRecord(req)
         responseTape.res = {...resObj}
@@ -55,7 +55,8 @@ export default class RequestHandler {
     resObj = responseTape.res
     
     if (this.options.responseDecorator) {
-      const resTape = this.options.responseDecorator(responseTape.clone(), req)
+      const clonedTape = await responseTape.clone()
+      const resTape = this.options.responseDecorator(clonedTape, req)
       
       if (resTape.res.headers["content-length"]) {
         resTape.res.headers["content-length"] = resTape.res.body.length

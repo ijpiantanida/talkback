@@ -33,8 +33,8 @@ export default class TalkbackServer {
     })
   }
 
-  start(callback) {
-    this.tapeStore.load()
+  async start(callback) {
+    await this.tapeStore.load()
     const app = this.handleRequest.bind(this);
 
     const serverFactory = this.options.https.enabled ? () => {

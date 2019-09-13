@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.12.0
+- Store compressed (gzip, deflate) human-readable bodies as plain text 
+
 ## v1.11.1
 - Dependencies updates
 

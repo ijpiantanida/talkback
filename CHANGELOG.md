@@ -1,6 +1,7 @@
 # Changelog
 
-## v1.13.0
+## v2.0.0
+- Drop node 8 support. Min. required version is node 10
 - Order of properties is ignored when matching JSON tapes body
 
 ## v1.12.0

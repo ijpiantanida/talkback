@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.13.0
+- Order of properties is ignored when matching JSON tapes body
+
 ## v1.12.0
 - Store compressed (gzip, deflate) human-readable bodies as plain text 
 

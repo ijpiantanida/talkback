@@ -9,6 +9,7 @@
     "buffer-shims": "^1.0.0",
     "content-type": "^1.0.4",
     "json5": "^2.1.0",
+    "lodash": "^4.17.15",
     "mkdirp": "^0.5.1",
     "node-fetch": "^2.2.1"
   },

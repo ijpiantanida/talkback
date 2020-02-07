@@ -1,5 +1,6 @@
 import ContentEncoding from "./utils/content-encoding"
 import MediaType from "./utils/media-type"
+const isEqual = require("lodash/isEqual");
 
 export default class TapeMatcher {
   constructor(tape, options) {
@@ -56,7 +57,9 @@ export default class TapeMatcher {
 
       let sameBody = false
       if(contentEncoding.isUncompressed() && mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
-        sameBody = JSON.stringify(JSON.parse(req.body.toString())) === JSON.stringify(JSON.parse(otherReq.body.toString()))
+        const parsedReqBody = JSON.parse(req.body.toString());
+        const parsedOtherReqBody = JSON.parse(otherReq.body.toString());
+        sameBody = isEqual(parsedReqBody, parsedOtherReqBody);
       } else {
         sameBody = req.body.equals(otherReq.body)
       }

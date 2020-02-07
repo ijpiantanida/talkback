@@ -1,4 +1,4 @@
-import contentTypeParser from "content-type";
+const contentTypeParser = require("content-type");
 import Headers from "./headers"
 
 export const jsonTypes = [

@@ -214,7 +214,8 @@ describe("talkback", () => {
       talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const headers = {"content-type": "application/json"}
-      const body = JSON.stringify({param1: 3, param2: {subParam: 1}})
+      // Different key order
+      const body = JSON.stringify({param2: {subParam: 1}, param1: 3})
 
       const res = await fetch(`${talkbackHost}/test/pretty`, {
         compress: false,
@@ -250,10 +251,6 @@ describe("talkback", () => {
 
       // Different nested object
       let body = JSON.stringify({param1: 3, param2: {subParam: 2}})
-      await makeRequest(body)
-
-      // Different key order
-      body = JSON.stringify({param2: {subParam: 1}, param1: 3})
       await makeRequest(body)
 
       // Extra key

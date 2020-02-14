@@ -1,11 +1,18 @@
-let talkback
+import {Options} from "../src/options"
+import testServer from "./support/test-server"
+import {expect} from "chai"
+import * as td from "testdouble"
+import {Talkback} from "../src/types"
+import TalkbackServer from "../src/server"
+import * as http from "http"
+
+let talkback: Talkback
 if (process.env.USE_DIST) {
   talkback = require("../dist/index")
   console.log("Using DIST talkback")
 } else {
-  talkback = require("../src/index").default
+  talkback = require("../src/index")
 }
-import testServer from "./support/test-server"
 
 const JSON5 = require("json5")
 const fs = require("fs")
@@ -16,7 +23,7 @@ const del = require("del")
 const RecordMode = talkback.Options.RecordMode
 const FallbackMode = talkback.Options.FallbackMode
 
-let talkbackServer, proxiedServer, currentTapeId
+let talkbackServer: TalkbackServer | null, proxiedServer: http.Server | null, currentTapeId: number
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = __dirname + "/tapes"
@@ -24,7 +31,7 @@ const tapesPath = __dirname + "/tapes"
 const talkbackPort = 8899
 const talkbackHost = `http://localhost:${talkbackPort}`
 
-const startTalkback = async (opts) => {
+const startTalkback = async (opts?: Partial<Options>) => {
   const talkbackServer = talkback({
       path: tapesPath,
       port: talkbackPort,
@@ -36,13 +43,13 @@ const startTalkback = async (opts) => {
       },
       responseDecorator: (tape, req) => {
         if (tape.meta.tag === "echo") {
-          tape.res.body = req.body
+          tape.res!.body = req.body
         }
 
-        let location = tape.res.headers["location"]
+        let location = tape.res!.headers["location"]
         if (location && location[0]) {
           location = location[0]
-          tape.res.headers["location"] = [location.replace(proxiedHost, talkbackHost)]
+          tape.res!.headers["location"] = [location.replace(proxiedHost, talkbackHost)]
         }
 
         return tape
@@ -65,7 +72,7 @@ const cleanupTapes = () => {
       fs.unlinkSync(path.join(tapesPath, files[i]))
     }
   }
-  const newTapesPath = path.join(tapesPath, 'new-tapes')
+  const newTapesPath = path.join(tapesPath, "new-tapes")
   del.sync(newTapesPath)
 }
 
@@ -78,14 +85,14 @@ describe("talkback", () => {
   })
 
   after(() => {
-    if(proxiedServer) {
+    if (proxiedServer) {
       proxiedServer.close()
       proxiedServer = null
     }
   })
 
   afterEach(() => {
-    if(talkbackServer) {
+    if (talkbackServer) {
       talkbackServer.close()
       talkbackServer = null
     }
@@ -166,7 +173,7 @@ describe("talkback", () => {
       talkbackServer = await startTalkback(
         {
           tapeNameGenerator: (tapeNumber, tape) => {
-            return path.join('new-tapes', `${tape.req.method}`, `my-tape-${tapeNumber}`)
+            return path.join("new-tapes", `${tape.req.method}`, `my-tape-${tapeNumber}`)
           }
         }
       )
@@ -235,7 +242,7 @@ describe("talkback", () => {
     })
 
     it("doesn't match pretty printed tapes with different body", async () => {
-      const makeRequest = async (body) => {
+      const makeRequest = async (body: string) => {
         let res = await fetch(`${talkbackHost}/test/pretty`, {
           compress: false,
           method: "POST",
@@ -355,9 +362,9 @@ describe("talkback", () => {
   })
 
   describe("summary printing", () => {
-    let log
+    let log: Function
     beforeEach(() => {
-      log = td.replace(console, 'log')
+      log = td.replace(console, "log")
     })
 
     afterEach(() => td.reset())
@@ -381,16 +388,16 @@ describe("talkback", () => {
     it("should indicate that a tape has been used after usage", async () => {
       talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
-      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
+      expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(false)
 
       const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
       expect(res.status).to.eq(200)
 
-      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(true)
+      expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(true)
 
       talkbackServer.resetTapeUsage()
 
-      expect(talkbackServer.hasTapeBeenUsed('saved-request.json5')).to.eq(false)
+      expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(false)
 
       const body = await res.json()
       expect(body).to.eql({ok: true})

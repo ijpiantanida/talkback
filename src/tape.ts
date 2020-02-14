@@ -1,12 +1,24 @@
 import MediaType from "./utils/media-type"
 import TapeRenderer from "./tape-renderer"
-import ContentEncoding from "./utils/content-encoding";
+import ContentEncoding from "./utils/content-encoding"
+import {Options} from "./options"
+import {Metadata, Req, Res} from "./types"
 
 const URL = require("url")
 const querystring = require("querystring")
 
 export default class Tape {
-  constructor(req, options) {
+  req: Req
+  res?: Res
+  options: Options
+  queryParamsToIgnore: string[]
+  meta: Metadata
+  path?: string
+
+  new: boolean = false
+  used: boolean = false
+
+  constructor(req: Req, options: Options) {
     this.req = {
       url: req.url,
       method: req.method,
@@ -30,8 +42,8 @@ export default class Tape {
     }
   }
 
-  static async fromStore(...args) {
-    return TapeRenderer.fromStore(...args)
+  static async fromStore(raw: any, options: Options) {
+    return TapeRenderer.fromStore(raw, options)
   }
 
   cleanupHeaders() {
@@ -48,7 +60,7 @@ export default class Tape {
       return
     }
 
-    const url = URL.parse(this.req.url, {parseQueryString: true})
+    const url = URL.parse(this.req.url, true)
     if (!url.search) {
       return
     }
@@ -70,8 +82,8 @@ export default class Tape {
   normalizeBody() {
     const mediaType = new MediaType(this.req)
     const contentEncoding = new ContentEncoding(this.req)
-    if(contentEncoding.isUncompressed() && mediaType.isJSON() && this.req.body.length > 0) {
-      this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body), null, 2))
+    if (contentEncoding.isUncompressed() && mediaType.isJSON() && this.req.body.length > 0) {
+      this.req.body = Buffer.from(JSON.stringify(JSON.parse(this.req.body.toString()), null, 2))
     }
   }
 

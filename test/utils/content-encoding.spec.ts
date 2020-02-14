@@ -1,22 +1,25 @@
-const zlib = require("zlib")
-import ContentEncoding from "../../src/utils/content-encoding";
+import {Req, ReqRes} from "../../src/types"
 
-let req, contentEncoding
+const zlib = require("zlib")
+import ContentEncoding from "../../src/utils/content-encoding"
+import {expect} from "chai"
+
+let reqRes: ReqRes, contentEncoding: ContentEncoding
 
 describe("ContentEncoding", () => {
   beforeEach(() => {
-    req = {
+    reqRes = {
       headers: {
         "content-encoding": "gzip"
       },
       body: Buffer.from("FOOBAR")
     }
-    contentEncoding = new ContentEncoding(req)
+    contentEncoding = new ContentEncoding(reqRes)
   })
 
   describe("#isUncompressed", () => {
     it("returns true when there's no content-encoding header", () => {
-      req.headers = {}     
+      reqRes.headers = {}
       expect(contentEncoding.isUncompressed()).to.eql(true)
     })
 
@@ -49,9 +52,9 @@ describe("ContentEncoding", () => {
   describe("#uncompressedBody", () => {
     it("throws an error when the algorithm is not supported", (done) => {
       setEncoding("br")
-      contentEncoding.uncompressedBody(req.body)
-        .then(() => done('failed'))
-        .catch(() => done())
+      contentEncoding.uncompressedBody(reqRes.body)
+      .then(() => done("failed"))
+      .catch(() => done())
     })
 
     it("returns uncompressed when algorithm is gzip", async () => {
@@ -74,29 +77,27 @@ describe("ContentEncoding", () => {
   describe("#compressedBody", () => {
     it("throws an error when the algorithm is not supported", (done) => {
       setEncoding("br")
-      contentEncoding.compressedBody(req.body)
-        .then(() => done('failed'))
-        .catch(() => done())
+      contentEncoding.compressedBody("FOOBAR")
+      .then(() => done("failed"))
+      .catch(() => done())
     })
 
     it("returns compressed when algorithm is gzip", async () => {
       setEncoding("gzip")
-      const uncompressedBody = Buffer.from("FOOBAR")
-      const compressed = await zlib.gzipSync(uncompressedBody)
+      const compressed = await zlib.gzipSync("FOOBAR")
 
-      expect(await contentEncoding.compressedBody(uncompressedBody)).to.eql(compressed)
+      expect(await contentEncoding.compressedBody("FOOBAR")).to.eql(compressed)
     })
 
     it("returns compressed when algorithm is deflate", async () => {
       setEncoding("deflate")
-      const uncompressedBody = Buffer.from("FOOBAR")
-      const compressed = await zlib.deflateSync(uncompressedBody)
+      const compressed = await zlib.deflateSync("FOOBAR")
 
-      expect(await contentEncoding.compressedBody(uncompressedBody)).to.eql(compressed)
+      expect(await contentEncoding.compressedBody("FOOBAR")).to.eql(compressed)
     })
   })
 
-  function setEncoding(encoding) {
-    req.headers["content-encoding"] = encoding
+  function setEncoding(encoding: string) {
+    reqRes.headers["content-encoding"] = encoding
   }
 })

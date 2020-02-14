@@ -1,8 +1,9 @@
 import TapeMatcher from "../src/tape-matcher"
 import Tape from "../src/tape"
-import Logger from "../src/logger"
 import Options from "../src/options"
-import ContentEncoding from "../src/utils/content-encoding";
+import ContentEncoding from "../src/utils/content-encoding"
+import {expect} from "chai"
+import {Req} from "../src/types"
 
 const raw = {
   meta: {
@@ -34,7 +35,7 @@ const opts = Options.prepare({
   debug: true
 })
 
-let tape
+let tape: Tape
 
 describe("TapeMatcher", () => {
   beforeEach(async () => {
@@ -153,7 +154,7 @@ describe("TapeMatcher", () => {
     })
 
     it("returns true when the request is compressed and are the same", async () => {
-      const contentEncoding = new ContentEncoding({headers: {"content-encoding": "gzip"}})
+      const contentEncoding = new ContentEncoding({headers: {"content-encoding": "gzip"}, body: Buffer.from("ASD")})
       const compressedBody = await contentEncoding.compressedBody(JSON.stringify({foo: "bar"}))
 
       const rawDup = {
@@ -221,19 +222,19 @@ describe("TapeMatcher", () => {
       it("returns true when just the bodies are different but the bodyMatcher says they match", () => {
         const newOpts = {
           ...opts,
-          bodyMatcher: (_tape, _otherReq) => true
+          bodyMatcher: (_tape: Tape, _otherReq: Req) => true
         }
-  
+
         const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
         expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.true
       })
-  
+
       it("returns false when just the bodies are different and the bodyMatcher says they don't match", () => {
         const newOpts = {
           ...opts,
-          bodyMatcher: (_tape, otherReq) => false
+          bodyMatcher: (_tape: Tape, _otherReq: Req) => false
         }
-  
+
         const tape2 = new Tape({...req, body: Buffer.from("XYZ")}, newOpts)
         expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.false
       })
@@ -243,9 +244,9 @@ describe("TapeMatcher", () => {
       it("returns true when urls are different but the urlMatcher says they match", () => {
         const newOpts = {
           ...opts,
-          urlMatcher: (_tape, _otherReq) => true
+          urlMatcher: (_tape: Tape, _otherReq: Req) => true
         }
-  
+
         const tape2 = new Tape({...req, url: "/not-same"}, newOpts)
         expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.true
       })
@@ -253,9 +254,9 @@ describe("TapeMatcher", () => {
       it("returns false when just the urls are different and the urlMatcher says they don't match", () => {
         const newOpts = {
           ...opts,
-          urlMatcher: (_tape, otherReq) => false
+          urlMatcher: (_tape: Tape, _otherReq: Req) => false
         }
-  
+
         const tape2 = new Tape({...req, url: "/not-same"}, newOpts)
         expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.false
       })

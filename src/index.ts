@@ -1,7 +1,7 @@
 import Server from "./server"
 import Options, {DefaultOptions, FallbackMode, RecordMode} from "./options"
 
-const talkback = usrOpts => {
+const talkback = (usrOpts: Partial<Options>) => {
   const opts = Options.prepare(usrOpts)
 
   return new Server(opts)
@@ -14,3 +14,4 @@ talkback.Options = {
 }
 
 export default talkback
+module.exports = talkback

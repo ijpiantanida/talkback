@@ -1,4 +1,5 @@
 const zlib = require("zlib")
+import {expect} from "chai"
 
 import TapeRenderer from "../src/tape-renderer"
 import Options from "../src/options"
@@ -126,7 +127,7 @@ describe("TapeRenderer", () => {
       expect(tape.req.body).to.eql(Buffer.from(JSON.stringify(newRaw.req.body, null, 2)))
 
       expect(tape.res.body).to.eql(Buffer.from(JSON.stringify(newRaw.res.body, null, 2)))
-      expect(tape.res.headers["content-length"]).to.eql([68])
+      expect(tape.res.headers["content-length"]).to.eql(["68"])
 
       delete newRaw.res.headers["content-length"]
       tape = await TapeRenderer.fromStore(newRaw, opts)

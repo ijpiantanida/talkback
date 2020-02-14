@@ -1,14 +1,20 @@
 import ContentEncoding from "./utils/content-encoding"
 import MediaType from "./utils/media-type"
-const isEqual = require("lodash/isEqual");
+import {Options} from "./options"
+import Tape from "./tape"
+
+const isEqual = require("lodash/isEqual")
 
 export default class TapeMatcher {
-  constructor(tape, options) {
+  private readonly tape: Tape
+  private readonly options: Options
+
+  constructor(tape: Tape, options: Options) {
     this.tape = tape
     this.options = options
   }
 
-  sameAs(otherTape) {
+  sameAs(otherTape: Tape) {
     const otherReq = otherTape.req
     const req = this.tape.req
     const sameURL = req.url === otherReq.url
@@ -19,7 +25,7 @@ export default class TapeMatcher {
       }
 
       const urlMatches = this.options.urlMatcher(this.tape, otherReq)
-      if(!urlMatches) {
+      if (!urlMatches) {
         this.options.logger.debug(`Not same urlMatcher ${req.url} vs ${otherReq.url}`)
         return false
       }
@@ -56,10 +62,10 @@ export default class TapeMatcher {
       const contentEncoding = new ContentEncoding(req)
 
       let sameBody = false
-      if(contentEncoding.isUncompressed() && mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
-        const parsedReqBody = JSON.parse(req.body.toString());
-        const parsedOtherReqBody = JSON.parse(otherReq.body.toString());
-        sameBody = isEqual(parsedReqBody, parsedOtherReqBody);
+      if (contentEncoding.isUncompressed() && mediaType.isJSON() && req.body.length > 0 && otherReq.body.length > 0) {
+        const parsedReqBody = JSON.parse(req.body.toString())
+        const parsedOtherReqBody = JSON.parse(otherReq.body.toString())
+        sameBody = isEqual(parsedReqBody, parsedOtherReqBody)
       } else {
         sameBody = req.body.equals(otherReq.body)
       }
@@ -71,7 +77,7 @@ export default class TapeMatcher {
         }
 
         const bodyMatches = this.options.bodyMatcher(this.tape, otherReq)
-        if(!bodyMatches) {
+        if (!bodyMatches) {
           this.options.logger.debug(`Not same bodyMatcher ${req.body} vs ${otherReq.body}`)
           return false
         }

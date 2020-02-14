@@ -25,6 +25,7 @@ If no tape matches the request, it will forward it to the origin host, save the 
 
 ```javascript
 const talkback = require("talkback");
+//import talkback from "talkback/es6";
 
 const opts = {
   host: "https://api.myapp.com/foo",

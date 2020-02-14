@@ -1,3 +1,5 @@
+import {Options} from "./options"
+
 const fs = require("fs")
 const path = require("path")
 const JSON5 = require("json5")
@@ -8,7 +10,11 @@ import TapeMatcher from "./tape-matcher"
 import TapeRenderer from "./tape-renderer"
 
 export default class TapeStore {
-  constructor(options) {
+  private readonly path: string
+  private readonly options: Options
+  tapes: Tape[]
+
+  constructor(options: Options) {
     this.path = path.normalize(options.path + "/")
     this.options = options
     this.tapes = []
@@ -21,8 +27,8 @@ export default class TapeStore {
     console.log(`Loaded ${this.tapes.length} tapes`)
   }
 
-  async loadTapesAtDir(directory) {
-    const items = fs.readdirSync(directory)
+  async loadTapesAtDir(directory: string) {
+    const items = fs.readdirSync(directory) as string[]
     for (let i = 0; i < items.length; i++) {
       const filename = items[i]
       const fullPath = `${directory}${filename}`
@@ -43,7 +49,7 @@ export default class TapeStore {
     }
   }
 
-  find(newTape) {
+  find(newTape: Tape) {
     const foundTape = this.tapes.find(t => {
       this.options.logger.debug(`Comparing against tape ${t.path}`)
       return new TapeMatcher(t, this.options).sameAs(newTape)
@@ -56,7 +62,7 @@ export default class TapeStore {
     }
   }
 
-  async save(tape) {
+  async save(tape: Tape) {
     tape.new = true
     tape.used = true
 
@@ -83,7 +89,7 @@ export default class TapeStore {
     return this.tapes.length
   }
 
-  hasTapeBeenUsed(tapeName) {
+  hasTapeBeenUsed(tapeName: string) {
     return this.tapes.some(t => t.used && t.path === tapeName)
   }
 
@@ -91,7 +97,7 @@ export default class TapeStore {
     return this.tapes.forEach(t => t.used = false)
   }
 
-  createTapePath(tape) {
+  createTapePath(tape: Tape) {
     const currentTapeId = this.currentTapeId()
     let tapePath = `unnamed-${currentTapeId}.json5`
     if (this.options.tapeNameGenerator) {

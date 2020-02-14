@@ -1,4 +1,5 @@
 import MediaType from "../../src/utils/media-type"
+import {expect} from "chai"
 
 describe("MediaType", () => {
   describe("#isHumanReadable", () => {
@@ -6,7 +7,8 @@ describe("MediaType", () => {
       const res = {
         headers: {
           "content-type": ["application/json"]
-        }
+        },
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
@@ -15,8 +17,8 @@ describe("MediaType", () => {
 
     it("returns false when content-type is not present", () => {
       const res = {
-        headers: {
-        }
+        headers: {},
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
@@ -27,7 +29,8 @@ describe("MediaType", () => {
       const res = {
         headers: {
           "content-type": ["img/png"]
-        }
+        },
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
@@ -39,7 +42,8 @@ describe("MediaType", () => {
         headers: {
           "content-encoding": ["identity"],
           "content-type": ["application/json"]
-        }
+        },
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
@@ -52,18 +56,20 @@ describe("MediaType", () => {
       const res = {
         headers: {
           "content-type": ["application/json"]
-        }
+        },
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
       expect(mediaType.isJSON()).to.be.true
     })
 
-    it("rerturns false when content-type is not JSON", () => {
+    it("returns false when content-type is not JSON", () => {
       const res = {
         headers: {
           "content-type": ["text/html"]
-        }
+        },
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)
@@ -72,8 +78,8 @@ describe("MediaType", () => {
 
     it("returns false when content-type is not set", () => {
       const res = {
-        headers: {
-        }
+        headers: {},
+        body: Buffer.from("FOO")
       }
 
       const mediaType = new MediaType(res)

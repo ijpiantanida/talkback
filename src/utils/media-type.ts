@@ -1,5 +1,7 @@
-const contentTypeParser = require("content-type");
+import {ReqRes} from "../types"
 import Headers from "./headers"
+
+const contentTypeParser = require("content-type");
 
 export const jsonTypes = [
   "application/json"
@@ -15,7 +17,9 @@ const humanReadableContentTypes = [
 ]
 
 export default class MediaType {
-  constructor(htmlReqRes) {
+  private htmlReqRes: ReqRes
+
+  constructor(htmlReqRes: ReqRes) {
     this.htmlReqRes = htmlReqRes
   }
 

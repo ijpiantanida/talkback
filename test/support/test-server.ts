@@ -1,16 +1,16 @@
-const http = require("http")
+import * as http from "http"
 
 const testServer = () => {
   return http.createServer(async (req, res) => {
-    let reqBody = []
+    let rawReqBody = [] as Uint8Array[]
     req.on("error", (err) => {
       console.error(err)
     }).on("data", (chunk) => {
-      reqBody.push(chunk)
+      rawReqBody.push(chunk)
     }).on("end", async () => {
       switch (req.url) {
         case "/test/1": {
-          reqBody = Buffer.concat(reqBody)
+          const reqBody = Buffer.concat(rawReqBody)
           const bodyAsString = reqBody.toString()
 
           const headers = {
@@ -32,7 +32,7 @@ const testServer = () => {
           return
         }
         case "/test/2": {
-          reqBody = Buffer.concat(reqBody)
+          const reqBody = Buffer.concat(rawReqBody)
           res.writeHead(200, {})
           const bodyAsJson = JSON.parse(reqBody.toString())
           res.end(JSON.stringify({ok: true, body: bodyAsJson}))
@@ -50,7 +50,7 @@ const testServer = () => {
         }
         case "/test/redirect/1": {
           res.writeHead(302, {
-            'Location': '/test/1'
+            "Location": "/test/1"
           })
           res.end()
           return

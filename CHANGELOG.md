@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.0
+- Add support for JSON Schema media-types
+- Rewrite talkback to Typescript
+- Now you can also `import talkback from "talkback/es6"`
+
 ## v2.0.0
 - Drop node 8 support. Min. required version is node 10
 - Order of properties is ignored when matching JSON tapes body

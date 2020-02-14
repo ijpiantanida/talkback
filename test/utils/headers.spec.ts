@@ -1,4 +1,5 @@
 import Headers from "../../src/utils/headers"
+import {expect} from "chai"
 
 describe("Headers", () => {
   describe(".write", () => {
@@ -21,13 +22,13 @@ describe("Headers", () => {
 
   describe(".write", () => {
     it("writes just the value as value when it's for req", () => {
-      const headers = {}
+      const headers = {"content-type": "foo"}
       Headers.write(headers, "content-type", "application/json", "req")
       expect(headers["content-type"]).to.eql("application/json")
     })
 
     it("writes just the value as an array when it's for res", () => {
-      const headers = {}
+      const headers = {"content-type": "foo"}
       Headers.write(headers, "content-type", "application/json", "res")
       expect(headers["content-type"]).to.eql(["application/json"])
     })

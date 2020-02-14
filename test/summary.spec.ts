@@ -1,8 +1,12 @@
 import Summary from "../src/summary"
+import * as td from "testdouble"
+import {DefaultOptions} from "../src/options"
+import Tape from "../src/tape"
 
-let log;
+let log: Function;
 
 const opts = {
+  ...DefaultOptions,
   name: "My Server"
 }
 
@@ -34,9 +38,9 @@ describe("Summary", () => {
 
     it("prints the path of new tapes", () => {
       const summary = new Summary([
-        {new: true, used: true, path: "path1"},
-        {used: true, path: "path2"},
-        {new: true, used: true, path: "path3"}
+        {new: true, used: true, path: "path1"} as Tape,
+        {used: true, path: "path2"} as Tape,
+        {new: true, used: true, path: "path3"} as Tape
       ], opts)
 
       summary.print()
@@ -48,9 +52,9 @@ describe("Summary", () => {
 
     it("prints the path of unused tapes", () => {
       const summary = new Summary([
-        {path: "path1"},
-        {used: true, path: "path2"},
-        {path: "path3"}
+        {path: "path1"} as Tape,
+        {used: true, path: "path2"} as Tape,
+        {path: "path3"} as Tape
       ], opts)
 
       summary.print()

@@ -1,5 +1,11 @@
-export default class Sumary {
-  constructor(tapes, opts) {
+import Tape from "./tape"
+import {Options} from "./options"
+
+export default class Summary {
+  private tapes: Tape[]
+  private opts: Options
+
+  constructor(tapes: Tape[], opts: Options) {
     this.tapes = tapes
     this.opts = opts
   }

@@ -1,3 +1,5 @@
+import {ReqRes} from "../types"
+
 const zlib = require("zlib")
 import Headers from "./headers"
 
@@ -6,14 +8,18 @@ const ALGORITHMS = {
   deflate: {compress: zlib.deflateSync, uncompress: zlib.inflateSync}
 }
 
+type SupportedAlgorithms = keyof typeof ALGORITHMS
+
 export default class ContentEncoding {
-  constructor(reqRes) {
+  private reqRes: ReqRes
+
+  constructor(reqRes: ReqRes) {
     this.reqRes = reqRes
   }
 
   isUncompressed() {
     const contentEncoding = this.contentEncoding()
-    return !contentEncoding || contentEncoding === 'identity'
+    return !contentEncoding || contentEncoding === "identity"
   }
 
   supportedAlgorithm() {
@@ -22,26 +28,26 @@ export default class ContentEncoding {
   }
 
   contentEncoding() {
-    return Headers.read(this.reqRes.headers, 'content-encoding')
+    return Headers.read(this.reqRes.headers, "content-encoding")
   }
 
-  async uncompressedBody(bufferContent) {
+  async uncompressedBody(body: Buffer) {
     const contentEncoding = this.contentEncoding()
 
-    if(!this.supportedAlgorithm()) {
+    if (!this.supportedAlgorithm()) {
       throw new Error(`Unsupported content-encoding ${contentEncoding}`)
     }
 
-    return ALGORITHMS[contentEncoding].uncompress(bufferContent)
+    return ALGORITHMS[contentEncoding as SupportedAlgorithms].uncompress(body)
   }
 
-  async compressedBody(bufferContent) {
+  async compressedBody(body: string) {
     const contentEncoding = this.contentEncoding()
 
-    if(!this.supportedAlgorithm()) {
+    if (!this.supportedAlgorithm()) {
       throw new Error(`Unsupported content-encoding ${contentEncoding}`)
     }
 
-    return ALGORITHMS[contentEncoding].compress(bufferContent)
+    return ALGORITHMS[contentEncoding as SupportedAlgorithms].compress(body)
   }
 }

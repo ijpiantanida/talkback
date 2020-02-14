@@ -1,3 +1,4 @@
+require("ts-node/register")
 const chai = require("chai");
 const td = require("testdouble");
 

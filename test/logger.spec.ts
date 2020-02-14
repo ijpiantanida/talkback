@@ -1,11 +1,12 @@
 import Logger from "../src/logger"
+import * as td from "testdouble"
 
-let log, debug, error
+let log: Function, debug: Function, error: Function
 describe("Logger", () => {
   beforeEach(() => {
-    log = td.replace(console, 'log')
-    debug = td.replace(console, 'debug')
-    error = td.replace(console, 'error')
+    log = td.replace(console, "log")
+    debug = td.replace(console, "debug")
+    error = td.replace(console, "error")
   })
 
   afterEach(() => td.reset())

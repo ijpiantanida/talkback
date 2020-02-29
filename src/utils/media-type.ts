@@ -1,18 +1,21 @@
 import {ReqRes} from "../types"
 import Headers from "./headers"
 
-const contentTypeParser = require("content-type");
+const contentTypeParser = require("content-type")
+
+const equals = (to: string) => (contentType: string) => to == contentType
 
 export const jsonTypes = [
-  "application/json"
+  equals("application/json"),
+  (contentType: string) => contentType.startsWith("application/") && contentType.endsWith("+json")
 ]
 
 const humanReadableContentTypes = [
-  "application/javascript",
-  "text/css",
-  "text/html",
-  "text/javascript",
-  "text/plain",
+  equals("application/javascript"),
+  equals("text/css"),
+  equals("text/html"),
+  equals("text/javascript"),
+  equals("text/plain"),
   ...jsonTypes
 ]
 
@@ -29,7 +32,7 @@ export default class MediaType {
       return false
     }
 
-    return humanReadableContentTypes.indexOf(contentType.type) >= 0
+    return humanReadableContentTypes.some(comparator => comparator(contentType))
   }
 
   isJSON() {
@@ -38,15 +41,16 @@ export default class MediaType {
       return false
     }
 
-    return jsonTypes.indexOf(contentType.type) >= 0
+    return jsonTypes.some(comparator => comparator(contentType))
   }
 
   contentType() {
-    let contentType = Headers.read(this.headers(), "content-type")
-    if(!contentType) {
+    const contentTypeHeader = Headers.read(this.headers(), "content-type")
+    if (!contentTypeHeader) {
       return null
     }
-    return contentTypeParser.parse(contentType);
+    const parsedContentType = contentTypeParser.parse(contentTypeHeader)
+    return parsedContentType.type as string
   }
 
   headers() {

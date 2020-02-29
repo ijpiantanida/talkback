@@ -1,50 +1,46 @@
 import MediaType from "../../src/utils/media-type"
 import {expect} from "chai"
+import Factories from "../support/factories"
 
 describe("MediaType", () => {
   describe("#isHumanReadable", () => {
     it("returns true when the content-type is human readable and there's no content-encoding", () => {
-      const res = {
+      const res = Factories.reqRes({
         headers: {
           "content-type": ["application/json"]
-        },
-        body: Buffer.from("FOO")
-      }
+        }
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isHumanReadable()).to.be.true
     })
 
     it("returns false when content-type is not present", () => {
-      const res = {
-        headers: {},
-        body: Buffer.from("FOO")
-      }
+      const res = Factories.reqRes({
+        headers: {}
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isHumanReadable()).to.be.false
     })
 
     it("returns false when the content-type is not human readable", () => {
-      const res = {
+      const res = Factories.reqRes({
         headers: {
           "content-type": ["img/png"]
-        },
-        body: Buffer.from("FOO")
-      }
+        }
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isHumanReadable()).to.be.false
     })
 
-    it("returns true when the content-type is human readable and the content-encoding is identity", () => {
-      const res = {
+    it("returns true when content-type is JSON Schema", () => {
+      const res = Factories.reqRes({
         headers: {
-          "content-encoding": ["identity"],
-          "content-type": ["application/json"]
-        },
-        body: Buffer.from("FOO")
-      }
+          "content-type": ["application/some-schema+json"]
+        }
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isHumanReadable()).to.be.true
@@ -52,35 +48,43 @@ describe("MediaType", () => {
   })
 
   describe("#isJSON", () => {
-    it("retunrs true when content-type is JSON", () => {
-      const res = {
+    it("returns true when content-type is JSON", () => {
+      const res = Factories.reqRes({
         headers: {
           "content-type": ["application/json"]
-        },
-        body: Buffer.from("FOO")
-      }
+        }
+      })
+
+      const mediaType = new MediaType(res)
+      expect(mediaType.isJSON()).to.be.true
+    })
+
+    it("returns true when content-type is JSON Schema", () => {
+      const res = Factories.reqRes({
+        headers: {
+          "content-type": ["application/some-schema+json"]
+        }
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isJSON()).to.be.true
     })
 
     it("returns false when content-type is not JSON", () => {
-      const res = {
+      const res = Factories.reqRes({
         headers: {
           "content-type": ["text/html"]
-        },
-        body: Buffer.from("FOO")
-      }
+        }
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isJSON()).to.be.false
     })
 
     it("returns false when content-type is not set", () => {
-      const res = {
-        headers: {},
-        body: Buffer.from("FOO")
-      }
+      const res = Factories.reqRes({
+        headers: {}
+      })
 
       const mediaType = new MediaType(res)
       expect(mediaType.isJSON()).to.be.false

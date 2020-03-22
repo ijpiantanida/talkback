@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.1
+- Dependencies updates
+
 ## v2.1.0
 - Add support for JSON Schema media-types
 - Rewrite talkback to Typescript

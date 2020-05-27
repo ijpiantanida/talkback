@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.2.0
+- Expose requestHandler as first-class citizen
+- Add requestHandler example
+
 ## v2.1.0
 - Add support for JSON Schema media-types
 - Rewrite talkback to Typescript

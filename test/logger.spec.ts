@@ -19,6 +19,13 @@ describe("Logger", () => {
       td.verify(log("Test"), {times: 0})
     })
 
+    it("writes to log if silent option is enabled but debug is enabled", () => {
+      const logger = new Logger({silent: true, debug: true})
+      logger.log("Test")
+
+      td.verify(log("Test"))
+    })
+
     it("writes to log console if silent option is disabled", () => {
       const logger = new Logger({silent: false})
       logger.log("Test")

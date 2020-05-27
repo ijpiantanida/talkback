@@ -1,5 +1,6 @@
 import {FallbackMode, Options, RecordMode} from "./options"
 import TalkbackServer from "./server"
+import RequestHandler from "./request-handler"
 
 export {}
 
@@ -13,9 +14,13 @@ export interface Req extends ReqRes {
   method: string
 }
 
+export type HttpRequest = Req
+
 export interface Res extends ReqRes {
   status: number
 }
+
+export type HttpResponse = Res
 
 export interface Metadata {
   createdAt: Date,
@@ -29,11 +34,14 @@ export interface Metadata {
   resHumanReadable?: boolean
 }
 
-type TalkbackBase = (usrOpts: Partial<Options>) => TalkbackServer
+type TalkbackBase = (options: Partial<Options>) => TalkbackServer
+
 export interface Talkback extends TalkbackBase {
   Options: {
     Default: Options,
     FallbackMode: typeof FallbackMode,
     RecordMode: typeof RecordMode
   }
+
+  requestHandler(options: Partial<Options>): RequestHandler
 }

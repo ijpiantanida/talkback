@@ -1,8 +1,7 @@
 # Talkback
 
-Record and playback HTTP requests.   
-Talkback is a pure javascript standalone HTTP proxy. As long as you have node.js in your environment, you can run Talkback to record requests from applications written in any language/framework.   
-You can use it to accelerate your integration tests or running your application against mocked HTTP servers.       
+Talkback is a javascript HTTP proxy to record and playback HTTP requests. As long as you have node.js in your environment you can run talkback to record requests from applications written in any language/framework.   
+You can use it to accelerate your integration tests or run your application against a mocked server.       
 
 Read more about the reasoning behind **talkback** on [10Pines blog](https://blog.10pines.com/2017/12/18/isolating-integration-tests-from-external-http-services-with-talkback/).   
 
@@ -35,13 +34,36 @@ const opts = {
 };
 const server = talkback(opts);
 server.start(() => console.log("Talkback Started"));
-server.close();
 ```
 
-### talkback(opts)
-Returns an unstarted talkback server instance.   
+Talkback can be used in 2 ways:
+  - as a standalone HTTP server in its own separate process. [Example](/examples/server).
+  - as a library, where you are in charge of routing requests to talkback. [Example](/examples/request-handler).
 
-**Options:**
+#### talkback(options: Partial\<Options\>): TalkbackServer
+Returns an unstarted instance of a talkback server.   
+See all [Options](#options).
+
+```javascript
+const talkback = talkback(options)
+
+talkback.start(() => console.log("Talkback Started"))
+talkback.stop()
+```
+
+#### talkback.requestHandler(options: Partial\<Options\>): Promise\<RequestHandler\>
+Returns a RequestHandler instance ready to receive requests.   
+See all [Options](#options).   
+
+The hanlder takes a [request](#request) and returns a [response](#response) Promise.
+
+```javascript
+const talkbackHandler = await talkback.requestHandler(options)
+
+const response = await talkbackHandler.handle(httpRequest)
+```
+
+### Options
 
 | Name | Type | Description | Default |   
 |------|------|-------------|---------|
@@ -73,24 +95,36 @@ Returns an unstarted talkback server instance.
 | **keyPath** | `String` | Path to the key file | `null` | 
 | **certPath** | `String` | Path to the cert file | `null` | 
 
-### start([callback])
-Starts the HTTP server and if provided calls `callback` after the server has successfully started.
-
-### close()
-Stops the HTTP server.
-
 ## Tapes
-Tapes can be freely edited to match new requests or return a different response than the original. They are loaded recursively from the `path` directory at startup.   
-They use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the JSON format that allows for very neat features like comments, trailing commas and keys without quotes.   
+Tapes are where talkback stores requests and their response.   
+They can be freely edited to match new requests or return a different response than the original. They are loaded recursively from the `path` directory at startup.   
+Since they are only loaded on startup, any changes to a tape requires a server restart to be applied.   
+Tapes use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the JSON format that allows for very neat features like comments, trailing commas and keys without quotes.         
 
 #### Format
 All tapes have the following 3 properties:   
 * **meta**: Stores metadata about the tape.
-* **req**: Request object. Used to match incoming requests against the tape.
-* **res**: Response object. The HTTP response that will be returned in case the tape matches a request.
+* **req**: [Request](#request) object. Used to match incoming requests against the tape.
+* **res**: [Response](#response) object. The HTTP response that will be returned in case the tape matches a request.
 
-You can freely edit any part of the tape, and even add your own properties to `meta`.   
-Since tapes are only loaded on startup, any changes to a tape requires a server restart to be applied.
+#### Request
+* **url** (String): Url relative to the host. E.g: `/users`
+* **method** (String): HTTP method. E.g: `GET`
+* **headers** (Object\<String, String\>): Request headers. E.g: `{"content-type": "application/json", accept: "*/*"}`
+* **body** (Buffer): Request body. E.g: `Buffer.from("FOOBAR")`
+
+#### Response
+* **status** (Number): HTTP response status code
+* **headers** (Object\<String, [String]\>): Response headers. E.g: `{"content-type": ["application/json"]}`
+* **body** (Buffer): Response body. E.g: `Buffer.from("FOOBAR")`
+
+#### Request and Response body
+If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
+Otherwise, the body will be saved as a Base64 string, allowing to save binary content.
+
+##### Pretty Printing
+If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   
+This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost.
 
 #### File Name
 New tapes will be created under the `path` directory with the name `unnamed-n.json5`, where `n` is the tape number.   
@@ -106,15 +140,7 @@ function nameGenerator(tapeNumber, tape) {
   //      tapes/POST/unnamed-2.json5
   return path.join(`${tape.req.method}`, `unnamed-${tapeNumber}`)
 }
-```
-
-#### Request and Response body
-If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
-Otherwise, the body will be saved as a Base64 string, allowing to save binary content.
-
-##### Pretty Printing
-If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   
-This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost. 
+``` 
  
 ## Recording Modes
 Talkback proxying and recording behavior can be controlled through the `record` and `fallbackMode` options.   
@@ -240,7 +266,7 @@ In this example we are also adding our own `tag` property to the saved tape `met
 Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
 
 ## Latency
-By default Talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
+By default talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
 Talkback lets you control response times both at a _global_ or at a _tape level_.   
 
 The `latency` option will apply for all requests that match an existing tape or when using the [`PROXY` fallback mode](#recording-modes).   
@@ -290,7 +316,7 @@ At the same time, tapes can define their own specific error rates by adding an `
 ```
 
 ## Exit summary
-If you are using Talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   
+If you are using talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   
 To help, when talkback exits, it will print a list of all the tapes that have NOT been used and a list of all the new tapes. If your test suite is green, you can safely delete anything that hasn't been used.
 ```
 ===== SUMMARY (My Server) =====

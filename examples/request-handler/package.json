@@ -1,0 +1,14 @@
+{
+  "name": "talkback-example-request-handler",
+  "version": "0.0.1",
+  "main": "start.js",
+  "license": "MIT",
+  "description": "Talkback Example - Request Handler",
+  "dependencies": {
+    "puppeteer": "^3.1.0"
+  },
+  "devDependencies": {
+    "talkback": "*"
+  },
+  "author": "Ignacio Piantanida"
+}

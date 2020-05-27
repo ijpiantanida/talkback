@@ -1,0 +1,23 @@
+<html>
+<body>
+<div id="content" class="loading">Loading...</div>
+<script type="application/javascript">
+  let contentEl = document.getElementById("content")
+  fetch("https://api.github.com/users/ijpiantanida")
+    .then(r => {
+      if (r.status >= 400) {
+        throw "error"
+      }
+      return r.json()
+    })
+    .then(json => {
+      contentEl.innerHTML = json.login
+      contentEl.classList.toggle("loading")
+    })
+    .catch(() => {
+      contentEl.innerHTML = "ERROR"
+      contentEl.classList.toggle("loading")
+    })
+</script>
+</body>
+</html>

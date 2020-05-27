@@ -41,7 +41,7 @@
   "scripts": {
     "build": "node tools/build.js",
     "ci": "yarn test && yarn build && USE_DIST=1 yarn test",
-    "start": "node ./example/start.js",
+    "start": "node examples/server/start.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extensions ts,js \"test/**/*.spec.{ts,js}\""
   }
 }

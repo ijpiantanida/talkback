@@ -11,6 +11,7 @@ import {Req} from "./types"
 export default class TalkbackServer {
   private readonly options: Options
   readonly tapeStore: TapeStore
+  private requestHandler: RequestHandler
   private readonly closeSignalHandler?: (...args: any[]) => void
   private server?: http.Server
   private closed: boolean = false
@@ -18,6 +19,8 @@ export default class TalkbackServer {
   constructor(options: Options) {
     this.options = options
     this.tapeStore = new TapeStore(this.options)
+    this.requestHandler = new RequestHandler(this.tapeStore, this.options)
+
     this.closeSignalHandler = this.close.bind(this)
   }
 
@@ -31,8 +34,7 @@ export default class TalkbackServer {
           ...rawReq,
           body: Buffer.concat(reqBody)
         } as Req
-        const requestHandler = new RequestHandler(this.tapeStore, this.options)
-        const fRes = await requestHandler.handle(req)
+        const fRes = await this.requestHandler.handle(req)
 
         res.writeHead(fRes.status, fRes.headers)
         res.end(fRes.body)

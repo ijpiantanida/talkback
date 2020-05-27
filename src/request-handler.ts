@@ -6,7 +6,7 @@ import Tape from "./tape"
 import OptionsFactory, {RecordMode, FallbackMode, Options} from "./options"
 import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
-import {Req, Res} from "./types"
+import {HttpRequest, HttpResponse} from "./types"
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
@@ -21,7 +21,7 @@ export default class RequestHandler {
     this.latency = new Latency(this.options)
   }
 
-  async handle(req: Req) {
+  async handle(req: HttpRequest): Promise<HttpResponse> {
     const recordMode = typeof (this.options.record) === "string" ? this.options.record : this.options.record(req)
 
     OptionsFactory.validateRecord(recordMode)
@@ -74,7 +74,7 @@ export default class RequestHandler {
     return resObj
   }
 
-  async onNoRecord(req: Req) {
+  private async onNoRecord(req: HttpRequest) {
     const fallbackMode = typeof (this.options.fallbackMode) === "string" ? this.options.fallbackMode : this.options.fallbackMode(req)
 
     OptionsFactory.validateFallbackMode(fallbackMode)
@@ -98,10 +98,10 @@ export default class RequestHandler {
       status: 404,
       headers: {"content-type": ["text/plain"]},
       body: Buffer.from("talkback - tape not found")
-    } as Res
+    } as HttpResponse
   }
 
-  async makeRealRequest(req: Req) {
+  private async makeRealRequest(req: HttpRequest) {
     let fetchBody: Buffer | null
     let {method, url, body} = req
     fetchBody = body
@@ -121,6 +121,6 @@ export default class RequestHandler {
       status: fRes.status,
       headers: fRes.headers.raw(),
       body: buff
-    } as Res
+    } as HttpResponse
   }
 }

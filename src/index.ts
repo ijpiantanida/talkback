@@ -1,10 +1,8 @@
-import Server from "./server"
+import TalkbackFactory from "./talkback-factory"
 import Options, {DefaultOptions, FallbackMode, RecordMode} from "./options"
 
-const talkback = (usrOpts: Partial<Options>) => {
-  const opts = Options.prepare(usrOpts)
-
-  return new Server(opts)
+const talkback = (options: Partial<Options>) => {
+  return TalkbackFactory.server(options)
 }
 
 talkback.Options = {
@@ -12,6 +10,8 @@ talkback.Options = {
   FallbackMode,
   RecordMode
 }
+
+talkback.requestHandler = (options: Partial<Options>) => TalkbackFactory.requestHandler(options)
 
 export default talkback
 module.exports = talkback

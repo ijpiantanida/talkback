@@ -1,17 +1,17 @@
-import {Options} from "../src/options"
-import testServer from "./support/test-server"
+import {Options} from "../../src/options"
+import testServer from "../support/test-server"
 import {expect} from "chai"
 import * as td from "testdouble"
-import {Talkback} from "../src/types"
-import TalkbackServer from "../src/server"
+import {HttpRequest, Talkback} from "../../src/types"
+import TalkbackServer from "../../src/server"
 import * as http from "http"
 
 let talkback: Talkback
 if (process.env.USE_DIST) {
-  talkback = require("../dist/index")
+  talkback = require("../../dist")
   console.log("Using DIST talkback")
 } else {
-  talkback = require("../src/index")
+  talkback = require("../../src")
 }
 
 const JSON5 = require("json5")
@@ -26,37 +26,40 @@ const FallbackMode = talkback.Options.FallbackMode
 let talkbackServer: TalkbackServer | null, proxiedServer: http.Server | null, currentTapeId: number
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
-const tapesPath = __dirname + "/tapes"
+const tapesPath = path.join(__dirname, "..", "/tapes")
 
 const talkbackPort = 8899
 const talkbackHost = `http://localhost:${talkbackPort}`
 
+const fullOptions = (opts?: Partial<Options>) => {
+  return {
+    path: tapesPath,
+    port: talkbackPort,
+    host: proxiedHost,
+    record: RecordMode.NEW,
+    silent: true,
+    bodyMatcher: (tape, req) => {
+      return tape.meta.tag === "echo"
+    },
+    responseDecorator: (tape, req) => {
+      if (tape.meta.tag === "echo") {
+        tape.res!.body = req.body
+      }
+
+      let location = tape.res!.headers["location"]
+      if (location && location[0]) {
+        location = location[0]
+        tape.res!.headers["location"] = [location.replace(proxiedHost, talkbackHost)]
+      }
+
+      return tape
+    },
+    ...opts
+  } as Options
+}
+
 const startTalkback = async (opts?: Partial<Options>) => {
-  const talkbackServer = talkback({
-      path: tapesPath,
-      port: talkbackPort,
-      host: proxiedHost,
-      record: RecordMode.NEW,
-      silent: true,
-      bodyMatcher: (tape, req) => {
-        return tape.meta.tag === "echo"
-      },
-      responseDecorator: (tape, req) => {
-        if (tape.meta.tag === "echo") {
-          tape.res!.body = req.body
-        }
-
-        let location = tape.res!.headers["location"]
-        if (location && location[0]) {
-          location = location[0]
-          tape.res!.headers["location"] = [location.replace(proxiedHost, talkbackHost)]
-        }
-
-        return tape
-      },
-      ...opts
-    }
-  )
+  const talkbackServer = talkback(fullOptions(opts))
   await talkbackServer.start()
 
   currentTapeId = talkbackServer.tapeStore.currentTapeId() + 1
@@ -76,7 +79,7 @@ const cleanupTapes = () => {
   del.sync(newTapesPath)
 }
 
-describe("talkback", () => {
+describe("talkbackServer", () => {
   beforeEach(() => cleanupTapes())
 
   before(async () => {
@@ -350,8 +353,8 @@ describe("talkback", () => {
 
     it("returns a 500 if anything goes wrong", async () => {
       talkbackServer = await startTalkback({record: RecordMode.DISABLED})
-      td.replace(talkbackServer, "tapeStore", {
-        find: () => {
+      td.replace(talkbackServer, "requestHandler", {
+        handle: () => {
           throw "Test error"
         }
       })
@@ -410,8 +413,8 @@ describe("talkback", () => {
         record: RecordMode.DISABLED,
         https: {
           enabled: true,
-          keyPath: "./example/httpsCert/localhost.key",
-          certPath: "./example/httpsCert/localhost.crt"
+          keyPath: "./examples/server/httpsCert/localhost.key",
+          certPath: "./examples/server/httpsCert/localhost.crt"
         }
       }
       talkbackServer = await startTalkback(options)
@@ -423,5 +426,26 @@ describe("talkback", () => {
 
       expect(res.status).to.eq(200)
     })
+  })
+})
+
+describe("talkback RequestHandler", () => {
+  beforeEach(() => cleanupTapes())
+
+  it("matches existing tapes", async () => {
+    const requestHandler = await talkback.requestHandler(fullOptions({ignoreHeaders: ["user-agent", "connection", "accept"]}))
+
+    const req = {
+      url: "/test/3",
+      method: "GET",
+      body: Buffer.alloc(0),
+      headers: []
+    } as HttpRequest
+
+    const res = await requestHandler.handle(req)
+    expect(res.status).to.eq(200)
+
+    const body = JSON.parse(res.body.toString())
+    expect(body).to.eql({ok: true})
   })
 })

@@ -1,9 +1,9 @@
 {
-  "name": "talkback-example",
+  "name": "talkback-example-server",
   "version": "0.0.1",
   "main": "start.js",
   "license": "MIT",
-  "description": "Talkback Example",
+  "description": "Talkback Example - Server",
   "dependencies": {},
   "devDependencies": {
     "talkback": "*"

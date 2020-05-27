@@ -40,9 +40,9 @@ node-fetch@^2.2.1:
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 talkback@*:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.1.1.tgz#874ea51329d11a9bd1e406869214ee044d03db6a"
-  integrity sha512-Ny6UFsKq0jlsWSWSbjHVGQNQdKX6XJr8XvsmWCc9YRMh5TyjnwxEsbz1ZsARpMSxZHPrkawd7l3DLpuKA5B7mA==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.0.tgz#bd4b4101fd82609ec325b0bb44e9d4a0a75aaae0"
+  integrity sha512-JnzH8392LhzU6swXwqexhFLX16D9MdVndBHbN1ab9UEQG0SWYGhKPD2dOilVZyC221VoXCFf3qXkbYgvmjFsHw==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"

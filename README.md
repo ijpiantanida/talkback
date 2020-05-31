@@ -3,8 +3,6 @@
 Talkback is a javascript HTTP proxy to record and playback HTTP requests. As long as you have node.js in your environment you can run talkback to record requests from applications written in any language/framework.   
 You can use it to accelerate your integration tests or run your application against a mocked server.       
 
-Read more about the reasoning behind **talkback** on [10Pines blog](https://blog.10pines.com/2017/12/18/isolating-integration-tests-from-external-http-services-with-talkback/).   
-
 [![npm version](https://badge.fury.io/js/talkback.svg)](https://badge.fury.io/js/talkback)
 [![Build Status](https://travis-ci.org/ijpiantanida/talkback.svg?branch=master)](https://travis-ci.org/ijpiantanida/talkback)
 

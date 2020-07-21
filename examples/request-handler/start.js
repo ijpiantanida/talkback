@@ -16,7 +16,8 @@ async function start() {
     path: __dirname + "/tapes",
     record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
     debug: true,
-    name: "Test Request Handler"
+    name: "Test Request Handler",
+    ignoreHeaders: ['user-agent']
   })
 
   const browser = await puppeteer.launch()
@@ -38,11 +39,11 @@ async function start() {
       }
 
       requestHandler.handle(talkbackRequest)
-        .then(r => interceptedRequest.respond(r))
-        .catch(error => {
-          console.log("Error handling talkback request", error)
-          interceptedRequest.abort()
-        })
+      .then(r => interceptedRequest.respond(r))
+      .catch(error => {
+        console.log("Error handling talkback request", error)
+        interceptedRequest.abort()
+      })
     } else {
       interceptedRequest.continue()
     }
@@ -61,3 +62,6 @@ async function start() {
 }
 
 start()
+.catch(err => {
+  console.log(err);
+})

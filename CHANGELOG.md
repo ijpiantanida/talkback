@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.2.1
+- Dependencies updates
+
 ## v2.2.0
 - Expose requestHandler as first-class citizen
 - Add requestHandler example

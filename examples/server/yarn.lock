@@ -20,9 +20,9 @@ json5@^2.1.1:
     minimist "^1.2.5"
 
 lodash@^4.17.15:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
+  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
 minimist@^1.2.5:
   version "1.2.5"
@@ -40,9 +40,9 @@ node-fetch@^2.2.1:
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 talkback@*:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.0.tgz#bd4b4101fd82609ec325b0bb44e9d4a0a75aaae0"
-  integrity sha512-JnzH8392LhzU6swXwqexhFLX16D9MdVndBHbN1ab9UEQG0SWYGhKPD2dOilVZyC221VoXCFf3qXkbYgvmjFsHw==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.1.tgz#9fe970f19b5501b97ea85378d29a80f2475c8259"
+  integrity sha512-qlPxGXZbsgn6Im1onZUYzK6VqskvWvQdX9IR+WNZPlMehB99ChvV/JbYgFazHDmqkdDg6cXTgdqmLl7mG8cxRg==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"

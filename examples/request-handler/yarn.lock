@@ -86,10 +86,10 @@ debug@4, debug@^4.1.0, debug@^4.1.1:
   dependencies:
     ms "^2.1.1"
 
-devtools-protocol@0.0.767361:
-  version "0.0.767361"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.767361.tgz#5977f2558b84f9df36f62501bdddb82f3ae7b66b"
-  integrity sha512-ziRTdhEVQ9jEwedaUaXZ7kl9w9TF/7A3SXQ0XuqrJB+hMS62POHZUWTbumDN2ehRTfvWqTPc2Jw4gUl/jggmHA==
+devtools-protocol@0.0.781568:
+  version "0.0.781568"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.781568.tgz#4cdca90a952d2c77831096ff6cd32695d8715a04"
+  integrity sha512-9Uqnzy6m6zEStluH9iyJ3iHyaQziFnMnLeC8vK0eN6smiJmIx7+yB64d67C2lH/LZra+5cGscJAJsNXO+MdPMg==
 
 end-of-stream@^1.1.0, end-of-stream@^1.4.1:
   version "1.4.4"
@@ -301,13 +301,13 @@ pump@^3.0.0:
     end-of-stream "^1.1.0"
     once "^1.3.1"
 
-puppeteer@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-5.2.0.tgz#c37bf605e6ec103428c872d820f30f2617bf38ad"
-  integrity sha512-Hru70mFT+dts5W3l1MVg46EfJiWE63qjmXlDvC2kkCeEzLgt6KrwEkDJcJKKzERTvy9xXhOvjyGNx36fd78mVQ==
+puppeteer@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-5.2.1.tgz#7f0564f0a5384f352a38c8cc42af875cd87f4ea6"
+  integrity sha512-PZoZG7u+T6N1GFWBQmGVG162Ak5MAy8nYSVpeeQrwJK2oYUlDWpHEJPcd/zopyuEMTv7DiztS1blgny1txR2qw==
   dependencies:
     debug "^4.1.0"
-    devtools-protocol "0.0.767361"
+    devtools-protocol "0.0.781568"
     extract-zip "^2.0.0"
     https-proxy-agent "^4.0.0"
     mime "^2.0.3"
@@ -348,9 +348,9 @@ string_decoder@^1.1.1:
     safe-buffer "~5.2.0"
 
 talkback@*:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.0.tgz#bd4b4101fd82609ec325b0bb44e9d4a0a75aaae0"
-  integrity sha512-JnzH8392LhzU6swXwqexhFLX16D9MdVndBHbN1ab9UEQG0SWYGhKPD2dOilVZyC221VoXCFf3qXkbYgvmjFsHw==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.1.tgz#9fe970f19b5501b97ea85378d29a80f2475c8259"
+  integrity sha512-qlPxGXZbsgn6Im1onZUYzK6VqskvWvQdX9IR+WNZPlMehB99ChvV/JbYgFazHDmqkdDg6cXTgdqmLl7mG8cxRg==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"

@@ -17,7 +17,7 @@ async function start() {
     record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
     debug: true,
     name: "Test Request Handler",
-    ignoreHeaders: ['user-agent']
+    ignoreHeaders: ["user-agent", "sec-ch-ua", "sec-ch-ua-mobile"]
   })
 
   const browser = await puppeteer.launch()

@@ -46,7 +46,7 @@ See all [Options](#options).
 const talkback = talkback(options)
 
 talkback.start(() => console.log("Talkback Started"))
-talkback.stop()
+talkback.close()
 ```
 
 #### talkback.requestHandler(options: Partial\<Options\>): Promise\<RequestHandler\>

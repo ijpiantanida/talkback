@@ -3,14 +3,14 @@ language: node_js
 node_js:
 - '10'
 - '11'
-- '12'
+- '14'
 cache: yarn
 script: yarn ci
 jobs:
   include:
     - stage: deploy
       if: tag IS present
-      node_js: '12'
+      node_js: '14'
       script: yarn build
       before_deploy:
       - cd dist

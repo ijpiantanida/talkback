@@ -19,10 +19,10 @@ json5@^2.1.1:
   dependencies:
     minimist "^1.2.5"
 
-lodash@^4.17.15:
-  version "4.17.19"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
-  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
+lodash@^4.17.20:
+  version "4.17.20"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
+  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
 
 minimist@^1.2.5:
   version "1.2.5"
@@ -35,18 +35,18 @@ mkdirp@^1.0.3:
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
 node-fetch@^2.2.1:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
-  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
+  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 talkback@*:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.1.tgz#9fe970f19b5501b97ea85378d29a80f2475c8259"
-  integrity sha512-qlPxGXZbsgn6Im1onZUYzK6VqskvWvQdX9IR+WNZPlMehB99ChvV/JbYgFazHDmqkdDg6cXTgdqmLl7mG8cxRg==
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.2.2.tgz#b613675cfee46d4e2bccc88fc22fc1c639768492"
+  integrity sha512-IgWHeVjbsuj8Hq34p9dyP8MyJo84NSBmZ18L/ZRm/Qp+KTKMZl2xNfH9p4yWAKzeVJpHGZnNWbGo69jOMx/uTQ==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"
     json5 "^2.1.1"
-    lodash "^4.17.15"
+    lodash "^4.17.20"
     mkdirp "^1.0.3"
     node-fetch "^2.2.1"

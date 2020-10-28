@@ -53,7 +53,7 @@ talkback.close()
 Returns a RequestHandler instance ready to receive requests.   
 See all [Options](#options).   
 
-The hanlder takes a [request](#request) and returns a [response](#response) Promise.
+The handler takes a [request](#request) and returns a [response](#response) Promise.
 
 ```javascript
 const talkbackHandler = await talkback.requestHandler(options)

@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.3.0
+- Fix for node 15 (thanks **[@halilb](https://github.com/halilb)**)
+- Dependencies updates
+
 ## v2.2.2
 - Dependencies updates
 

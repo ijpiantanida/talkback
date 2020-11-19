@@ -5,7 +5,7 @@
   "license": "MIT",
   "description": "Talkback Example - Request Handler",
   "dependencies": {
-    "puppeteer": "^5.2.1"
+    "puppeteer": "^5.5.0"
   },
   "devDependencies": {
     "talkback": "*"

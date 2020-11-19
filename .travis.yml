@@ -4,6 +4,7 @@ node_js:
 - '10'
 - '11'
 - '14'
+- '15'
 cache: yarn
 script: yarn ci
 jobs:

@@ -31,9 +31,10 @@ export default class TalkbackServer {
     }).on("end", async () => {
       try {
         const req = {
-          ...rawReq,
-          body: Buffer.concat(reqBody),
-          headers: rawReq.headers
+          headers: rawReq.headers,
+          url: rawReq.url,
+          method: rawReq.method,
+          body: Buffer.concat(reqBody)
         } as Req
         const fRes = await this.requestHandler.handle(req)
 

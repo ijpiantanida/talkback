@@ -1,6 +1,6 @@
 name: CI Build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -10,6 +10,8 @@ jobs:
         node-version: [10.x, 14.x, 15.x]
     steps:
       - uses: actions/checkout@v2
+      - name: Get version
+        run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -24,5 +26,32 @@ jobs:
             ${{ runner.OS }}-node-${{ matrix.node-version }}
       - run: yarn install --frozen-lockfile
       - run: yarn ci
+      - name: Save artifact
+        if: ${{ success() && contains(matrix.node-version, '15') && contains(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: talkback-dist-${{ env.TALKBACK_VERSION }}
+          path: ./dist
+          retention-days: 1
+  publish:
+    needs: build
+    if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get version
+        run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
+      - name: Use Node.js 15.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '15.x'
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: talkback-dist-${{ env.TALKBACK_VERSION }}
+          path: ./dist
+      - run: yarn publish
+        working-directory: dist
         env:
-          CI: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

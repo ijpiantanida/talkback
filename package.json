@@ -10,7 +10,8 @@
     "json5": "^2.1.1",
     "lodash": "^4.17.20",
     "mkdirp": "^1.0.3",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",

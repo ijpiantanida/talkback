@@ -19,12 +19,7 @@ export default class Tape {
   used: boolean = false
 
   constructor(req: Req, options: Options) {
-    this.req = {
-      url: req.url,
-      method: req.method,
-      headers: req.headers,
-      body: req.body
-    }
+    this.req = {...req}
     this.options = options
 
     // This needs to happen before we erase headers since we could lose information

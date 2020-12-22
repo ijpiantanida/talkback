@@ -73,7 +73,9 @@ describe("RequestHandler", () => {
 
           context("when there's a responseDecorator", () => {
             beforeEach(() => {
-              opts.responseDecorator = (tape, req) => {
+              opts.responseDecorator = (tape, req, context) => {
+                expect(context.id).to.exist
+
                 tape.res!.body = req.body
                 return tape
               }
@@ -100,6 +102,16 @@ describe("RequestHandler", () => {
 
               expect(resObj.headers["content-length"]).to.eq(3)
             })
+
+            it("throws an error if the responseDecorator returns null", async () => {
+              opts.requestDecorator = () => null
+              try {
+                await reqHandler.handle(savedTape.req)
+                expect.fail("Exception expected to be thrown")
+              } catch (ex) {
+                expect(ex.message).to.eql("requestDecorator didn't return a req object")
+              }
+            })
           })
         })
 
@@ -116,9 +128,40 @@ describe("RequestHandler", () => {
             td.verify(tapeStore.save(td.matchers.anything()))
           })
 
+          context("when there's a tapeDecorator", async () => {
+            beforeEach(() => {
+              opts.tapeDecorator = (tape, context) => {
+                expect(context.id).to.exist
+                tape.meta.myOwnMeta = "myOwnMeta_value"
+                return tape
+              }
+            })
+
+            it("stores the decorated tape", async () => {
+              await reqHandler.handle(savedTape.req)
+              const tapeCaptor = td.matchers.captor()
+
+              td.verify(tapeStore.save(tapeCaptor.capture()))
+
+              const persistedTape = tapeCaptor.value
+              expect(persistedTape.meta.myOwnMeta).to.eql("myOwnMeta_value")
+            })
+
+            it("throws an error if the tapeDecorator returns null", async () => {
+              opts.tapeDecorator = () => null
+              try {
+                await reqHandler.handle(savedTape.req)
+                expect.fail("Exception expected to be thrown")
+              } catch (ex) {
+                expect(ex.message).to.eql("tapeDecorator didn't return a tape object")
+              }
+            })
+          })
+
           context("when there's a responseDecorator", () => {
             beforeEach(() => {
-              opts.responseDecorator = (tape, req) => {
+              opts.responseDecorator = (tape, req, context) => {
+                expect(context.id).to.exist
                 tape.res!.body = req.body
                 return tape
               }
@@ -130,6 +173,16 @@ describe("RequestHandler", () => {
               expect(resObj.status).to.eql(200)
               expect(resObj.body).to.eql(Buffer.from("ABC"))
               expect(savedTape.res!.body).to.eql(Buffer.from("Hello"))
+            })
+
+            it("throws an error if the responseDecorator returns null", async () => {
+              opts.responseDecorator = () => null
+              try {
+                await reqHandler.handle(savedTape.req)
+                expect.fail("Exception expected to be thrown")
+              } catch (ex) {
+                expect(ex.message).to.eql("responseDecorator didn't return a tape object")
+              }
             })
           })
         })
@@ -300,7 +353,8 @@ describe("RequestHandler", () => {
         req.url = "MODIFIED"
         req.headers["accept"] = "INVALID"
 
-        opts.requestDecorator = (req) => {
+        opts.requestDecorator = (req, context) => {
+          expect(context.id).to.exist
           req.url = originalUrl
           req.headers["accept"] = "application/json"
           return req

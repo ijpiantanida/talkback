@@ -1,4 +1,5 @@
 import TapeStore from "./tape-store"
+import { v4 as uuidv4 } from 'uuid';
 
 const fetch = require("node-fetch")
 
@@ -6,7 +7,7 @@ import Tape from "./tape"
 import OptionsFactory, {RecordMode, FallbackMode, Options} from "./options"
 import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
-import {HttpRequest, HttpResponse} from "./types"
+import {HttpRequest, HttpResponse, MatchingContext} from "./types"
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
@@ -22,12 +23,18 @@ export default class RequestHandler {
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
+    const matchingContext: MatchingContext = {
+      id: uuidv4()
+    }
     const recordMode = typeof (this.options.record) === "string" ? this.options.record : this.options.record(req)
 
     OptionsFactory.validateRecord(recordMode)
 
     if (this.options.requestDecorator) {
-      req = this.options.requestDecorator(req)
+      req = this.options.requestDecorator(req, matchingContext)
+      if (!req) {
+        throw new Error("requestDecorator didn't return a req object")
+      }
     }
 
     let newTape = new Tape(req, this.options)
@@ -52,6 +59,12 @@ export default class RequestHandler {
       if (recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE) {
         resObj = await this.makeRealRequest(req)
         responseTape.res = {...resObj}
+        if (this.options.tapeDecorator) {
+          responseTape = this.options.tapeDecorator(responseTape, matchingContext)
+          if (!responseTape) {
+            throw new Error("tapeDecorator didn't return a tape object")
+          }
+        }
         await this.tapeStore.save(responseTape)
       } else {
         resObj = await this.onNoRecord(req)
@@ -63,7 +76,10 @@ export default class RequestHandler {
 
     if (this.options.responseDecorator) {
       const clonedTape = await responseTape.clone()
-      const resTape = this.options.responseDecorator(clonedTape, req)
+      const resTape = this.options.responseDecorator(clonedTape, req, matchingContext)
+      if (!resTape) {
+        throw new Error("responseDecorator didn't return a tape object")
+      }
 
       if (resTape.res.headers["content-length"]) {
         resTape.res.headers["content-length"] = resTape.res.body.length

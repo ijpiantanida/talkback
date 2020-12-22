@@ -2,9 +2,10 @@ import {Options} from "../../src/options"
 import testServer from "../support/test-server"
 import {expect} from "chai"
 import * as td from "testdouble"
-import {HttpRequest, Talkback} from "../../src/types"
+import {HttpRequest, Req, Talkback} from "../../src/types"
 import TalkbackServer from "../../src/server"
 import * as http from "http"
+import Tape from "../../src/tape"
 
 let talkback: Talkback
 if (process.env.USE_DIST) {
@@ -103,7 +104,7 @@ describe("talkbackServer", () => {
 
   describe("## record mode NEW", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
-      talkbackServer = await startTalkback({debug: true, silent: false})
+      talkbackServer = await startTalkback()
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
@@ -187,6 +188,34 @@ describe("talkbackServer", () => {
 
       const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/GET/my-tape-${currentTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
+    })
+
+    it("proxies and creates a new tape with a custom tape decorator that saves data on the request", async () => {
+      const customMetaValue = "custom meta value"
+      const requestDecorator = (req: Req) => {
+        req.headers["x-data"] = customMetaValue
+        return req
+      }
+
+      const tapeDecorator = (tape: Tape) => {
+        tape.meta.myOwnData = tape.req.headers["x-data"]
+        return tape
+      }
+
+      talkbackServer = await startTalkback(
+        {
+          requestDecorator,
+          tapeDecorator: tapeDecorator
+        }
+      )
+
+      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
+
+      expect(res.status).to.eq(200)
+
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      expect(tape.req.url).to.eql("/test/1")
+      expect(tape.meta.myOwnData).to.eql(customMetaValue)
     })
 
     it("decorates proxied responses", async () => {
@@ -325,14 +354,14 @@ describe("talkbackServer", () => {
   })
 
   describe("## record mode DISABLED", () => {
-    it("returns a 404 on unkwown request with fallbackMode NOT_FOUND (default)", async () => {
+    it("returns a 404 on unknown request with fallbackMode NOT_FOUND (default)", async () => {
       talkbackServer = await startTalkback({record: RecordMode.DISABLED})
 
       const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
       expect(res.status).to.eq(404)
     })
 
-    it("proxies request to host on unkwown request with fallbackMode PROXY", async () => {
+    it("proxies request to host on unknown request with fallbackMode PROXY", async () => {
       talkbackServer = await startTalkback({record: RecordMode.DISABLED, fallbackMode: FallbackMode.PROXY})
 
       const reqBody = JSON.stringify({foo: "bar"})

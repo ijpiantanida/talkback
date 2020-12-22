@@ -1,6 +1,6 @@
 import Logger from "./logger"
 import Tape from "./tape"
-import {Req} from "./types"
+import {Req, MatchingContext} from "./types"
 
 export const RecordMode = {
   NEW: "NEW", // If no tape matches the request, proxy it and save the response to a tape
@@ -37,8 +37,9 @@ export interface Options {
   bodyMatcher?: (tape: Tape, req: Req) => boolean,
   urlMatcher?: (tape: Tape, req: Req) => boolean,
 
-  requestDecorator?: (req: Req) => any,
-  responseDecorator?: (tape: Tape, req: Req) => any,
+  requestDecorator?: (req: Req, context: MatchingContext) => Req,
+  responseDecorator?: (tape: Tape, req: Req, context: MatchingContext) => Tape,
+  tapeDecorator?: (tape: Tape, context: MatchingContext) => Tape,
 
   latency: number | number[] | ((req: Req) => number),
   errorRate: number | ((req: Req) => number),
@@ -73,6 +74,7 @@ export const DefaultOptions: Options = {
 
   requestDecorator: undefined,
   responseDecorator: undefined,
+  tapeDecorator: undefined,
 
   latency: 0,
   errorRate: 0,

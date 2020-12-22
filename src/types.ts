@@ -4,6 +4,14 @@ import RequestHandler from "./request-handler"
 
 export {}
 
+export interface More {
+  [key: string]: any
+}
+
+export interface MatchingContext extends More {
+  id: string;
+}
+
 export interface ReqRes {
   headers: any,
   body: Buffer
@@ -22,7 +30,7 @@ export interface Res extends ReqRes {
 
 export type HttpResponse = Res
 
-export interface Metadata {
+export interface Metadata extends More {
   createdAt: Date,
   host: string,
   tag?: string,

@@ -1,6 +1,6 @@
 # Talkback
 
-Talkback is a javascript HTTP proxy to record and playback HTTP requests. As long as you have node.js in your environment you can run talkback to record requests from applications written in any language/framework.   
+Talkback is a javascript HTTP proxy that records and playbacks HTTP requests. As long as you have node.js in your environment, you can run talkback to record requests from applications written in any language/framework.   
 You can use it to accelerate your integration tests or run your application against a mocked server.       
 
 [![npm version](https://badge.fury.io/js/talkback.svg)](https://badge.fury.io/js/talkback)
@@ -14,7 +14,7 @@ npm install talkback
 
 ## Usage
 
-Talkback is pretty easy to setup.   
+Talkback is pretty easy to set up.   
 Define which host it will be proxying, which port it should listen to and where to find and save tapes.   
 
 When a request arrives to talkback, it will try to match it against a previously saved tape and quickly return the tape's response.   
@@ -72,16 +72,17 @@ const response = await talkbackHandler.handle(httpRequest)
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
-| **latency** | `String \| Array \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
-| **errorRate** | `Number \| Function` | Probabilty between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
+| **latency** | `Number \| \[Number\] \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
+| **errorRate** | `Number \| Function` | Probability between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
-| **requestDecorator** | `Function` | Modify requests before they're proxied. [More info](#custom-request-decorator) | `null` |  
-| **responseDecorator** | `Function` | Modify responses before they're returned. [More info](#custom-response-decorator) | `null` |  
+| **requestDecorator** | `Function` | Modify requests before they are proxied. [More info](#custom-request-decorator) | `null` |  
+| **responseDecorator** | `Function` | Modify responses before they are returned. [More info](#custom-response-decorator) | `null` |  
+| **tapeDecorator** | `Function` | Modify tapes before they are stored. [More info](#custom-tape-decorator) | `null` |
 | **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |
@@ -101,20 +102,39 @@ Tapes use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the J
 
 #### Format
 All tapes have the following 3 properties:   
-* **meta**: Stores metadata about the tape.
+* **meta**: [Metadata](#metadata) object. Stores additional metadata about the tape.
 * **req**: [Request](#request) object. Used to match incoming requests against the tape.
 * **res**: [Response](#response) object. The HTTP response that will be returned in case the tape matches a request.
 
+#### Metadata
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| **createdAt** | `Date` | Creation datetime of the tape | `2018-12-07T02:49:53.859Z` |
+| **host** | `String` | Base host url used for this request. Informative, it plays no role during the matching process | `https://api.github.com` |
+| **tag** | `String` | Custom tag to identify the tape | `auth` |
+| **errorRate** | `Number` | Number between 0 and 100 that marks the probability of the request producing a synthetic failure. [More info](#error-rate) | `10` |
+| **latency** | `Number \| [Number]` | Synthetic latency for requests (in ms). [More info](#latency) | `10` |
+| **reqUncompressed** | `Boolean` | Whether the request body has been uncompressed | `false` |
+| **resUncompressed** | `Boolean` | Whether the response body has been uncompressed | `false` | 
+| **reqHumanReadable** | `Boolean` | Whether the request body is in a human-readable format or base64 encoded | `true` | 
+| **resHumanReadable** | `Boolean` | Whether the response body is in a human-readable format or base64 encoded | `true` |
+   
+In addition to talkback properties, you can define their own custom fields either by manually editing the tape file or by dynamically adding them using a [custom tape decorator](#custom-tape-decorator).   
+
 #### Request
-* **url** (String): Url relative to the host. E.g: `/users`
-* **method** (String): HTTP method. E.g: `GET`
-* **headers** (Object\<String, String\>): Request headers. E.g: `{"content-type": "application/json", accept: "*/*"}`
-* **body** (Buffer): Request body. E.g: `Buffer.from("FOOBAR")`
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| **url** | `String` | Url relative to the host. | `/users` |
+| **method** | `String` | HTTP method | `GET` |
+| **headers** | `Object\<String, String\>` | Request headers | `{"content-type": "application/json", accept: "*/*"}` |
+| **body** | `Buffer` | Request body | `Buffer.from("FOOBAR")` |
 
 #### Response
-* **status** (Number): HTTP response status code
-* **headers** (Object\<String, [String]\>): Response headers. E.g: `{"content-type": ["application/json"]}`
-* **body** (Buffer): Response body. E.g: `Buffer.from("FOOBAR")`
+| Property | Type | Description | Example |
+|----------|------|-------------|---------|
+| **status** | `Number` | HTTP response status code | `200` |
+| **headers** | `Object\<String, [String]\>` | Response headers | `{"content-type": ["application/json"]}` |
+| **body** | `Buffer` | Response body | `Buffer.from("FOOBAR")` |
 
 #### Request and Response body
 If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
@@ -131,7 +151,7 @@ If a custom `tapeNameGenerator` is provided, it will be called to produce an alt
 
 ##### Example:
 ```javascript
-function nameGenerator(tapeNumber, tape) {
+function nameGenerator(tapeNumber: number, tape: Tape) {
   // organize in folders by request method
   // e.g. tapes/GET/unnamed-1.json5
   //      tapes/GET/unnamed-3.json5
@@ -160,7 +180,7 @@ There are 2 possible fallback modes:
 |`NOT_FOUND`| Log an error and return a 404 response|
 |`PROXY`| Proxy the request to `host` and return its response, but don't create a tape|
 
-**It is recommended to `DISABLE` recording when using talkback for test running. This way, there are no side-effects and broken tests fail faster.**
+**It is recommended to `DISABLE` recording when using talkback for test running. This way, there are no side effects and broken tests fail faster.**
 
 Both options accept either one of the possible modes to be used for all requests or a function that takes the request as a parameter and returns a valid mode.
 
@@ -169,7 +189,7 @@ const talkback = require("talkback")
 
 const opts = {
   record: talkback.Options.RecordMode.DISABLED,
-  fallbackMode: (req) => {
+  fallbackMode: (req: Req) => {
     if (req.url.includes("/mytest")) {
         return talkback.Options.FallbackMode.PROXY
       }
@@ -181,7 +201,7 @@ const opts = {
 
 ## Custom request body matcher
 By default, in order for a request to match against a saved tape, both request and tape need to have the exact same body.      
-There might be cases were this rule is too strict (for example, if your body contains time dependent bits) but enabling `ignoreBody` is too lax.
+There might be cases where this rule is too strict (for example, if your body contains time dependent bits) but enabling `ignoreBody` is too lax.
 
 Talkback lets you pass a custom matching function as the `bodyMatcher` option.   
 The function will receive a saved tape and the current request, and it has to return whether they should be considered a match on their body.   
@@ -191,7 +211,7 @@ The `bodyMatcher` is not called if tape and request bodies are already the same.
 ### Example:
 
 ```javascript
-function bodyMatcher(tape, req) {
+function bodyMatcher(tape: Tape, req: Req) {
     if (tape.meta.tag === "fake-post") {
       const tapeBody = JSON.parse(tape.req.body.toString());
       const reqBody = JSON.parse(req.body.toString());
@@ -206,12 +226,12 @@ In this case we are adding our own `tag` property to the saved tape `meta` objec
 Note that both the tape's and the request's bodies are `Buffer` objects.
 
 ## Custom request URL matcher
-Similar to the [`bodyMatcher`](#custom-request-body-matcher), there's the `urlMatcher` option, which will let you customize how a request and a tape are matched on their URL.
+Similar to the [`bodyMatcher`](#custom-request-body-matcher) option, there's the `urlMatcher` option, which will let you customize how a request and a tape are matched on their URL.
 
 ### Example:
 
 ```javascript
-function urlMatcher(tape, req) {
+function urlMatcher(tape: Tape, req: Req) {
     if (tape.meta.tag === "user-info") {
       // Match if URL is of type /users/{username}
       return !!req.url.match(/\/users\/[a-zA-Z-0-9]+/);
@@ -220,32 +240,51 @@ function urlMatcher(tape, req) {
 }
 ```
 
+## Custom decorators
+Talback lets you tap into the request lifecycle through the decorator options:
+1. [Request Decorator](#custom-request-decorator)
+2. [Response Decorator](#custom-response-decorator)
+3. [Tape Decorator](#custom-tape-decorator)
+
+#### Matching Context
+When the request starts, talkback will create a `MatchingContext` object, which will be passed to all your decorators as an additional parameter.   
+It's the main way in which you can connect all your different decorator functions without having to modify the actual request/response.   
+
+The context will contain some useful properties, but you can also extend it with your own.
+
+|Property | Type | Description | Example | 
+|---------|------|-------------|---------|
+| **id** | `String` | Unique id (UUID v4) | `52a3cdf9-e3be-439f-b81d-4301b4f5adf0` |
+
 ## Custom request decorator
-By default talkback will just proxy requests to the host as they are.   
+By default, talkback will just proxy requests to the host as they are.   
 If you want to customize requests before they're proxied (or looked up in stored tapes) you can do so through the `requestDecorator` option.   
 
-`requestDecorator` takes an option that will receive the original request as a parameter and should return the modified request.   
+`requestDecorator` takes a function that will receive the original request and the context object as parameters, and should return the modified request.
 
 ```javascript
-function requestDecorator(req) {
-    delete req.headers['accept-encoding'];
-    return req;
+function requestDecorator(req: Req, context: MatchingContext) {
+  requestStartTime[context.id] = new Date().getTime()
+
+  delete req.headers['accept-encoding'];
+  return req;
 }
 ```
+In this example we are using the context's id to store the request's start time to later be used by another decorator. 
 
   
 ## Custom response decorator
-If you want to add a little bit of dynamism to the response coming from a matching existing tape or adjust the response that the proxied server returns, you can do so by using the `responseDecorator` option.      
+If you want to add dynamism to the response coming from a matching existing tape or adjust the response that the proxied server returns, you can do so by using the `responseDecorator` option.      
 This can be useful for example if your response needs to contain an ID that gets sent on the request, or if your response has a time dependent field.     
 
-The function will receive a copy of the matching tape and the in-flight request object, and it has to return the modified tape. Note that since you're receiving a copy of the matching tape, modifications that you do to it won't persist between different requests.   
+The function will receive a copy of the matching tape, the in-flight request object and the context object as parameters, and it should return the modified tape. Note that since you're receiving a copy of the matching tape, changes to the object won't persist between different requests.   
 Talkback will also update the `Content-Length` header if it was present in the original response.   
 
 ### Example:
 We're going to hit an `/auth` endpoint, and update just the `expiration` field of the JSON response that was saved in the tape to be a day from now.      
 
 ```javascript
-function responseDecorator(tape, req) {
+function responseDecorator(tape: Tape, req: Req, context: MatchingContext) {
   if (tape.meta.tag === "auth") {
     const tapeBody = JSON.parse(tape.res.body.toString())
     const expiration = new Date()
@@ -260,11 +299,33 @@ function responseDecorator(tape, req) {
 }
 ```
 
-In this example we are also adding our own `tag` property to the saved tape `meta` object. This way, we are only using the custom logic on some specific requests, and can even have different logic for different categories of requests.   
-Note that both the tape's and the request's bodies are `Buffer` objects and they should be kept as such.    
+In this example we are making use of the `meta.tag` property on the saved tape to decide whether we apply the custom logic or not.      
+*Note that both the tape's and the request's bodies are `Buffer` objects, and they should be kept as such.*    
+
+## Custom tape decorator
+Before saving the tape to disk talback can call your own `tapeDecorator` function where you can edit any of the tape's properties.
+The function will receive the original tape and the context object as parameters, and it should return the tape to be stored.   
+
+You can use this to edit any of talkback's properties or add your own `meta` fields.
+
+```javascript
+function tapeDecorator(tape: Tape, context: MatchingContext) {
+  if( tape.req.url.includes("/auth/")) {
+    tape.meta.tag = "auth"
+  }
+
+  const originalDurationMs = new Date().getTime() - requestStartTime[context.id]
+  tape.meta.originalDurationMs = originalDurationMs 
+  tape.meta.latency = [Math.floor(0.5*originalDurationMs), Math.floor(1.5*originalDurationMs)]
+  
+  return tape
+}
+```
+In this example we are dynamically adding a tag based on the request URL.  
+We are also using the context's id to retrieve the initial request time which was saved by a custom [`requestDecorator`](#custom-request-decorator) and calculating how long did the request take. We store the original duration as a custom meta property, and we also set a range for the [`latency` feature](#latency).  
 
 ## Latency
-By default talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
+By default, talkback will try to reply to requests as fast as it can, but sometimes it's useful to understand how applications behave under real-world or even undesirably high response times.   
 Talkback lets you control response times both at a _global_ or at a _tape level_.   
 
 The `latency` option will apply for all requests that match an existing tape or when using the [`PROXY` fallback mode](#recording-modes).   
@@ -296,8 +357,8 @@ Talkback can aid here through the `errorRate` option, by returning synthetic 503
 The `errorRate` option will apply for all requests that match an existing tape or when using the [`PROXY` fallback mode](#recording-modes).   
 
 There are 2 possible types of values:
- - A number between 0 and 100 that defines the probabilty of returning an error for each request.
- - A function `(req) => errorRate`: The function will be called for each request and it should return the desired probabilty of error for that specific request.
+ - A number between 0 and 100 that defines the probability of returning an error for each request.
+ - A function `(req) => errorRate`: The function will be called for each request and it should return the desired probability of error for that specific request.
 
 At the same time, tapes can define their own specific error rates by adding an `errorRate` property to the [`meta` object](#tapes).   
 

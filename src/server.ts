@@ -30,12 +30,12 @@ export default class TalkbackServer {
       reqBody.push(chunk)
     }).on("end", async () => {
       try {
-        const req = {
+        const req: Req = {
           headers: rawReq.headers,
           url: rawReq.url,
           method: rawReq.method,
           body: Buffer.concat(reqBody)
-        } as Req
+        }
         const fRes = await this.requestHandler.handle(req)
 
         res.writeHead(fRes.status, fRes.headers)

@@ -32,15 +32,29 @@ function urlMatcher(tape, req) {
   return false
 }
 
-function requestDecorator(req) {
+var requestStartTime = {}
+
+function requestDecorator(req, context) {
+  requestStartTime[context.id] = new Date().getTime()
+
   const acceptEncoding = req.headers["accept-encoding"]
-  if(acceptEncoding && acceptEncoding.includes("test")) {
-    delete req.headers["accept-encoding"];
+  if (acceptEncoding && acceptEncoding.includes("test")) {
+    delete req.headers["accept-encoding"]
   }
   return req
 }
 
-function responseDecorator(tape, req) {
+function tapeDecorator(tape, context) {
+  var originalDurationMs = new Date().getTime() - requestStartTime[context.id]
+  delete requestStartTime[context.id]
+
+  tape.meta.originalDurationMs = originalDurationMs
+  tape.meta.latency = [Math.floor(0.5*originalDurationMs), Math.floor(1.5*originalDurationMs)]
+
+  return tape
+}
+
+function responseDecorator(tape, req, context) {
   if (tape.meta.tag === "auth") {
     var tapeBody = JSON.parse(tape.res.body.toString())
     var expiration = new Date()
@@ -59,7 +73,7 @@ var server = talkback({
   path: __dirname + "/tapes",
   record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
   fallbackMode: fallbackMode,
-  debug: false,
+  debug: true,
   name: "Test Server",
   ignoreQueryParams: ["t"],
   ignoreHeaders: ["user-agent"],
@@ -67,6 +81,7 @@ var server = talkback({
   urlMatcher: urlMatcher,
   requestDecorator: requestDecorator,
   responseDecorator: responseDecorator,
+  tapeDecorator: tapeDecorator,
   https: {
     enabled: true,
     keyPath: __dirname + "/httpsCert/localhost.key",

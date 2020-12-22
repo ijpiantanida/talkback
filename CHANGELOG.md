@@ -3,6 +3,7 @@
 ## v2.4.0
 - Add [`tapeDecorator` option](/README.md#custom-tape-decorator)
 - Add [`MatchingContext` object](/README.md#matching-context) as decorators parameter
+- Dependencies updates
 
 ## v2.3.0
 - Fix for node 15 (thanks **[@halilb](https://github.com/halilb)**)

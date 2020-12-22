@@ -2,7 +2,7 @@ import {Options} from "../../src/options"
 import testServer from "../support/test-server"
 import {expect} from "chai"
 import * as td from "testdouble"
-import {HttpRequest, Req, Talkback} from "../../src/types"
+import {HttpRequest, MatchingContext, Req, Talkback} from "../../src/types"
 import TalkbackServer from "../../src/server"
 import * as http from "http"
 import Tape from "../../src/tape"
@@ -192,12 +192,14 @@ describe("talkbackServer", () => {
 
     it("proxies and creates a new tape with a custom tape decorator that saves data on the request", async () => {
       const customMetaValue = "custom meta value"
-      const requestDecorator = (req: Req) => {
+      const requestDecorator = (req: Req, context: MatchingContext) => {
+        req.headers["x-req-id"] = context.id
         req.headers["x-data"] = customMetaValue
         return req
       }
 
-      const tapeDecorator = (tape: Tape) => {
+      const tapeDecorator = (tape: Tape, context: MatchingContext) => {
+        expect(tape.req.headers["x-req-id"]).to.eql(context.id)
         tape.meta.myOwnData = tape.req.headers["x-data"]
         return tape
       }

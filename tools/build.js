@@ -6,9 +6,14 @@ const exec = require("child_process").exec
 
 let promise = Promise.resolve()
   .then(() => del(["dist/*"]))
-  .then(() => new Promise((resolve) => {
+  .then(() => new Promise((resolve, reject) => {
     exec("yarn run tsc", function(error, stdout, stderr) {
-      resolve()
+      console.info(stdout)
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
     })
   }))
   .then(() => {

@@ -1,5 +1,7 @@
 ## Unit-Test Example
 
-Example of Mocha starting talkback before running the test suite and gracefully shutting talkback down once it finishes.
+Example of using talkback for test suites with Mocha and Jest.
+
+The test runner, before running any test will start talkback and once finished will gracefully shut it down.
 
 To run `yarn test`

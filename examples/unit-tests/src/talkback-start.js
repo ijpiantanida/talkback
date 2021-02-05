@@ -1,4 +1,4 @@
-var talkback
+let talkback
 if (process.env.USE_NPM) {
   talkback = require("talkback")
   console.log("Using NPM talkback")
@@ -6,18 +6,20 @@ if (process.env.USE_NPM) {
   talkback = require("../../../dist")
 }
 
-var host = "http://localhost:8080"
+let talkbackInstance
 
 module.exports = function talkbackStart() {
-  var server = talkback({
-    host: host,
-    port: 8080,
-    path: __dirname + "/tapes",
-    record: talkback.Options.RecordMode.DISABLED,
-    ignoreHeaders: ["user-agent", "referer", "accept", "accept-encoding", "connection"]
-  })
+  if (!talkbackInstance) {
+    talkbackInstance = talkback({
+      host: "http://localhost:8080",
+      port: 8080,
+      path: __dirname + "/tapes",
+      record: talkback.Options.RecordMode.DISABLED,
+      ignoreHeaders: ["user-agent", "referer", "accept", "accept-encoding", "connection"]
+    })
 
-  server.start()
+    talkbackInstance.start()
+  }
 
-  return server
+  return talkbackInstance
 }

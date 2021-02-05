@@ -8,5 +8,8 @@
   "devDependencies": {
     "talkback": "*"
   },
-  "author": "Ignacio Piantanida"
+  "author": "Ignacio Piantanida",
+  "scripts": {
+    "test": "node start.js & TALKBACK_PID=$! && sleep 1 && ./test_script.sh && kill -15 $TALKBACK_PID"
+  }
 }

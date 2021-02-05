@@ -1,4 +1,4 @@
-var talkback
+let talkback
 if (process.env.USE_NPM) {
   talkback = require("talkback")
   console.log("Using NPM talkback")
@@ -39,11 +39,11 @@ async function start() {
       }
 
       requestHandler.handle(talkbackRequest)
-      .then(r => interceptedRequest.respond(r))
-      .catch(error => {
-        console.log("Error handling talkback request", error)
-        interceptedRequest.abort()
-      })
+        .then(r => interceptedRequest.respond(r))
+        .catch(error => {
+          console.log("Error handling talkback request", error)
+          interceptedRequest.abort()
+        })
     } else {
       interceptedRequest.continue()
     }
@@ -62,6 +62,6 @@ async function start() {
 }
 
 start()
-.catch(err => {
-  console.log(err);
-})
+  .catch(err => {
+    console.log(err)
+  })

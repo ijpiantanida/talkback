@@ -1,0 +1,17 @@
+{
+  "name": "talkback-example-server",
+  "version": "0.0.1",
+  "main": "start.js",
+  "license": "MIT",
+  "description": "Talkback Example - Unit Tests",
+  "devDependencies": {
+    "@types/mocha": "^8.2.0",
+    "mocha": "^8.1.3",
+    "node-fetch": "^2.6.1",
+    "talkback": "*"
+  },
+  "scripts": {
+    "test": "mocha 'src/**/*.spec.js'"
+  },
+  "author": "Ignacio Piantanida"
+}

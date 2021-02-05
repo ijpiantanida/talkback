@@ -10,5 +10,8 @@
   "devDependencies": {
     "talkback": "*"
   },
-  "author": "Ignacio Piantanida"
+  "author": "Ignacio Piantanida",
+  "scripts": {
+    "test": "node start.js"
+  }
 }

@@ -98,7 +98,11 @@ export default class TapeRenderer {
       const rawBody = body.toString("utf8")
 
       if (mediaType.isJSON()) {
-        return JSON.parse(rawBody)
+        try {
+          return JSON.parse(rawBody);
+        } catch {
+          return rawBody;
+        }
       } else {
         return rawBody
       }

@@ -186,6 +186,36 @@ describe("TapeRenderer", () => {
       expect(await tapeRenderer.render()).to.eql(newRaw)
     })
 
+    it("renders invalid json response as text", async () => {
+      const newRaw = {
+        ...raw,
+        meta: {
+          ...raw.meta,
+          resHumanReadable: true
+        },
+        req: {
+          ...raw.req,
+          headers: {
+            ...raw.req.headers
+          }
+        },
+        res: {
+          ...raw.res,
+          headers: {
+            ...raw.res.headers,
+            "content-type": ["application/json"],
+            "content-length": [20]
+          },
+          body: "I said I was going to send JSON, but actually I've changed my mind and here's some text"
+        }
+      }
+      const newTape = await TapeRenderer.fromStore(newRaw, opts)
+
+      delete newRaw.req.headers["x-ignored"]
+      const tapeRenderer = new TapeRenderer(newTape)
+      expect(await tapeRenderer.render()).to.eql(newRaw)
+    })
+
     it("renders tapes with empty bodies", async () => {
       const newRaw = {
         ...raw,

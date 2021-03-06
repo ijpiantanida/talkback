@@ -55,6 +55,10 @@ const testServer = () => {
           res.end()
           return
         }
+        case "/test/invalid-json": {
+          res.writeHead(200, {"content-type": "application/json"})
+          res.end('{"invalid: ')
+        }
         default: {
           res.writeHead(404)
           res.end()

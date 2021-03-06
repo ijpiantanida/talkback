@@ -220,6 +220,18 @@ describe("talkbackServer", () => {
       expect(tape.meta.myOwnData).to.eql(customMetaValue)
     })
 
+    it("proxies and creates a new tape with an invalid JSON response", async () => {
+      talkbackServer = await startTalkback()
+      const res = await fetch(`${talkbackHost}/test/invalid-json`, {compress: false, method: "GET"})
+
+      expect(res.status).to.eq(200)
+
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      expect(tape.req.url).to.eql("/test/invalid-json")
+      expect(tape.meta.resHumanReadable).to.eq(true)
+      expect(tape.res.body).to.eql('{"invalid: ')
+    })
+
     it("decorates proxied responses", async () => {
       talkbackServer = await startTalkback()
 

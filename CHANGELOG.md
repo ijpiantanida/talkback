@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.4.1
+- Fix handling of responses with JSON content-type, but malformed body (thanks **[@SebFlippence](https://github.com/SebFlippence)**)
+- Dependencies updates
+
 ## v2.4.0
 - Add [`tapeDecorator` option](/README.md#custom-tape-decorator)
 - Add [`MatchingContext` object](/README.md#matching-context) as decorators parameter

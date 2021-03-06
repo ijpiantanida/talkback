@@ -6,7 +6,7 @@
   "description": "Talkback Example - Server",
   "dependencies": {},
   "devDependencies": {
-    "talkback": "*"
+    "talkback": "2.4.0"
   },
   "author": "Ignacio Piantanida",
   "scripts": {

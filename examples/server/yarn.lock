@@ -12,14 +12,14 @@ content-type@^1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
-json5@^2.1.1:
+json5@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.0.tgz#2dfefe720c6ba525d9ebd909950f0515316c89a3"
   integrity sha512-f+8cldu7X/y7RAJurMEJmdoKXGB/X550w2Nr3tTbezL6RwEE/iMcm+tZnXeoZtKuOq6ft8+CqzEkrIgx1fPoQA==
   dependencies:
     minimist "^1.2.5"
 
-lodash@^4.17.20:
+lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -39,15 +39,15 @@ node-fetch@^2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-talkback@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.4.0.tgz#36e5e30b03c4afc694304cbca1c95f9f2767ca19"
-  integrity sha512-t+fijKQoa8cZKmbUsgGeyhg18i1xvyodSSn64KayVAyw1bDnFWp5Ep0pzls+TTLJqZQviAxW/kKh/Allt6Jp9w==
+talkback@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.4.1.tgz#238e29a471da8096064e5da6c43cfd4b5724028f"
+  integrity sha512-D345NbxXA5+YP4sd9N6Vtbc/n96UhKhtMj3POX9ZZw1vN7n7ZSJnRVNt0MTemX1+wDLbUkmw6wHeXR9EnaOO+g==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"
-    json5 "^2.1.1"
-    lodash "^4.17.20"
+    json5 "^2.2.0"
+    lodash "^4.17.21"
     mkdirp "^1.0.3"
     node-fetch "^2.6.1"
     uuid "^8.3.2"

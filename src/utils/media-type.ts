@@ -7,6 +7,8 @@ const equals = (to: string) => (contentType: string) => to == contentType
 
 export const jsonTypes = [
   equals("application/json"),
+  equals("application/x-amz-json-1.0"),
+  equals("application/x-amz-json-1.1"),
   (contentType: string) => contentType.startsWith("application/") && contentType.endsWith("+json")
 ]
 

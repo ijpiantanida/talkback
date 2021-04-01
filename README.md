@@ -4,7 +4,7 @@ Talkback is a javascript HTTP proxy that records and playbacks HTTP requests. As
 You can use it to accelerate your integration tests or run your application against a mocked server.       
 
 [![npm version](https://badge.fury.io/js/talkback.svg)](https://badge.fury.io/js/talkback)
-[![Build Status](https://travis-ci.org/ijpiantanida/talkback.svg?branch=master)](https://travis-ci.org/ijpiantanida/talkback)
+[![Build Status](https://github.com/ijpiantanida/talkback/actions/workflows/ci_build.yml/badge.svg?branch=master)](https://github.com/ijpiantanida/talkback/actions/workflows/ci_build.yml)
 
 ## Installation
 

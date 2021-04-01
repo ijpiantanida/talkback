@@ -121,10 +121,12 @@ export default class RequestHandler {
     let fetchBody: Buffer | null
     let {method, url, body} = req
     fetchBody = body
-    const headers = {...req.headers}
-    delete headers.host
-
     const host = this.options.host
+    const headers = {...req.headers}
+
+    if (headers.host === undefined) {
+      headers.host = host.replace(/^https?:\/\//, "")
+    }
     this.options.logger.log(`Making real request to ${host}${url}`)
 
     if (method === "GET" || method === "HEAD") {

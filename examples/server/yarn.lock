@@ -39,10 +39,10 @@ node-fetch@^2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-talkback@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.4.1.tgz#238e29a471da8096064e5da6c43cfd4b5724028f"
-  integrity sha512-D345NbxXA5+YP4sd9N6Vtbc/n96UhKhtMj3POX9ZZw1vN7n7ZSJnRVNt0MTemX1+wDLbUkmw6wHeXR9EnaOO+g==
+talkback@*:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/talkback/-/talkback-2.4.2.tgz#0e897079d1d9a8824efdd279e730def181161399"
+  integrity sha512-8QTk5MiTn1KnB6Y7egftwZnjRrcBpeDCM8YIBcgMXNLPdQKiqBWJi3OdcNowDU8UjjnaTFhRBOry6dU0dmFOxQ==
   dependencies:
     buffer-shims "^1.0.0"
     content-type "^1.0.4"

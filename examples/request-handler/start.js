@@ -57,6 +57,7 @@ async function start() {
     console.log("SUCCESS")
   } else {
     console.log("FAILED")
+    process.exit(1)
   }
 
 }

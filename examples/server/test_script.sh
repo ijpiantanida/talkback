@@ -50,6 +50,7 @@ make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip"
 
 if [ "$error" = true ]; then
   echo "FAILED"
+  exit 1
 else
   echo "SUCCESS"
 fi

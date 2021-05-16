@@ -40,7 +40,7 @@
   ],
   "author": "Ignacio Piantanida",
   "scripts": {
-    "build": "node tools/build.js",
+    "build": "node scripts/build.js",
     "ci": "yarn ts-check && yarn test && yarn build && USE_DIST=1 yarn test",
     "start": "node examples/server/start.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extensions ts,js \"test/**/*.spec.{ts,js}\"",

@@ -310,7 +310,7 @@ You can use this to edit any of talkback's properties or add your own `meta` fie
 
 ```javascript
 function tapeDecorator(tape: Tape, context: MatchingContext) {
-  if( tape.req.url.includes("/auth/")) {
+  if (tape.req.url.includes("/auth/")) {
     tape.meta.tag = "auth"
   }
 

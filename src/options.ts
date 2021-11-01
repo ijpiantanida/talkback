@@ -30,6 +30,7 @@ export interface Options {
     keyPath?: string,
     certPath?: string
   },
+  allowHeaders: string[],
   ignoreHeaders: string[],
   ignoreQueryParams: string[],
   ignoreBody: boolean,
@@ -65,6 +66,7 @@ export const DefaultOptions: Options = {
     certPath: undefined
   },
 
+  allowHeaders: undefined,
   ignoreHeaders: ["content-length", "host"],
   ignoreQueryParams: [],
   ignoreBody: false,

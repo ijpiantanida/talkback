@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.4.3
+- Add `allowHeaders` option.
+
 ## v2.4.2
 - Add `application/x-amz-json-1.0` and `application/x-amz-json-1.1` as json media types (thanks **[@brandonc](https://github.com/brandonc)**)
 

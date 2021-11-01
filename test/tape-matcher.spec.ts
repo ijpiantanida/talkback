@@ -1,6 +1,6 @@
 import TapeMatcher from "../src/tape-matcher"
 import Tape from "../src/tape"
-import Options from "../src/options"
+import Options, {Options as OptionsType} from "../src/options"
 import ContentEncoding from "../src/utils/content-encoding"
 import {expect} from "chai"
 import {Req} from "../src/types"
@@ -99,6 +99,25 @@ describe("TapeMatcher", () => {
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.true
     })
 
+    it("returns true when only headers outside of allowed headers are different", async () => {
+      const headers = {
+        ...req.headers,
+        "x-invalid": "diff"
+      }
+      const newOpts: OptionsType = {
+        ...opts,
+        allowHeaders: ["accept", "not-present"]
+      }
+
+      tape = await Tape.fromStore(raw, newOpts)
+      const tape2 = new Tape({
+        ...req,
+        headers
+      }, newOpts)
+
+      expect(new TapeMatcher(tape, newOpts).sameAs(tape2)).to.be.true
+    })
+
     it("returns false when the urls are different", () => {
       const tape2 = new Tape({...req, url: "/bar"}, opts)
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
@@ -183,7 +202,7 @@ describe("TapeMatcher", () => {
       }, opts)
 
       expect(new TapeMatcher(newTape, opts).sameAs(tape2)).to.be.true
-    });
+    })
 
     it("returns false when there are more headers", () => {
       const tape2 = new Tape({

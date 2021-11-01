@@ -75,7 +75,8 @@ const response = await talkbackHandler.handle(httpRequest)
 | **latency** | `Number \| \[Number\] \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
 | **errorRate** | `Number \| Function` | Probability between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
-| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. Useful when having dynamic headers like cookies or correlation ids | `['content-length', 'host]` |
+| **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`) | `null` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |

@@ -42,7 +42,18 @@ export default class Tape {
   }
 
   cleanupHeaders() {
-    const newHeaders = {...this.req.headers}
+    let newHeaders = {}
+    if (this.options.allowHeaders.length > 0) {
+      newHeaders = this.options.allowHeaders.reduce((headers, header) => {
+        const lowerHeader = header.toLowerCase()
+        if (lowerHeader in this.req.headers) {
+          headers[lowerHeader] = this.req.headers[lowerHeader]
+        }
+        return headers
+      }, {})
+    } else {
+      newHeaders = {...this.req.headers}
+    }
     this.options.ignoreHeaders.forEach(h => delete newHeaders[h])
     this.req = {
       ...this.req,

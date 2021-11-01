@@ -1,5 +1,5 @@
 import TalkbackFactory from "./talkback-factory"
-import Options, {DefaultOptions, FallbackMode, RecordMode} from "./options"
+import {DefaultOptions, FallbackMode, RecordMode, Options} from "./options"
 
 const talkback = (options: Partial<Options>) => {
   return TalkbackFactory.server(options)

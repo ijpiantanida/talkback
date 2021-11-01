@@ -43,7 +43,7 @@ export default class Tape {
 
   cleanupHeaders() {
     let newHeaders = {}
-    if (this.options.allowHeaders.length > 0) {
+    if (this.options.allowHeaders != undefined) {
       newHeaders = this.options.allowHeaders.reduce((headers, header) => {
         const lowerHeader = header.toLowerCase()
         if (lowerHeader in this.req.headers) {

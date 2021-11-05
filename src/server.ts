@@ -61,7 +61,7 @@ export default class TalkbackServer {
     } : () => http.createServer(handleRequest)
 
     this.server = serverFactory()
-    console.log(`Starting talkback on ${this.options.port}`)
+    console.log(`Starting ${this.options.name} talkback server on ${this.options.port}`)
     this.server.listen(this.options.port, callback)
 
     process.on("exit", this.closeSignalHandler as any)

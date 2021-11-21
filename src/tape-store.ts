@@ -8,6 +8,7 @@ const mkdirp = require("mkdirp")
 import Tape from "./tape"
 import TapeMatcher from "./tape-matcher"
 import TapeRenderer from "./tape-renderer"
+import {logger} from "./logger"
 
 export default class TapeStore {
   private readonly path: string
@@ -24,7 +25,7 @@ export default class TapeStore {
     mkdirp.sync(this.path)
 
     await this.loadTapesAtDir(this.path)
-    console.log(`Loaded ${this.tapes.length} tapes`)
+    logger.log.info(`Loaded ${this.tapes.length} tapes from ${this.path}`)
   }
 
   async loadTapesAtDir(directory: string) {
@@ -41,7 +42,7 @@ export default class TapeStore {
           tape.path = filename
           this.tapes.push(tape)
         } catch (e) {
-          console.log(`Error reading tape ${fullPath}`, e.message)
+          logger.log.error(`Error reading tape ${fullPath}`, e.message)
         }
       } else {
         this.loadTapesAtDir(fullPath + "/")
@@ -51,13 +52,13 @@ export default class TapeStore {
 
   find(newTape: Tape) {
     const foundTape = this.tapes.find(t => {
-      this.options.logger.debug(`Comparing against tape ${t.path}`)
+      logger.log.debug(`Comparing against tape ${t.path}`)
       return new TapeMatcher(t, this.options).sameAs(newTape)
     })
 
     if (foundTape) {
       foundTape.used = true
-      this.options.logger.log(`Found matching tape for ${newTape.req.url} at ${foundTape.path}`)
+      logger.log.info(`Found matching tape for ${newTape.req.url} at ${foundTape.path}`)
       return foundTape
     }
   }
@@ -78,7 +79,7 @@ export default class TapeStore {
       fullFilename = this.createTapePath(tape)
       tape.path = path.relative(this.path, fullFilename)
     }
-    this.options.logger.log(`Saving request ${tape.req.url} at ${tape.path}`)
+    logger.log.info(`Saving request ${tape.req.url} at ${tape.path}`)
 
     const tapeRenderer = new TapeRenderer(tape)
     const toSave = await tapeRenderer.render()

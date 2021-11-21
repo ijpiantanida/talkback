@@ -1,5 +1,6 @@
 import Tape from "./tape"
 import {Options} from "./options"
+import {logger} from "./logger"
 
 export default class Summary {
   private tapes: Tape[]
@@ -11,16 +12,17 @@ export default class Summary {
   }
 
   print() {
-    console.log(`===== SUMMARY (${this.opts.name}) =====`)
+    let message = `===== SUMMARY =====\n`
     const newTapes = this.tapes.filter(t => t.new)
     if (newTapes.length > 0) {
-      console.log("New tapes:")
-      newTapes.forEach(t => console.log(`- ${t.path}`))
+      message += "New tapes:\n"
+      newTapes.forEach(t => message += `- ${t.path}\n`)
     }
     const unusedTapes = this.tapes.filter(t => !t.used)
     if (unusedTapes.length > 0) {
-      console.log("Unused tapes:")
-      unusedTapes.forEach(t => console.log(`- ${t.path}`))
+      message += "Unused tapes:\n"
+      unusedTapes.forEach(t => message += `- ${t.path}\n`)
     }
+    logger.log.info(message)
   }
 }

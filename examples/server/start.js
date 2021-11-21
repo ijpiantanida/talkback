@@ -74,7 +74,7 @@ var server = talkback({
   record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
   fallbackMode: fallbackMode,
   debug: true,
-  name: "Test Server",
+  name: "Example - Server",
   ignoreQueryParams: ["t"],
   ignoreHeaders: ["user-agent"],
   bodyMatcher: bodyMatcher,

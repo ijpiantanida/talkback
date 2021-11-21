@@ -1,6 +1,7 @@
 import OptionsFactory, {Options} from "../options"
 import Tape from "../tape"
 import {Req, Res} from "../types"
+import {logger} from "../logger"
 
 export default class ErrorRate {
   private options: Options
@@ -21,7 +22,7 @@ export default class ErrorRate {
   }
 
   simulate(req: Req) {
-    this.options.logger.log(`Simulating error for ${req.url}`)
+    logger.log.info(`Simulating error for ${req.url}`)
     return {
       status: 503,
       headers: {'content-type': ['text/plain']},

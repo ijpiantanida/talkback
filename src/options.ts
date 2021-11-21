@@ -1,4 +1,3 @@
-import Logger from "./logger"
 import Tape from "./tape"
 import {Req, MatchingContext} from "./types"
 
@@ -48,7 +47,6 @@ export interface Options {
   silent: boolean,
   summary: boolean,
   debug: boolean,
-  logger: Logger
 }
 
 export const DefaultOptions: Options = {
@@ -57,7 +55,7 @@ export const DefaultOptions: Options = {
   path: "./tapes/",
   record: RecordMode.NEW,
   fallbackMode: FallbackMode.NOT_FOUND,
-  name: "unnamed",
+  name: "unnamed server",
   tapeNameGenerator: undefined,
 
   https: {
@@ -84,25 +82,19 @@ export const DefaultOptions: Options = {
   silent: false,
   summary: true,
   debug: false,
-  logger: new Logger({})
 }
 
 export default class OptionsFactory {
-  private static logger: Logger
-
   static prepare(usrOpts: Partial<Options> = {}) {
     const opts: typeof DefaultOptions = {
       ...DefaultOptions,
-      name: usrOpts.host!,
+      name: usrOpts.host! || DefaultOptions.name,
       ...usrOpts,
       ignoreHeaders: [
         ...DefaultOptions.ignoreHeaders,
         ...(usrOpts.ignoreHeaders || [])
       ]
     }
-
-    this.logger = new Logger(opts)
-    opts.logger = this.logger
 
     this.validateOptions(opts)
 

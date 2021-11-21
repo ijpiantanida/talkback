@@ -1,7 +1,6 @@
 {
   "name": "talkback-example-server",
   "version": "0.0.1",
-  "main": "start.js",
   "license": "MIT",
   "description": "Talkback Example - Unit Tests",
   "devDependencies": {

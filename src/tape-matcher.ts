@@ -3,6 +3,7 @@ import MediaType from "./utils/media-type"
 import {Options} from "./options"
 import Tape from "./tape"
 import {Req} from "./types"
+import {logger} from "./logger"
 
 const isEqual = require("lodash/isEqual")
 
@@ -49,13 +50,13 @@ export default class TapeMatcher {
 
     if (!sameBody) {
       if (!this.options.bodyMatcher) {
-        this.options.logger.debug(`Not same BODY ${req.body} vs ${otherReq.body}`)
+        logger.log.debug(`Not same BODY ${req.body} vs ${otherReq.body}`)
         return false
       }
 
       const bodyMatches = this.options.bodyMatcher(this.tape, otherReq)
       if (!bodyMatches) {
-        this.options.logger.debug(`Not same bodyMatcher ${req.body} vs ${otherReq.body}`)
+        logger.log.debug(`Not same bodyMatcher ${req.body} vs ${otherReq.body}`)
         return false
       }
     }
@@ -67,7 +68,7 @@ export default class TapeMatcher {
     const otherHeadersLength = Object.keys(otherReq.headers).length
     const sameNumberOfHeaders = currentHeadersLength === otherHeadersLength
     if (!sameNumberOfHeaders) {
-      this.options.logger.debug(`Not same #HEADERS ${JSON.stringify(req.headers)} vs ${JSON.stringify(otherReq.headers)}`)
+      logger.log.debug(`Not same #HEADERS ${JSON.stringify(req.headers)} vs ${JSON.stringify(otherReq.headers)}`)
       return false
     }
 
@@ -79,7 +80,7 @@ export default class TapeMatcher {
       headersSame = headersSame && entryHeader === header
     })
     if (!headersSame) {
-      this.options.logger.debug(`Not same HEADERS values ${JSON.stringify(req.headers)} vs ${JSON.stringify(otherReq.headers)}`)
+      logger.log.debug(`Not same HEADERS values ${JSON.stringify(req.headers)} vs ${JSON.stringify(otherReq.headers)}`)
       return false
     }
     return true
@@ -88,7 +89,7 @@ export default class TapeMatcher {
   private isSameMethod(req: Req, otherReq: Req) {
     const sameMethod = req.method === otherReq.method
     if (!sameMethod) {
-      this.options.logger.debug(`Not same METHOD ${req.method} vs ${otherReq.method}`)
+      logger.log.debug(`Not same METHOD ${req.method} vs ${otherReq.method}`)
       return false
     }
     return true
@@ -98,13 +99,13 @@ export default class TapeMatcher {
     const sameURL = req.url === otherReq.url
     if (!sameURL) {
       if (!this.options.urlMatcher) {
-        this.options.logger.debug(`Not same URL ${req.url} vs ${otherReq.url}`)
+        logger.log.debug(`Not same URL ${req.url} vs ${otherReq.url}`)
         return false
       }
 
       const urlMatches = this.options.urlMatcher(this.tape, otherReq)
       if (!urlMatches) {
-        this.options.logger.debug(`Not same urlMatcher ${req.url} vs ${otherReq.url}`)
+        logger.log.debug(`Not same urlMatcher ${req.url} vs ${otherReq.url}`)
         return false
       }
     }

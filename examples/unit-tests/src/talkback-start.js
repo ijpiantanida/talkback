@@ -12,6 +12,7 @@ module.exports = function talkbackStart() {
   if (!talkbackInstance) {
     talkbackInstance = talkback({
       host: "http://localhost:8080",
+      name: "Example - Unit Testing",
       port: 8080,
       path: __dirname + "/tapes",
       record: talkback.Options.RecordMode.DISABLED,

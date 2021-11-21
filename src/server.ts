@@ -7,6 +7,7 @@ import * as https from "https"
 import * as fs from "fs"
 import {Options} from "./options"
 import {Req} from "./types"
+import {logger} from "./logger"
 
 export default class TalkbackServer {
   private readonly options: Options
@@ -61,7 +62,7 @@ export default class TalkbackServer {
     } : () => http.createServer(handleRequest)
 
     this.server = serverFactory()
-    console.log(`Starting talkback on ${this.options.port}`)
+    logger.log.info(`Starting talkback on port ${this.options.port}`)
     this.server.listen(this.options.port, callback)
 
     process.on("exit", this.closeSignalHandler as any)

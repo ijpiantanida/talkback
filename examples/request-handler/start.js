@@ -16,7 +16,7 @@ async function start() {
     path: __dirname + "/tapes",
     record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
     debug: true,
-    name: "Test Request Handler",
+    name: "Example - Request Handler",
     allowHeaders: []
   })
 

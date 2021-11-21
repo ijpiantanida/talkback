@@ -335,8 +335,6 @@ describe("talkbackServer", () => {
       talkbackServer = await startTalkback({
         record: RecordMode.OVERWRITE,
         ignoreHeaders: ["x-talkback-ping"],
-        silent: false,
-        debug: true
       })
 
       const nextTapeId = currentTapeId
@@ -408,25 +406,22 @@ describe("talkbackServer", () => {
   })
 
   describe("summary printing", () => {
-    let log: Function
-    beforeEach(() => {
-      log = td.replace(console, "log")
-    })
-
     afterEach(() => td.reset())
 
     it("prints the summary when enabled", async () => {
       talkbackServer = await startTalkback({summary: true})
+      const logInfo = td.replace(talkback._logger.log, "info")
       talkbackServer.close()
 
-      td.verify(log(td.matchers.contains("SUMMARY")))
+      td.verify(logInfo(td.matchers.contains("SUMMARY")))
     })
 
     it("doesn't print the summary when disabled", async () => {
       talkbackServer = await startTalkback({summary: false})
+      const logInfo = td.replace(talkback._logger.log, "info")
       talkbackServer.close()
 
-      td.verify(log(td.matchers.contains("SUMMARY")), {times: 0})
+      td.verify(logInfo(td.matchers.contains("SUMMARY")), {times: 0})
     })
   })
 

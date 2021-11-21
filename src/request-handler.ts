@@ -8,6 +8,7 @@ import OptionsFactory, {RecordMode, FallbackMode, Options} from "./options"
 import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
 import {HttpRequest, HttpResponse, MatchingContext} from "./types"
+import {logger} from "./logger"
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
@@ -95,8 +96,8 @@ export default class RequestHandler {
 
     OptionsFactory.validateFallbackMode(fallbackMode)
 
-    this.options.logger.log(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
-    this.options.logger.log({
+    logger.log.info(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
+    logger.log.info({
       url: req.url,
       headers: req.headers
     })
@@ -125,7 +126,7 @@ export default class RequestHandler {
     delete headers.host
 
     const host = this.options.host
-    this.options.logger.log(`Making real request to ${host}${url}`)
+    logger.log.info(`Making real request to ${host}${url}`)
 
     if (method === "GET" || method === "HEAD") {
       fetchBody = null

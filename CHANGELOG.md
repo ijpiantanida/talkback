@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.5.0
+- Structured log format
+
 ## v2.4.3
 - Add `allowHeaders` option
 - Dependencies updates

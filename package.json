@@ -1,6 +1,6 @@
 {
   "name": "talkback",
-  "version": "2.4.3",
+  "version": "2.5.0",
   "main": "index.js",
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",

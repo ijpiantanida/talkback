@@ -72,10 +72,8 @@ const response = await talkbackHandler.handle(httpRequest)
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
-| **latency** | `Number \| \[Number\] \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
-| **errorRate** | `Number \| Function` | Probability between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
-| **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`) | `null` |
+| **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`)</br></br>Setting this value to `[]` will disable header matching on tapes. | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
@@ -84,6 +82,8 @@ const response = await talkbackHandler.handle(httpRequest)
 | **requestDecorator** | `Function` | Modify requests before they are proxied. [More info](#custom-request-decorator) | `null` |  
 | **responseDecorator** | `Function` | Modify responses before they are returned. [More info](#custom-response-decorator) | `null` |  
 | **tapeDecorator** | `Function` | Modify tapes before they are stored. [More info](#custom-tape-decorator) | `null` |
+| **latency** | `Number \| \[Number\] \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
+| **errorRate** | `Number \| Function` | Probability between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
 | **silent** | `Boolean` | Disable requests information console messages in the middle of requests | `false` |
 | **summary** | `Boolean` | Enable exit summary of new and unused tapes at exit. [More info](#exit-summary) | `true` |
 | **debug** | `Boolean` | Enable verbose debug information | `false` |

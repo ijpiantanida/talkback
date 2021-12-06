@@ -73,7 +73,7 @@ var server = talkback({
   path: __dirname + "/tapes",
   record: process.env.RECORD === "true" ? talkback.Options.RecordMode.NEW : talkback.Options.RecordMode.DISABLED,
   fallbackMode: fallbackMode,
-  debug: true,
+  debug: false,
   name: "Example - Server",
   ignoreQueryParams: ["t"],
   ignoreHeaders: ["user-agent"],

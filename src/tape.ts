@@ -23,9 +23,9 @@ export default class Tape {
     this.options = options
 
     // This needs to happen before we erase headers since we could lose information
-    this.normalizeBody()
+    this.normalizeReqBody()
 
-    this.cleanupHeaders()
+    this.cleanupReqHeaders()
 
     this.queryParamsToIgnore = this.options.ignoreQueryParams
     this.cleanupQueryParams()
@@ -41,7 +41,7 @@ export default class Tape {
     return TapeRenderer.fromStore(raw, options)
   }
 
-  cleanupHeaders() {
+  cleanupReqHeaders() {
     let newHeaders = {}
     if (this.options.allowHeaders != undefined) {
       newHeaders = this.options.allowHeaders.reduce((headers, header) => {
@@ -85,7 +85,7 @@ export default class Tape {
     this.req.url = URL.format(url)
   }
 
-  normalizeBody() {
+  normalizeReqBody() {
     const mediaType = new MediaType(this.req)
     const contentEncoding = new ContentEncoding(this.req)
     if (contentEncoding.isUncompressed() && mediaType.isJSON() && this.req.body.length > 0) {

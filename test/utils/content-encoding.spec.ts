@@ -39,11 +39,11 @@ describe("ContentEncoding", () => {
   describe("#supportedAlgorithm", () => {
     it("returns true when content-encoding is a supported algorithm", () => {
       expect(contentEncoding.supportedAlgorithm()).to.eql(true)
+      setEncoding("br")
+      expect(contentEncoding.supportedAlgorithm()).to.eql(true)
     })
 
-    it("returns true when content-encoding is not a supported algorithm", () => {
-      setEncoding("br")
-      expect(contentEncoding.supportedAlgorithm()).to.eql(false)
+    it("returns false when content-encoding is not a supported algorithm", () => {
       setEncoding("identity")
       expect(contentEncoding.supportedAlgorithm()).to.eql(false)
     })
@@ -51,7 +51,7 @@ describe("ContentEncoding", () => {
 
   describe("#uncompressedBody", () => {
     it("throws an error when the algorithm is not supported", (done) => {
-      setEncoding("br")
+      setEncoding("identity")
       contentEncoding.uncompressedBody(reqRes.body)
       .then(() => done("failed"))
       .catch(() => done())
@@ -72,11 +72,19 @@ describe("ContentEncoding", () => {
 
       expect(await contentEncoding.uncompressedBody(body)).to.eql(uncompressedBody)
     })
+
+    it("returns uncompressed when algorithm is br", async () => {
+      setEncoding("br")
+      const uncompressedBody = Buffer.from("FOOBAR")
+      const body = await zlib.brotliCompressSync(uncompressedBody)
+
+      expect(await contentEncoding.uncompressedBody(body)).to.eql(uncompressedBody)
+    })
   })
 
   describe("#compressedBody", () => {
     it("throws an error when the algorithm is not supported", (done) => {
-      setEncoding("br")
+      setEncoding("identity")
       contentEncoding.compressedBody("FOOBAR")
       .then(() => done("failed"))
       .catch(() => done())
@@ -92,6 +100,13 @@ describe("ContentEncoding", () => {
     it("returns compressed when algorithm is deflate", async () => {
       setEncoding("deflate")
       const compressed = await zlib.deflateSync("FOOBAR")
+
+      expect(await contentEncoding.compressedBody("FOOBAR")).to.eql(compressed)
+    })
+
+    it("returns compressed when algorithm is br", async () => {
+      setEncoding("br")
+      const compressed = await zlib.brotliCompressSync("FOOBAR")
 
       expect(await contentEncoding.compressedBody("FOOBAR")).to.eql(compressed)
     })

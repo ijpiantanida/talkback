@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.0
+- Drop support for node 10. Minimum required version 12.0
+
 ## v2.5.0
 - Structured log format
 

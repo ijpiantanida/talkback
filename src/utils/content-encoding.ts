@@ -5,7 +5,8 @@ import Headers from "./headers"
 
 const ALGORITHMS = {
   gzip: {compress: zlib.gzipSync, uncompress: zlib.gunzipSync},
-  deflate: {compress: zlib.deflateSync, uncompress: zlib.inflateSync}
+  deflate: {compress: zlib.deflateSync, uncompress: zlib.inflateSync},
+  br: {compress: zlib.brotliCompressSync, uncompress: zlib.brotliDecompressSync}
 }
 
 type SupportedAlgorithms = keyof typeof ALGORITHMS

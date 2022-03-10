@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.0.0
+## v3.0.1
 - Drop support for node 10. Minimum required version 12.0
 - Add support for brotli (br) encoding
 - Dependencies updates

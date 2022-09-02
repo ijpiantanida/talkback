@@ -1,7 +1,7 @@
 import {Options} from "./options"
 
 export class Logger {
-  static for(options: Options) {
+  static for(options: Options): Logger {
     return new Logger(options)
   }
 

@@ -1,8 +1,9 @@
 <html>
 <body>
-<div id="content" class="loading">Loading...</div>
+<div id="github-content" class="loading">Loading...</div>
+<div id="weather-content" class="loading">Loading...</div>
 <script type="application/javascript">
-  let contentEl = document.getElementById("content")
+  const githubContentEl = document.getElementById("github-content")
   fetch("https://api.github.com/users/ijpiantanida")
     .then(r => {
       if (r.status >= 400) {
@@ -11,13 +12,29 @@
       return r.json()
     })
     .then(json => {
-      contentEl.innerHTML = json.login
-      contentEl.classList.toggle("loading")
+      githubContentEl.innerHTML = json.login
+      githubContentEl.classList.toggle("loading")
     })
     .catch(() => {
-      contentEl.innerHTML = "ERROR"
-      contentEl.classList.toggle("loading")
+      githubContentEl.innerHTML = "ERROR"
+      githubContentEl.classList.toggle("loading")
     })
+    const weatherContentEl = document.getElementById("weather-content")
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relativehumidity_2m,windspeed_10m")
+      .then(r => {
+        if (r.status >= 400) {
+          throw "error"
+        }
+        return r.json()
+      })
+      .then(json => {
+        weatherContentEl.innerHTML = json.elevation
+        weatherContentEl.classList.toggle("loading")
+      })
+      .catch(() => {
+        weatherContentEl.innerHTML = "ERROR"
+        weatherContentEl.classList.toggle("loading")
+      })
 </script>
 </body>
 </html>

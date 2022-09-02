@@ -32,7 +32,8 @@ const raw = {
 const opts = Options.prepare({
   ignoreHeaders: ["x-ignored"],
   ignoreQueryParams: ["ignored1", "ignored2"],
-  debug: true
+  debug: false,
+  silent: true,
 })
 
 let tape: Tape

@@ -8,19 +8,21 @@ import OptionsFactory, {RecordMode, FallbackMode, Options} from "./options"
 import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
 import {HttpRequest, HttpResponse, MatchingContext} from "./types"
-import {logger} from "./logger"
+import {Logger} from "./logger"
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
   private readonly options: Options
   private readonly errorRate: ErrorRate
   private readonly latency: Latency
+  private readonly logger: Logger;
 
   constructor(tapeStore: TapeStore, options: Options) {
     this.tapeStore = tapeStore
     this.options = options
     this.errorRate = new ErrorRate(this.options)
     this.latency = new Latency(this.options)
+    this.logger = Logger.for(this.options)
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
@@ -96,8 +98,8 @@ export default class RequestHandler {
 
     OptionsFactory.validateFallbackMode(fallbackMode)
 
-    logger.log.info(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
-    logger.log.info({
+    this.logger.info(`Tape for ${req.url} not found and recording is disabled (fallbackMode: ${fallbackMode})`)
+    this.logger.info({
       url: req.url,
       headers: req.headers
     })
@@ -126,7 +128,7 @@ export default class RequestHandler {
     delete headers.host
 
     const host = this.options.host
-    logger.log.info(`Making real request to ${host}${url}`)
+    this.logger.info(`Making real request to ${host}${url}`)
 
     if (method === "GET" || method === "HEAD") {
       fetchBody = null

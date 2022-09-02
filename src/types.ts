@@ -1,7 +1,6 @@
 import {FallbackMode, Options, RecordMode} from "./options"
 import TalkbackServer from "./server"
 import RequestHandler from "./request-handler"
-import Logger from "./logger"
 
 export {}
 
@@ -54,7 +53,4 @@ export interface Talkback extends TalkbackBase {
 
   requestHandler(options: Partial<Options>): RequestHandler
 
-  _logger: {
-    log: Logger
-  }
 }

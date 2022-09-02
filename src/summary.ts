@@ -1,14 +1,17 @@
 import Tape from "./tape"
 import {Options} from "./options"
-import {logger} from "./logger"
+import {Logger} from "./logger"
 
 export default class Summary {
   private tapes: Tape[]
-  private opts: Options
+  private options: Options
+  private logger: Logger
 
-  constructor(tapes: Tape[], opts: Options) {
+  constructor(tapes: Tape[], options: Options) {
     this.tapes = tapes
-    this.opts = opts
+    this.options = options
+
+    this.logger = Logger.for(this.options)
   }
 
   print() {
@@ -23,6 +26,6 @@ export default class Summary {
       message += "Unused tapes:\n"
       unusedTapes.forEach(t => message += `- ${t.path}\n`)
     }
-    logger.log.info(message)
+    this.logger.info(message)
   }
 }

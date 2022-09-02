@@ -1,14 +1,10 @@
 import {Options} from "./options"
 
-export default interface Logger {
-  info(message: any): void
+export class Logger {
+  static for(options: Options) {
+    return new Logger(options)
+  }
 
-  error(message: any, ...optionalParameters: any[]): void
-
-  debug(message: any): void
-}
-
-export class ConsoleLogger implements Logger {
   options: Options
 
   constructor(options: Options) {
@@ -46,25 +42,3 @@ export class ConsoleLogger implements Logger {
     return `${formattedNow} [${this.options.name}] [${level}] ${messageString}`
   }
 }
-
-export class NoopLogger implements Logger {
-  debug(message: any): void {
-  }
-
-  error(message: any, ...optionalParameters: any[]): void {
-  }
-
-  info(message: any): void {
-  }
-
-}
-
-const logger = {
-  log: new NoopLogger()
-}
-
-function initializeLogger(options: Options) {
-  logger.log = new ConsoleLogger(options)
-}
-
-export {logger, initializeLogger}

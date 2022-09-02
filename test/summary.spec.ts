@@ -2,7 +2,6 @@ import Summary from "../src/summary"
 import * as td from "testdouble"
 import {DefaultOptions} from "../src/options"
 import Tape from "../src/tape"
-import {logger} from "../src/logger"
 
 let logInfo: Function;
 
@@ -13,7 +12,7 @@ const opts = {
 
 describe("Summary", () => {
   beforeEach(() => {
-    logInfo = td.replace(logger.log, "info")
+    logInfo = td.replace(console, "log")
   })
 
   afterEach(() => {

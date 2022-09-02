@@ -7,7 +7,7 @@ import * as https from "https"
 import * as fs from "fs"
 import {Options} from "./options"
 import {Req} from "./types"
-import {logger} from "./logger"
+import {Logger} from "./logger"
 
 export default class TalkbackServer {
   private readonly options: Options
@@ -16,6 +16,7 @@ export default class TalkbackServer {
   private readonly closeSignalHandler?: (...args: any[]) => void
   private server?: http.Server
   private closed: boolean = false
+  private readonly logger: Logger
 
   constructor(options: Options) {
     this.options = options
@@ -23,6 +24,7 @@ export default class TalkbackServer {
     this.requestHandler = new RequestHandler(this.tapeStore, this.options)
 
     this.closeSignalHandler = this.close.bind(this)
+    this.logger = Logger.for(this.options)
   }
 
   handleRequest(rawReq: http.IncomingMessage, res: http.ServerResponse) {
@@ -62,7 +64,7 @@ export default class TalkbackServer {
     } : () => http.createServer(handleRequest)
 
     this.server = serverFactory()
-    logger.log.info(`Starting talkback on port ${this.options.port}`)
+    this.logger.info(`Starting talkback on port ${this.options.port}`)
     this.server.listen(this.options.port, callback)
 
     process.on("exit", this.closeSignalHandler as any)

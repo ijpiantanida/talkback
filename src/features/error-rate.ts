@@ -1,13 +1,16 @@
 import OptionsFactory, {Options} from "../options"
 import Tape from "../tape"
 import {Req, Res} from "../types"
-import {logger} from "../logger"
+import {Logger} from "../logger"
 
 export default class ErrorRate {
-  private options: Options
+  private readonly options: Options
+  private readonly logger: Logger
 
   constructor(options: Options) {
     this.options = options
+
+    this.logger = Logger.for(this.options)
   }
 
   shouldSimulate(req:Req, tape?: Tape) {
@@ -22,7 +25,7 @@ export default class ErrorRate {
   }
 
   simulate(req: Req) {
-    logger.log.info(`Simulating error for ${req.url}`)
+    this.logger.info(`Simulating error for ${req.url}`)
     return {
       status: 503,
       headers: {'content-type': ['text/plain']},

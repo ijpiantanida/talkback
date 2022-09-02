@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.2
+- Fix: logger options getting overriden when running multiple instances with different logging options.
+
 ## v3.0.1
 - Drop support for node 10. Minimum required version 12.0
 - Add support for brotli (br) encoding

@@ -8,24 +8,27 @@ const mkdirp = require("mkdirp")
 import Tape from "./tape"
 import TapeMatcher from "./tape-matcher"
 import TapeRenderer from "./tape-renderer"
-import {logger} from "./logger"
+import {Logger} from "./logger"
 
 export default class TapeStore {
   private readonly path: string
   private readonly options: Options
   tapes: Tape[]
+  private readonly logger: Logger
 
   constructor(options: Options) {
     this.path = path.normalize(options.path + "/")
     this.options = options
     this.tapes = []
+
+    this.logger = Logger.for(this.options)
   }
 
   async load() {
     mkdirp.sync(this.path)
 
     await this.loadTapesAtDir(this.path)
-    logger.log.info(`Loaded ${this.tapes.length} tapes from ${this.path}`)
+    this.logger.info(`Loaded ${this.tapes.length} tapes from ${this.path}`)
   }
 
   async loadTapesAtDir(directory: string) {
@@ -42,7 +45,7 @@ export default class TapeStore {
           tape.path = filename
           this.tapes.push(tape)
         } catch (e) {
-          logger.log.error(`Error reading tape ${fullPath}`, e.message)
+          this.logger.error(`Error reading tape ${fullPath}`, e.message)
         }
       } else {
         this.loadTapesAtDir(fullPath + "/")
@@ -52,13 +55,13 @@ export default class TapeStore {
 
   find(newTape: Tape) {
     const foundTape = this.tapes.find(t => {
-      logger.log.debug(`Comparing against tape ${t.path}`)
+      this.logger.debug(`Comparing against tape ${t.path}`)
       return new TapeMatcher(t, this.options).sameAs(newTape)
     })
 
     if (foundTape) {
       foundTape.used = true
-      logger.log.info(`Found matching tape for ${newTape.req.url} at ${foundTape.path}`)
+      this.logger.info(`Found matching tape for ${newTape.req.url} at ${foundTape.path}`)
       return foundTape
     }
   }
@@ -79,7 +82,7 @@ export default class TapeStore {
       fullFilename = this.createTapePath(tape)
       tape.path = path.relative(this.path, fullFilename)
     }
-    logger.log.info(`Saving request ${tape.req.url} at ${tape.path}`)
+    this.logger.info(`Saving request ${tape.req.url} at ${tape.path}`)
 
     const tapeRenderer = new TapeRenderer(tape)
     const toSave = await tapeRenderer.render()

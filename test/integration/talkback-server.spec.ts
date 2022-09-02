@@ -409,16 +409,16 @@ describe("talkbackServer", () => {
     afterEach(() => td.reset())
 
     it("prints the summary when enabled", async () => {
-      talkbackServer = await startTalkback({summary: true})
-      const logInfo = td.replace(talkback._logger.log, "info")
+      talkbackServer = await startTalkback({summary: true, silent: false})
+      const logInfo = td.replace(console, "log")
       talkbackServer.close()
 
       td.verify(logInfo(td.matchers.contains("SUMMARY")))
     })
 
     it("doesn't print the summary when disabled", async () => {
-      talkbackServer = await startTalkback({summary: false})
-      const logInfo = td.replace(talkback._logger.log, "info")
+      talkbackServer = await startTalkback({summary: false, silent: false})
+      const logInfo = td.replace(console, "log")
       talkbackServer.close()
 
       td.verify(logInfo(td.matchers.contains("SUMMARY")), {times: 0})

@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 15.x]
+        node-version: [14.x, 15.x, 16.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get version
         run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
       - name: Use Node.js ${{ matrix.node-version }}
@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
@@ -28,7 +28,7 @@ jobs:
       - run: yarn ci
       - name: Save artifact
         if: ${{ success() && contains(matrix.node-version, '15') && contains(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: talkback-dist-${{ env.TALKBACK_VERSION }}
           path: ./dist
@@ -38,16 +38,16 @@ jobs:
     if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Get version
         run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
-      - name: Use Node.js 15.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
         with:
-          node-version: '15.x'
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: talkback-dist-${{ env.TALKBACK_VERSION }}
           path: ./dist

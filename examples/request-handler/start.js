@@ -25,7 +25,9 @@ async function start() {
 
   await page.setRequestInterception(true)
   page.on("request", async interceptedRequest => {
-    if (interceptedRequest.url().startsWith(host)) {
+    const parsedUrl = new URL(interceptedRequest.url())
+    const parsedHost = `${parsedUrl.protocol}://${parsedUrl.hostname}`
+    if (parsedHost == host ) {
       let body = Buffer.alloc(0)
       if (interceptedRequest.postData()) {
         body = Buffer.from(interceptedRequest.postData())

@@ -18,8 +18,10 @@ export interface ReqRes {
 }
 
 export interface Req extends ReqRes {
-  url: string,
+  url: string
   method: string
+  /** Uses 'manual' by default */
+  redirect?: "manual" | "follow" | "error"
 }
 
 export type HttpRequest = Req

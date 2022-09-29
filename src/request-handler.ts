@@ -122,7 +122,7 @@ export default class RequestHandler {
 
   private async makeRealRequest(req: HttpRequest) {
     let fetchBody: Buffer | null
-    let {method, url, body} = req
+    let {method, url, body, redirect='manual'} = req
     fetchBody = body
     const headers = {...req.headers}
     delete headers.host
@@ -134,7 +134,7 @@ export default class RequestHandler {
       fetchBody = null
     }
 
-    const fRes = await fetch(host + url, {method, headers, body: fetchBody, compress: false, redirect: "manual"})
+    const fRes = await fetch(host + url, {method, headers, body: fetchBody, compress: false, redirect})
     const buff = await fRes.buffer()
     return {
       status: fRes.status,

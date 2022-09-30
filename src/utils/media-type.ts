@@ -6,6 +6,7 @@ const contentTypeParser = require("content-type")
 const equals = (to: string) => (contentType: string) => to == contentType
 
 export const jsonTypes = [
+  equals("application/graphql"),
   equals("application/json"),
   equals("application/x-amz-json-1.0"),
   equals("application/x-amz-json-1.1"),

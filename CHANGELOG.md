@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.3
+- `application/graphql` added to the list of JSON media-types
+
 ## v3.0.2
 - Fix: logger options getting overriden when running multiple instances with different logging options.
 - Dependencies updates

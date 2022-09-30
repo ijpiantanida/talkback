@@ -97,9 +97,9 @@ const response = await talkbackHandler.handle(httpRequest)
 
 ## Tapes
 Tapes are where talkback stores requests and their response.   
-They can be freely edited to match new requests or return a different response than the original. They are loaded recursively from the `path` directory at startup.   
-Since they are only loaded on startup, any changes to a tape requires a server restart to be applied.   
-Tapes use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the JSON format that allows for very neat features like comments, trailing commas and keys without quotes.         
+* They can be freely edited to match new requests or return a different response than the original. They are loaded recursively from the `path` directory at startup. Since they are only loaded on startup, any changes to a tape requires a server restart to be applied.   
+* Talkback will do a best effort to store the tape request and response body in plain text (human readable) [More info](#request-and-response-body).    
+* Tapes use the [JSON5](http://json5.org/) format. JSON5 is an extensions to the JSON format that allows for very neat features like comments, trailing commas and keys without quotes.      
 
 #### Format
 All tapes have the following 3 properties:   
@@ -138,8 +138,7 @@ In addition to talkback properties, you can define their own custom fields eithe
 | **body** | `Buffer` | Response body | `Buffer.from("FOOBAR")` |
 
 #### Request and Response body
-If the content type of the request or response is considered _human readable_ and _uncompressed_, the body will be saved in plain text.      
-Otherwise, the body will be saved as a Base64 string, allowing to save binary content.
+Talkback will store the request and response body in plan text and uncompressed (human readable) if the content-encoding is supported (gzip, deflate, br) and the content-type is considered human readable ([see list](src/utils/media-type.ts#L15)).
 
 ##### Pretty Printing
 If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   

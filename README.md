@@ -138,7 +138,7 @@ In addition to talkback properties, you can define their own custom fields eithe
 | **body** | `Buffer` | Response body | `Buffer.from("FOOBAR")` |
 
 #### Request and Response body
-Talkback will store the request and response body in plan text and uncompressed (human readable) if the content-encoding is supported (gzip, deflate, br) and the content-type is considered human readable ([see list](src/utils/media-type.ts#L15)).
+Talkback will store the request and response body in plan text and uncompressed (human readable) if the content-encoding is supported (gzip, deflate, br) and the content-type is considered human readable ([see list](src/utils/media-type.ts#L15)). For this to work, the content-type header should be present in the request/response.  
 
 ##### Pretty Printing
 If the request or response have a JSON *content-type*, their body will be pretty printed as an object in the tape for easier readability.   

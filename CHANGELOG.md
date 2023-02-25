@@ -2,6 +2,7 @@
 
 ## v3.0.3
 - `application/graphql` added to the list of JSON media-types
+- Add logo! (thanks **[@denislutz](https://github.com/denislutz)**)
 
 ## v3.0.2
 - Fix: logger options getting overriden when running multiple instances with different logging options.

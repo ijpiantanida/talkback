@@ -1,3 +1,5 @@
+<img src="docs/logo.png" width="300" alt="Talkback logo">
+
 # Talkback
 
 Talkback is a javascript HTTP proxy that records and playbacks HTTP requests. As long as you have node.js in your environment, you can run talkback to record requests from applications written in any language/framework.   

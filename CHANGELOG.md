@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.4
+- Dependencies updates
+
 ## v3.0.3
 - `application/graphql` added to the list of JSON media-types
 - Add logo! (thanks **[@denislutz](https://github.com/denislutz)**)

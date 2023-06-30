@@ -75,7 +75,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
-| **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`)</br></br>Setting this value to `[]` will disable header matching on tapes. | `null` |
+| **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`)</br></br>Setting this value to `[]` will disable header matching on tapes.</br>Note that `content-type` is needed to decode the body into plain-text.  | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host]` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |

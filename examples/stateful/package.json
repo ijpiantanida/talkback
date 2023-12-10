@@ -1,0 +1,15 @@
+{
+  "name": "talkback-example-server",
+  "version": "0.0.1",
+  "main": "start.js",
+  "license": "MIT",
+  "description": "Talkback Example - Stateful",
+  "dependencies": {},
+  "devDependencies": {
+    "talkback": "*"
+  },
+  "author": "Ignacio Piantanida",
+  "scripts": {
+    "test": "node start.js & TALKBACK_PID=$! && sleep 1 && ./test_script.sh && kill -15 $TALKBACK_PID"
+  }
+}

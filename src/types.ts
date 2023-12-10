@@ -48,7 +48,7 @@ export interface Talkback extends TalkbackBase {
   Options: {
     Default: Options,
     FallbackMode: typeof FallbackMode,
-    RecordMode: typeof RecordMode
+    RecordMode: typeof RecordMode,
   }
 
   requestHandler(options: Partial<Options>): RequestHandler

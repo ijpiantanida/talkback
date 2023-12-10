@@ -1,5 +1,7 @@
+import { ControlPlaneRequestHandler } from "./features/control-plane"
 import Tape from "./tape"
 import {Req, MatchingContext} from "./types"
+import { noopSuccessRequestHandler } from "./utils/request-handlers"
 
 export const RecordMode = {
   NEW: "NEW", // If no tape matches the request, proxy it and save the response to a tape
@@ -15,6 +17,12 @@ export const FallbackMode = {
   ALL: [] as string[]
 }
 FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY]
+
+export interface ControlPlaneOptions {
+  enabled: boolean,
+  path: string,
+  requestHandler: ControlPlaneRequestHandler,
+}
 
 export interface Options {
   host: string,
@@ -47,6 +55,8 @@ export interface Options {
   silent: boolean,
   summary: boolean,
   debug: boolean,
+
+  controlPlane: ControlPlaneOptions
 }
 
 export const DefaultOptions: Options = {
@@ -62,6 +72,12 @@ export const DefaultOptions: Options = {
     enabled: false,
     keyPath: undefined,
     certPath: undefined
+  },
+
+  controlPlane: {
+    enabled: true,
+    path: '/__talkback__',
+    requestHandler: noopSuccessRequestHandler,
   },
 
   allowHeaders: undefined,

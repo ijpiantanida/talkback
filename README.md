@@ -68,7 +68,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | Name | Type | Description | Default |   
 |------|------|-------------|---------|
 | **host** | `String` | Where to proxy unknown requests| |
-| **port** | `String` | Talkback port | 8080 |
+| **port** | `String` | Talkback port | `8080` |
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
@@ -76,7 +76,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | **name** | `String` | Server name | Defaults to `host` value |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`)</br></br>Setting this value to `[]` will disable header matching on tapes.</br>Note that `content-type` and `content-encoding` are needed to decode the body into plain-text. [More info](#request-and-response-body)  | `null` |
-| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host]` |
+| **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host']` |
 | **ignoreQueryParams** | `[String]` | List of query params to ignore when matching tapes. Useful when having dynamic query params like timestamps| `[]` |
 | **ignoreBody** | `Boolean` | Should the request body be ignored when matching tapes | `false` |
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
@@ -168,20 +168,20 @@ Talkback proxying and recording behavior can be controlled through the `record` 
 
 There are 3 possible recording modes:   
 
-|Value| Description|
-|-----|------------|
-|`NEW`| If no tape matches the request, proxy it and save the response to a tape|
-|`OVERWRITE`| Always proxy the request and save the response to a tape, overwriting any existing one|
-|`DISABLED`| If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response|
+| Value | Description |
+|-------|-------------|
+| `NEW` | If no tape matches the request, proxy it and save the response to a tape |
+| `OVERWRITE` | Always proxy the request and save the response to a tape, overwriting any existing one |
+| `DISABLED` | If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response |
             
 The `fallbackMode` option lets you choose what to do when recording is `DISABLED` and an unknown request arrives.  
 
 There are 2 possible fallback modes:   
 
-|Value| Description|
-|-----|------------|
-|`NOT_FOUND`| Log an error and return a 404 response|
-|`PROXY`| Proxy the request to `host` and return its response, but don't create a tape|
+| Value | Description |
+|-------|-------------|
+| `NOT_FOUND` | Log an error and return a 404 response |
+| `PROXY` | Proxy the request to `host` and return its response, but don't create a tape |
 
 **It is recommended to `DISABLE` recording when using talkback for test running. This way, there are no side effects and broken tests fail faster.**
 
@@ -199,7 +199,6 @@ const opts = {
       return talkback.Options.FallbackMode.NOT_FOUND
   } 
 }
-
 ```
 
 ## Custom request body matcher
@@ -273,6 +272,7 @@ function requestDecorator(req: Req, context: MatchingContext) {
   return req;
 }
 ```
+
 In this example we are using the context's id to store the request's start time to later be used by another decorator. 
 
   
@@ -380,6 +380,7 @@ At the same time, tapes can define their own specific error rates by adding an `
 ## Exit summary
 If you are using talkback for your test suite, you will probably have tons of different tapes after some time. It can be difficult to know if all of them are still required.   
 To help, when talkback exits, it will print a list of all the tapes that have NOT been used and a list of all the new tapes. If your test suite is green, you can safely delete anything that hasn't been used.
+
 ```
 ===== SUMMARY (My Server) =====
 New tapes:
@@ -388,6 +389,7 @@ Unused tapes:
 - not-valid-request.json5
 - user-profile.json5
 ```
+
 This can be disabled with the `summary` option.
 
 # Licence

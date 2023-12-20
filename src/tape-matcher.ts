@@ -22,6 +22,7 @@ export default class TapeMatcher {
   sameAs(otherTape: Tape) {
     const otherReq = otherTape.req
     const req = this.tape.req
+
     if (!this.isSameUrl(req, otherReq)) {
       return false
     }
@@ -34,8 +35,38 @@ export default class TapeMatcher {
       return false
     }
 
-    return this.options.ignoreBody || this.isSameBody(req, otherReq);
+    if(!(this.options.ignoreBody || this.isSameBody(req, otherReq))) {
+      return false
+    }
 
+    if(!this.isSameSequence(otherTape)) {
+      return false
+    }
+
+    return true
+  }
+
+  private isSameSequence(otherTape: Tape) {
+    if(!(this.tape.meta.sequenceNumber || otherTape.meta.sequenceNumber)) {
+      return true
+    }
+
+    if(this.tape.meta.sequenceNumber && !otherTape.meta.sequenceNumber) {
+      this.logger.debug(`Expected sequenceNumber=${this.tape.meta.sequenceNumber}, but received None`)
+      return false
+    }
+
+    if(!this.tape.meta.sequenceNumber && otherTape.meta.sequenceNumber) {
+      this.logger.debug(`Expected no sequenceNumber, but received sequenceNumber=${otherTape.meta.sequenceNumber}`)
+      return false
+    }
+
+    if(this.tape.meta.sequenceNumber !== otherTape.meta.sequenceNumber) {
+      this.logger.debug(`Expected sequenceNumber=${this.tape.meta.sequenceNumber}, but received ${otherTape.meta.sequenceNumber}`)
+      return false
+    }
+    
+    return true
   }
 
   private isSameBody(req: Req, otherReq: Req) {

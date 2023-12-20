@@ -48,7 +48,7 @@ export default class TapeStore {
           this.logger.error(`Error reading tape ${fullPath}`, e.message)
         }
       } else {
-        this.loadTapesAtDir(fullPath + "/")
+        await this.loadTapesAtDir(fullPath + "/")
       }
     }
   }

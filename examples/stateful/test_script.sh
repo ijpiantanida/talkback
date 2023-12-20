@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE_URL=https://localhost:8080
+BASE_URL="http://localhost:8080"
 
 error=false
 
@@ -12,41 +12,34 @@ function make_request() {
   fi
 }
 
-# Pertty printed tape
-make_request 200 "$BASE_URL/users/ijpiantanida"
+# reset sequence
+make_request 200 "$BASE_URL/__talkback__/sequence/reset" -X POST
 
-# HEAD requests
-make_request 200 "$BASE_URL/users/ijpiantanida" -I
+# Get requests in sequence order
+make_request 200 "$BASE_URL/carts/1"
+make_request 200 "$BASE_URL/user" # this doesn't affect sequence
+make_request 200 "$BASE_URL/carts/1" -X PUT
+make_request 200 "$BASE_URL/carts/1"
 
-# tape's latency
-make_request 200 "$BASE_URL/users/slow"
+# reset sequence
+make_request 200 "$BASE_URL/__talkback__/sequence/reset" -X POST
 
-# responseDecorator
-make_request 200 "$BASE_URL/auth" -H "content-type: application/json" -d '{"username": "james", "password": "moriarty"}'
+# Get requests in sequence order again
+make_request 200 "$BASE_URL/carts/1"
+make_request 200 "$BASE_URL/carts/1" -X PUT
+make_request 200 "$BASE_URL/user" # this doesn't affect sequence
+make_request 200 "$BASE_URL/carts/1"
 
-# urlMatcher
-make_request 200 "$BASE_URL/orgs/test"
+# Out of sequence
+make_request 404 "$BASE_URL/carts/1"
+make_request 200 "$BASE_URL/user" # this doesn't affect sequence
 
-# bodyMatcher
-make_request 200 "$BASE_URL/users" -H "content-type: application/json" -d '{"username": "james", "ignore": "abc"}'
+# reset sequence
+make_request 200 "$BASE_URL/__talkback__/sequence/reset" -X POST
 
-# Non-200 tape
-make_request 400 "$BASE_URL/repos/not-valid"
-
-# Not pretty body printed
-make_request 200 "$BASE_URL/repos/ijpiantanida/talkback"
-
-# Fails because of tape's errorRate
-make_request 503 "$BASE_URL/users/errorRate"
-
-# Removed by requestDecorator
-make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip, deflate, br, test"
-
-# Compressed with supported algorithm and saved as plain text
-make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip, deflate, br"
-
-# Compressed with supported algorithm but saved as base64
-make_request 200 "$BASE_URL/users/ijpiantanida" -H "accept-encoding: gzip"
+# Out of sequence - fails
+make_request 200 "$BASE_URL/carts/1"
+make_request 404 "$BASE_URL/carts/1"
 
 if [ "$error" = true ]; then
   echo "FAILED"

@@ -1,0 +1,37 @@
+{
+    meta: {
+        createdAt: '2023-12-20T02:20:11.798Z',
+        host: 'http://localhost:8898',
+        sequenceNumber: '4',
+        resHumanReadable: true,
+    },
+    req: {
+        headers: {
+            accept: '*/*',
+            'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+            'accept-encoding': 'gzip,deflate',
+            connection: 'close',
+        },
+        url: '/test/sequential_stored_read',
+        method: 'GET',
+        body: '',
+    },
+    res: {
+        status: 200,
+        headers: {
+            'content-type': [
+                'text/plain',
+            ],
+            date: [
+                'Wed, 20 Dec 2023 02:20:11 GMT',
+            ],
+            connection: [
+                'close',
+            ],
+            'transfer-encoding': [
+                'chunked',
+            ],
+        },
+        body: '4',
+    },
+}

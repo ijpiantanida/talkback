@@ -82,7 +82,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | **bodyMatcher** | `Function` | Customize how a request's body is matched against saved tapes. [More info](#custom-request-body-matcher) | `null` |
 | **urlMatcher** | `Function` | Customize how a request's URL is matched against saved tapes. [More info](#custom-request-url-matcher) | `null` |
 | **requestDecorator** | `Function` | Modify requests before they are proxied. [More info](#custom-request-decorator) | `null` |  
-| **responseDecorator** | `Function` | Modify responses before they are returned. [More info](#custom-response-decorator) | `null` |  
+| **responseDecorator** | `Function` | Modify responses before they are returned by talkback. [More info](#custom-response-decorator) | `null` |  
 | **tapeDecorator** | `Function` | Modify tapes before they are stored. [More info](#custom-tape-decorator) | `null` |
 | **latency** | `Number \| \[Number\] \| Function` | Synthetic latency for requests (in ms). [More info](#latency) | `0` |
 | **errorRate** | `Number \| Function` | Probability between 0 and 100 of injecting a synthetic error. [More info](#error-rate) | `0` |
@@ -238,7 +238,7 @@ function urlMatcher(tape: Tape, req: Req) {
       // Match if URL is of type /users/{username}
       return !!req.url.match(/\/users\/[a-zA-Z-0-9]+/);
     }
-    return false;
+    return tape.req.url === req.url;
 }
 ```
 

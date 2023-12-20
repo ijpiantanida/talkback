@@ -39,7 +39,8 @@ export interface Metadata extends More {
   reqUncompressed?: boolean,
   resUncompressed?: boolean,
   reqHumanReadable?: boolean,
-  resHumanReadable?: boolean
+  resHumanReadable?: boolean,
+  sequenceNumber?: string,
 }
 
 type TalkbackBase = (options: Partial<Options>) => TalkbackServer

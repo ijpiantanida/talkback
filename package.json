@@ -48,6 +48,7 @@
     "ci": "yarn ts-check && yarn test && yarn build && USE_DIST=1 yarn test",
     "start": "node examples/server/start.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extensions ts,js \"test/**/*.spec.{ts,js}\"",
+    "test-watch": "yarn test --watch --watch-files test",
     "ts-check": "tsc --noEmit"
   }
 }

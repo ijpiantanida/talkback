@@ -1,11 +1,10 @@
-import { ControlPlaneRequestHandler } from "./features/control-plane"
+import { ControlPlaneRequestHandler } from "./features/types"
 import Tape from "./tape"
 import {Req, MatchingContext} from "./types"
-import { noopSuccessRequestHandler } from "./utils/request-handlers"
 
 export const RecordMode = {
   NEW: "NEW", // If no tape matches the request, proxy it and save the response to a tape
-  OVERWRITE: "OVERWRITE", // Always proxy the request and save the response to a tape, overwriting any existing one
+  OVERWRITE: "OVERWRITE", // Always proxy the request and save the response to a tape, overwriting any existing ones
   DISABLED: "DISABLED", // If a matching tape exists, return it. Otherwise, don't proxy the request and use `fallbackMode` for the response
   ALL: [] as string[]
 }
@@ -21,7 +20,7 @@ FallbackMode.ALL = [FallbackMode.NOT_FOUND, FallbackMode.PROXY]
 export interface ControlPlaneOptions {
   enabled: boolean,
   path: string,
-  requestHandler: ControlPlaneRequestHandler,
+  requestHandler?: ControlPlaneRequestHandler,
 }
 
 export interface Options {
@@ -56,7 +55,11 @@ export interface Options {
   summary: boolean,
   debug: boolean,
 
-  controlPlane: ControlPlaneOptions
+  controlPlane: ControlPlaneOptions,
+
+  alpha: {
+    sequentialMode: boolean | ((req: Req) => boolean)
+  }
 }
 
 export const DefaultOptions: Options = {
@@ -77,7 +80,6 @@ export const DefaultOptions: Options = {
   controlPlane: {
     enabled: true,
     path: '/__talkback__',
-    requestHandler: noopSuccessRequestHandler,
   },
 
   allowHeaders: undefined,
@@ -98,6 +100,10 @@ export const DefaultOptions: Options = {
   silent: false,
   summary: true,
   debug: false,
+
+  alpha: {
+    sequentialMode: false,
+  }
 }
 
 export default class OptionsFactory {
@@ -109,7 +115,11 @@ export default class OptionsFactory {
       ignoreHeaders: [
         ...DefaultOptions.ignoreHeaders,
         ...(usrOpts.ignoreHeaders || [])
-      ]
+      ],
+      controlPlane: {
+        ...DefaultOptions.controlPlane,
+        ...(usrOpts.controlPlane || {})
+      }
     }
 
     this.validateOptions(opts)

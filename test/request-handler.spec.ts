@@ -2,7 +2,7 @@ import RequestHandler from "../src/request-handler"
 import Tape from "../src/tape"
 import TapeStore from "../src/tape-store"
 import OptionsFactory, {FallbackMode, Options, RecordMode} from "../src/options"
-import {Res} from "../src/types"
+import {MatchingContext, Res, Req} from "../src/types"
 import * as td from "testdouble"
 import {expect} from "chai"
 
@@ -104,7 +104,7 @@ describe("RequestHandler", () => {
             })
 
             it("throws an error if the responseDecorator returns null", async () => {
-              opts.requestDecorator = () => null
+              opts.requestDecorator = () => null as unknown as Req
               try {
                 await reqHandler.handle(savedTape.req)
                 expect.fail("Exception expected to be thrown")
@@ -148,7 +148,7 @@ describe("RequestHandler", () => {
             })
 
             it("throws an error if the tapeDecorator returns null", async () => {
-              opts.tapeDecorator = () => null
+              opts.tapeDecorator = (tape: Tape, context: MatchingContext) => null as unknown as Tape
               try {
                 await reqHandler.handle(savedTape.req)
                 expect.fail("Exception expected to be thrown")
@@ -176,7 +176,7 @@ describe("RequestHandler", () => {
             })
 
             it("throws an error if the responseDecorator returns null", async () => {
-              opts.responseDecorator = () => null
+              opts.responseDecorator = (tape: Tape, req: Req, context: MatchingContext) => null as unknown as Tape
               try {
                 await reqHandler.handle(savedTape.req)
                 expect.fail("Exception expected to be thrown")

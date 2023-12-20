@@ -8,23 +8,20 @@ import * as fs from "fs"
 import {Options} from "./options"
 import {Req, Res} from "./types"
 import {Logger} from "./logger"
-import { ControlPlane } from "./features/control-plane"
 
 export default class TalkbackServer {
   private readonly options: Options
   readonly tapeStore: TapeStore
-  private requestHandler: RequestHandler
+  private readonly requestHandler: RequestHandler
   private readonly closeSignalHandler?: (...args: any[]) => void
   private server?: http.Server
   private closed: boolean = false
   private readonly logger: Logger
-  private controlPlane: ControlPlane
 
   constructor(options: Options) {
     this.options = options
     this.tapeStore = new TapeStore(this.options)
     this.requestHandler = new RequestHandler(this.tapeStore, this.options)
-    this.controlPlane = new ControlPlane(this.options)
 
     this.closeSignalHandler = this.close.bind(this)
     this.logger = Logger.for(this.options)
@@ -43,13 +40,7 @@ export default class TalkbackServer {
           body: Buffer.concat(reqBody)
         }
 
-        let fRes: Res
-        if(this.controlPlane.isControlPlaneRequest(req)) {
-          fRes = await this.controlPlane.handleRequest(req)
-        } else {
-          fRes = await this.requestHandler.handle(req)
-        }
-
+        const fRes: Res = await this.requestHandler.handle(req)
 
         res.writeHead(fRes.status, fRes.headers)
         res.end(fRes.body)

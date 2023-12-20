@@ -24,7 +24,9 @@ const del = require("del")
 const RecordMode = talkback.Options.RecordMode
 const FallbackMode = talkback.Options.FallbackMode
 
-let talkbackServer: TalkbackServer | null, proxiedServer: http.Server | null, currentTapeId: number
+let talkbackServer: TalkbackServer | null
+let proxiedServer: http.Server | null
+let currentTapeId: number
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = path.join(__dirname, "..", "/tapes")
@@ -104,7 +106,7 @@ describe("talkbackServer", () => {
 
   describe("## record mode NEW", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
-      talkbackServer = await startTalkback()
+      talkbackServer = await startTalkback({debug: true, })
 
       const reqBody = JSON.stringify({foo: "bar"})
       const headers = {"content-type": "application/json"}
@@ -442,6 +444,82 @@ describe("talkbackServer", () => {
 
       const body = await res.json()
       expect(body).to.eql({ok: true})
+    })
+  })
+
+  describe("sequentialMode and control plane", () => {
+    it("saves multiple tapes for same url if sequenceNumber differs", async () => {
+      const isSequentialRequest = (req: Req) => req.url.startsWith("/test/sequential_")
+
+      talkbackServer = await startTalkback({record: RecordMode.NEW, alpha: {
+        sequentialMode: isSequentialRequest,
+      }})
+
+      const res1 = await fetch(`${talkbackHost}/test/sequential_read`)
+      expect(res1.status).to.eql(200)
+      expect(await res1.text()).to.eql("1")
+
+      const tape1 = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      expect(tape1.res.body).to.eql("1")
+
+      const res2 = await fetch(`${talkbackHost}/test/sequential_read`)
+      expect(res2.status).to.eql(200)
+      expect(await res2.text()).to.eql("1")
+
+      const tape2 = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId + 1}.json5`))
+      expect(tape2.res.body).to.eql("1")
+
+      const res3 = await fetch(`${talkbackHost}/test/sequential_write`)
+      expect(res3.status).to.eql(200)
+      expect(await res3.text()).to.eql("2")
+
+      const tape3 = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId + 2}.json5`))
+      expect(tape3.res.body).to.eql("2")
+
+      const res4 = await fetch(`${talkbackHost}/test/sequential_read`)
+
+      expect(res4.status).to.eql(200)
+      expect(await res4.text()).to.eql("2")
+
+      const tape4 = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId + 3}.json5`))
+      expect(tape4.res.body).to.eql("2")
+    })
+
+    it("uses tapes in sequential order", async () => {
+      const isSequentialRequest = (req: Req) => req.url.startsWith("/test/sequential_")
+
+      talkbackServer = await startTalkback({record: RecordMode.DISABLED, alpha: {
+        sequentialMode: isSequentialRequest,
+      }})
+
+      const res1 = await fetch(`${talkbackHost}/test/sequential_stored_read`)
+      expect(res1.status).to.eql(200)
+      expect(await res1.text()).to.eql("1")
+      const res2 = await fetch(`${talkbackHost}/test/sequential_stored_read`)
+      expect(res2.status).to.eql(200)
+      expect(await res2.text()).to.eql("2")
+
+      // A non-sequential request does not change sequential order
+      const nonSequentialRes = await fetch(`${talkbackHost}/test/3`, {compress: false})
+      expect(nonSequentialRes.status).to.eql(200)
+
+      const res3 = await fetch(`${talkbackHost}/test/sequential_stored_write`, {method: "POST"})
+      expect(res3.status).to.eql(200)
+      expect(await res3.text()).to.eql("3")
+      const res4 = await fetch(`${talkbackHost}/test/sequential_stored_read`)
+      expect(res4.status).to.eql(200)
+      expect(await res4.text()).to.eql("4")
+
+      // Asking out of sequence fails
+      const res5 = await fetch(`${talkbackHost}/test/sequential_stored_read`)
+      expect(res5.status).to.eql(404)
+
+      // But works again if we reset the sequence
+      await fetch(`${talkbackHost}/__talkback__/sequence/reset`, {method: "POST"})
+
+      const res6 = await fetch(`${talkbackHost}/test/sequential_stored_read`)
+      expect(res6.status).to.eql(200)
+      expect(await res6.text()).to.eql("1")
     })
   })
 

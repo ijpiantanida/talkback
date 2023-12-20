@@ -1,6 +1,8 @@
 import * as http from "http"
 
 const testServer = () => {
+  let statefulCounter = 1
+
   return http.createServer(async (req, res) => {
     let rawReqBody = [] as Uint8Array[]
     req.on("error", (err) => {
@@ -58,6 +60,18 @@ const testServer = () => {
         case "/test/invalid-json": {
           res.writeHead(200, {"content-type": "application/json"})
           res.end('{"invalid: ')
+          return
+        }
+        case "/test/sequential_read": {
+          res.writeHead(200, {"content-type": "text/plain"})
+          res.end(String(statefulCounter))
+          return
+        }
+        case "/test/sequential_write": {
+          res.writeHead(200, {"content-type": "text/plain"})
+          statefulCounter++
+          res.end(String(statefulCounter))
+          return
         }
         default: {
           res.writeHead(404)

@@ -1,0 +1,27 @@
+{
+    meta: {
+        createdAt: '2023-11-27T02:49:53.859Z',
+        host: 'http://fake-server.localhost.com',
+        resHumanReadable: true,
+        sequenceNumber: "3"
+    },
+    req: {
+        url: '/carts/1',
+        method: 'GET',
+        headers: {
+            accept: '*/*',
+        },
+        body: '',
+    },
+    res: {
+        status: 200,
+        headers: {
+            'content-type': [
+                'application/json; charset=utf-8',
+            ],
+        },
+        body: {
+            items: 1
+        },
+    },
+}

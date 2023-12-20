@@ -5,7 +5,7 @@
         resHumanReadable: true,
     },
     req: {
-        url: '/carts/1',
+        url: '/user',
         method: 'GET',
         headers: {
             accept: '*/*',
@@ -20,7 +20,7 @@
             ],
         },
         body: {
-            items: []
+            username: "talkback_user"
         },
     },
 }

@@ -9,6 +9,8 @@ import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
 import {HttpRequest, HttpResponse, MatchingContext} from "./types"
 import {Logger} from "./logger"
+import { SequenceManager } from "./features/sequence";
+import { ControlPlane } from "./features/control-plane";
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
@@ -16,16 +18,27 @@ export default class RequestHandler {
   private readonly errorRate: ErrorRate
   private readonly latency: Latency
   private readonly logger: Logger;
+  private readonly sequenceManager: SequenceManager;
+  private readonly controlPlane: ControlPlane
 
   constructor(tapeStore: TapeStore, options: Options) {
     this.tapeStore = tapeStore
     this.options = options
     this.errorRate = new ErrorRate(this.options)
     this.latency = new Latency(this.options)
+
+    this.sequenceManager = new SequenceManager(this.options)
+    this.controlPlane = new ControlPlane(this.sequenceManager, this.options)
+
     this.logger = Logger.for(this.options)
   }
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
+    if(this.controlPlane.isControlPlaneRequest(req)) {
+      return await this.controlPlane.handleRequest(req)
+    }
+    
+
     const matchingContext: MatchingContext = {
       id: uuidv4()
     }
@@ -39,8 +52,14 @@ export default class RequestHandler {
         throw new Error("requestDecorator didn't return a req object")
       }
     }
-
     let newTape = new Tape(req, this.options)
+
+    const isSequentialRequest = typeof (this.options.alpha.sequentialMode) === "boolean" ?  this.options.alpha.sequentialMode : this.options.alpha.sequentialMode(req)
+
+    if (isSequentialRequest) {
+      this.sequenceManager.decorate(newTape)
+    }
+
     let matchingTape = this.tapeStore.find(newTape)
     let resObj, responseTape
 
@@ -88,6 +107,10 @@ export default class RequestHandler {
         resTape.res.headers["content-length"] = resTape.res.body.length
       }
       resObj = resTape.res
+    }
+
+    if (isSequentialRequest) {
+      this.sequenceManager.next()
     }
 
     return resObj

@@ -9,9 +9,6 @@ export class Logger {
 
   constructor(options: Options) {
     this.options = options
-    if (this.options.debug) {
-      this.debug("DEBUG mode active")
-    }
   }
 
   info(message: any) {

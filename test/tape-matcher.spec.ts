@@ -238,6 +238,42 @@ describe("TapeMatcher", () => {
       expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
     })
 
+    describe("sequenceMatcher", () => {
+      it("returns true when sequence number match", () => {
+        tape.meta.sequenceNumber = "3"
+
+        const tape2 = new Tape(req, opts)
+        tape2.meta.sequenceNumber = "3"
+
+        expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.true
+      })
+
+      it("returns false when sequence number defers", () => {
+        tape.meta.sequenceNumber = "3"
+
+        const tape2 = new Tape(req, opts)
+        tape2.meta.sequenceNumber = "1"
+
+        expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
+      })
+
+      it("returns false when one tape misses the sequence number", () => {
+        tape.meta.sequenceNumber = "3"
+
+        const tape2 = new Tape(req, opts)
+        tape2.meta.sequenceNumber = undefined
+
+        expect(new TapeMatcher(tape, opts).sameAs(tape2)).to.be.false
+
+        tape.meta.sequenceNumber = undefined
+
+        const tape3 = new Tape(req, opts)
+        tape3.meta.sequenceNumber = "3"
+
+        expect(new TapeMatcher(tape, opts).sameAs(tape3)).to.be.false
+      })
+    })
+
     describe("bodyMatcher", () => {
       it("returns true when just the bodies are different but the bodyMatcher says they match", () => {
         const newOpts = {

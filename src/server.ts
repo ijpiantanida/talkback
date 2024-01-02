@@ -53,7 +53,7 @@ export default class TalkbackServer {
   }
 
   async start(callback?: () => void) {
-    await this.tapeStore.load()
+    this.tapeStore.setPath(this.options.path)
     const handleRequest = this.handleRequest.bind(this)
 
     const serverFactory = this.options.https.enabled ? () => {

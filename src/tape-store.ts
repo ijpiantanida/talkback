@@ -11,27 +11,30 @@ import TapeRenderer from "./tape-renderer"
 import {Logger} from "./logger"
 
 export default class TapeStore {
-  private readonly path: string
+  private path: string
   private readonly options: Options
   tapes: Tape[]
   private readonly logger: Logger
 
   constructor(options: Options) {
-    this.path = path.normalize(options.path + "/")
     this.options = options
-    this.tapes = []
-
     this.logger = Logger.for(this.options)
   }
 
-  async load() {
+  public async setPath(newPath: string) {
+    this.path = path.normalize(newPath + "/")
+    this.tapes = []
+    await this.load()
+  }
+
+  private async load() {
     mkdirp.sync(this.path)
 
     await this.loadTapesAtDir(this.path)
     this.logger.info(`Loaded ${this.tapes.length} tapes from ${this.path}`)
   }
 
-  async loadTapesAtDir(directory: string) {
+  private async loadTapesAtDir(directory: string) {
     const items = fs.readdirSync(directory) as string[]
     for (let i = 0; i < items.length; i++) {
       const filename = items[i]

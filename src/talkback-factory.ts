@@ -12,7 +12,7 @@ export default class TalkbackFactory {
   static async requestHandler(options: Partial<Options>) {
     const fullOptions = Options.prepare(options)
     const tapeStore = new TapeStore(fullOptions)
-    await tapeStore.load()
+    await tapeStore.setPath(fullOptions.path)
     return new RequestHandler(tapeStore, fullOptions)
   }
 }

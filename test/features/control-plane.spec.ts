@@ -1,8 +1,10 @@
 import { expect } from "chai"
 import { ControlPlane } from "../../src/features/control-plane"
 import OptionsFactory, { Options } from "../../src/options"
-import { Req } from "../../src/types"
+import { ControlPlaneNs, Req } from "../../src/types"
 import { SequenceManager } from "../../src/features/sequence"
+import sinon from "ts-sinon";
+import TapeStore from "../../src/tape-store"
 
 
 describe("ControlPlane", () => {
@@ -10,6 +12,7 @@ describe("ControlPlane", () => {
     let sequenceManager: SequenceManager
     let options: Options
     let req: Req
+    let tapeStore: sinon.SinonStubbedInstance<TapeStore>
 
     beforeEach(() => {
         req = {
@@ -25,7 +28,8 @@ describe("ControlPlane", () => {
             requestHandler: undefined,
         }})
         sequenceManager = new SequenceManager(options)
-        controlPlane = new ControlPlane(sequenceManager, options)
+        tapeStore = sinon.createStubInstance(TapeStore)
+        controlPlane = new ControlPlane(sequenceManager, tapeStore as unknown as TapeStore, options)
     }) 
 
     describe("isControlPlaneRequest", () => {
@@ -66,6 +70,36 @@ describe("ControlPlane", () => {
                     await controlPlane.handleRequest(req)
 
                     expect(sequenceManager.nextSequenceNumber).to.eql(1)
+                })
+            })
+
+            describe.only("tapes", () =>{
+                describe("/tapes/set", () => {
+                    it("does nothing if path is not provided", async () => {
+                        req.url = options.controlPlane.path + "/tapes/set"  
+                        req.method = "POST"
+
+                        const req_body = {} as ControlPlaneNs.TapesSetReqeuest
+                        req.body = Buffer.from(JSON.stringify(req_body))
+
+                        await controlPlane.handleRequest(req)
+
+                        sinon.assert.notCalled(tapeStore.setPath);
+                    })
+
+                    it("sets path if provided", async () => {
+                        req.url = options.controlPlane.path + "/tapes/set"  
+                        req.method = "POST"
+
+                        
+                        const req_body = {
+                            path: "some_path"
+                        } as ControlPlaneNs.TapesSetReqeuest
+                        req.body = Buffer.from(JSON.stringify(req_body))
+                        await controlPlane.handleRequest(req)
+
+                        sinon.assert.calledWith(tapeStore.setPath, "some_path")
+                    })
                 })
             })
         })

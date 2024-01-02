@@ -12,6 +12,7 @@
     "lodash": "^4.17.21",
     "mkdirp": "^3.0.1",
     "node-fetch": "^2.6.1",
+    "ts-sinon": "^2.0.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

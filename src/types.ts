@@ -30,6 +30,12 @@ export interface Res extends ReqRes {
 
 export type HttpResponse = Res
 
+export namespace ControlPlaneNs {
+  export interface TapesSetReqeuest {
+    path?: string,
+  }
+}
+
 export interface Metadata extends More {
   createdAt: Date,
   host: string,

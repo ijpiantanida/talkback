@@ -28,7 +28,7 @@ export default class RequestHandler {
     this.latency = new Latency(this.options)
 
     this.sequenceManager = new SequenceManager(this.options)
-    this.controlPlane = new ControlPlane(this.sequenceManager, this.options)
+    this.controlPlane = new ControlPlane(this.sequenceManager, this.tapeStore, this.options)
 
     this.logger = Logger.for(this.options)
   }

@@ -1,6 +1,7 @@
 import { Logger } from "../logger";
 import { Options } from "../options";
-import { HttpRequest, HttpResponse, Req } from "../types";
+import TapeStore from "../tape-store";
+import { ControlPlaneNs, HttpRequest, HttpResponse, Req } from "../types";
 import { SequenceManager } from "./sequence";
 import { ControlPlaneRequestHandlerContext, ControlPlaneResponseBody } from "./types";
 
@@ -8,11 +9,13 @@ import { ControlPlaneRequestHandlerContext, ControlPlaneResponseBody } from "./t
 export class ControlPlane {
     private readonly options: Options
     private readonly logger: Logger
-    sequenceManager: SequenceManager;
+    private readonly sequenceManager: SequenceManager;
+    private readonly tapeStore: TapeStore;
   
-    constructor(sequenceManager: SequenceManager, options: Options) {
+    constructor(sequenceManager: SequenceManager, tapeStore: TapeStore, options: Options) {
       this.options = options
       this.sequenceManager = sequenceManager
+      this.tapeStore = tapeStore
   
       this.logger = Logger.for(this.options)
     }
@@ -27,6 +30,14 @@ export class ControlPlane {
     async defaultHandler(req: HttpRequest, context: ControlPlaneRequestHandlerContext): Promise<ControlPlaneResponseBody | undefined> {
         if(req.method == 'POST' && context.cleanUrl.startsWith("/sequence/reset")) {
             this.sequenceManager.reset()
+            return "OK"
+        }
+        if(req.method == 'POST' && context.cleanUrl.startsWith("/tapes/set")) {
+            const tapesSetRequest = JSON.parse(req.body.toString()) as ControlPlaneNs.TapesSetReqeuest
+            if(tapesSetRequest.path) {
+                this.options.path = tapesSetRequest.path
+                this.tapeStore.setPath(tapesSetRequest.path)
+            }
             return "OK"
         }
         return undefined
@@ -44,7 +55,7 @@ export class ControlPlane {
             body = await this.options.controlPlane.requestHandler(req, context)
         }
         if(body == undefined) {
-            this.logger.error("Unknown ControlPanel request url=${req.url} method=${req.method}")
+            this.logger.error(`Unknown ControlPanel request url=${req.url} method=${req.method}`)
             return {
                 status: 404,
                 headers: {},

@@ -97,5 +97,7 @@ export default class TalkbackServer {
       const summary = new Summary(this.tapeStore.tapes, this.options)
       summary.print()
     }
+
+    process.exit(0)
   }
 }

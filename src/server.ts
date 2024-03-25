@@ -5,9 +5,9 @@ import TapeStore from "./tape-store"
 import * as http from "http"
 import * as https from "https"
 import * as fs from "fs"
-import {Options} from "./options"
-import {Req} from "./types"
-import {Logger} from "./logger"
+import { Options } from "./options"
+import { Req } from "./types"
+import { Logger } from "./logger"
 
 export default class TalkbackServer {
   private readonly options: Options
@@ -23,7 +23,7 @@ export default class TalkbackServer {
     this.tapeStore = new TapeStore(this.options)
     this.requestHandler = new RequestHandler(this.tapeStore, this.options)
 
-    this.closeSignalHandler = this.close.bind(this)
+    this.closeSignalHandler = this.closeForSignalHandler.bind(this)
     this.logger = Logger.for(this.options)
   }
 
@@ -82,7 +82,13 @@ export default class TalkbackServer {
     this.tapeStore.resetTapeUsage()
   }
 
+  private closeForSignalHandler() {
+    this.close()
+    process.exit(0)
+  }
+
   close(callback?: () => void) {
+    this.logger.debug(`Closing server ${this.options.name}`)
     if (this.closed) {
       return
     }
@@ -97,7 +103,5 @@ export default class TalkbackServer {
       const summary = new Summary(this.tapeStore.tapes, this.options)
       summary.print()
     }
-
-    process.exit(0)
   }
 }

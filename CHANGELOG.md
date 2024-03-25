@@ -1,6 +1,7 @@
 # Changelog
 
-## v3.0.5
+## v3.1.0
+- Drop support for node 14 and node 16. Minimum required version 18.0
 - Dependencies updates
 - Close process with exit code 0 when handling process signals (thank **[unstubbable](https://github.com/unstubbable)**)
 

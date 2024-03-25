@@ -1,8 +1,8 @@
-import {Options} from "../../src/options"
+import { Options } from "../../src/options"
 import testServer from "../support/test-server"
-import {expect} from "chai"
+import { expect } from "chai"
 import * as td from "testdouble"
-import {HttpRequest, MatchingContext, Req, Talkback} from "../../src/types"
+import { HttpRequest, MatchingContext, Req, Talkback } from "../../src/types"
 import TalkbackServer from "../../src/server"
 import * as http from "http"
 import Tape from "../../src/tape"
@@ -38,7 +38,9 @@ const fullOptions = (opts?: Partial<Options>) => {
     port: talkbackPort,
     host: proxiedHost,
     record: RecordMode.NEW,
-    silent: true,
+    silent: false,
+    debug: true,
+    ignoreHeaders: ["connection", "user-agent"],
     bodyMatcher: (tape, req) => {
       return tape.meta.tag === "echo"
     },
@@ -106,12 +108,12 @@ describe("talkbackServer", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
       talkbackServer = await startTalkback()
 
-      const reqBody = JSON.stringify({foo: "bar"})
-      const headers = {"content-type": "application/json"}
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
+      const reqBody = JSON.stringify({ foo: "bar" })
+      const headers = { "content-type": "application/json" }
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "POST", headers, body: reqBody })
       expect(res.status).to.eq(200)
 
-      const expectedResBody = {ok: true, body: {foo: "bar"}}
+      const expectedResBody = { ok: true, body: { foo: "bar" } }
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
@@ -125,10 +127,10 @@ describe("talkbackServer", () => {
     it("proxies and creates a new tape when the GET request is unknown", async () => {
       talkbackServer = await startTalkback()
 
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "GET" })
       expect(res.status).to.eq(200)
 
-      const expectedResBody = {ok: true, body: null}
+      const expectedResBody = { ok: true, body: null }
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
@@ -142,12 +144,12 @@ describe("talkbackServer", () => {
     it("proxies and creates a new tape when the POST request is unknown with human readable req and res", async () => {
       talkbackServer = await startTalkback()
 
-      const reqBody = JSON.stringify({foo: "bar"})
-      const headers = {"content-type": "application/json"}
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
+      const reqBody = JSON.stringify({ foo: "bar" })
+      const headers = { "content-type": "application/json" }
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "POST", headers, body: reqBody })
       expect(res.status).to.eq(200)
 
-      const expectedResBody = {ok: true, body: {foo: "bar"}}
+      const expectedResBody = { ok: true, body: { foo: "bar" } }
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
@@ -161,8 +163,8 @@ describe("talkbackServer", () => {
     it("proxies and creates a new tape when the HEAD request is unknown", async () => {
       talkbackServer = await startTalkback()
 
-      const headers = {"content-type": "application/json"}
-      const res = await fetch(`${talkbackHost}/test/head`, {method: "HEAD", headers})
+      const headers = { "content-type": "application/json" }
+      const res = await fetch(`${talkbackHost}/test/head`, { method: "HEAD", headers })
       expect(res.status).to.eq(200)
 
       const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
@@ -182,7 +184,7 @@ describe("talkbackServer", () => {
         }
       )
 
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "GET" })
 
       expect(res.status).to.eq(200)
 
@@ -211,7 +213,7 @@ describe("talkbackServer", () => {
         }
       )
 
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "GET"})
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "GET" })
 
       expect(res.status).to.eq(200)
 
@@ -222,7 +224,7 @@ describe("talkbackServer", () => {
 
     it("proxies and creates a new tape with an invalid JSON response", async () => {
       talkbackServer = await startTalkback()
-      const res = await fetch(`${talkbackHost}/test/invalid-json`, {compress: false, method: "GET"})
+      const res = await fetch(`${talkbackHost}/test/invalid-json`, { compress: false, method: "GET" })
 
       expect(res.status).to.eq(200)
 
@@ -235,7 +237,7 @@ describe("talkbackServer", () => {
     it("decorates proxied responses", async () => {
       talkbackServer = await startTalkback()
 
-      const res = await fetch(`${talkbackHost}/test/redirect/1`, {compress: false, method: "GET", redirect: "manual"})
+      const res = await fetch(`${talkbackHost}/test/redirect/1`, { compress: false, method: "GET", redirect: "manual" })
       expect(res.status).to.eq(302)
 
       const location = res.headers.get("location")
@@ -254,21 +256,21 @@ describe("talkbackServer", () => {
     })
 
     it("loads existing tapes and uses them if they match", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
-      const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
+      const res = await fetch(`${talkbackHost}/test/3`, { compress: false })
       expect(res.status).to.eq(200)
 
       const body = await res.json()
-      expect(body).to.eql({ok: true})
+      expect(body).to.eql({ ok: true })
     })
 
     it("matches and returns pretty printed tapes", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
-      const headers = {"content-type": "application/json"}
+      const headers = { "content-type": "application/json" }
       // Different key order
-      const body = JSON.stringify({param2: {subParam: 1}, param1: 3})
+      const body = JSON.stringify({ param2: { subParam: 1 }, param1: 3 })
 
       const res = await fetch(`${talkbackHost}/test/pretty`, {
         compress: false,
@@ -281,7 +283,7 @@ describe("talkbackServer", () => {
       const resClone = await res.clone()
 
       const resBody = await res.json()
-      expect(resBody).to.eql({ok: true, foo: {bar: 3}})
+      expect(resBody).to.eql({ ok: true, foo: { bar: 3 } })
 
       const resBodyAsText = await resClone.text()
       expect(resBodyAsText).to.eql("{\n  \"ok\": true,\n  \"foo\": {\n    \"bar\": 3\n  }\n}")
@@ -298,24 +300,24 @@ describe("talkbackServer", () => {
         expect(res.status).to.eq(404)
       }
 
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
-      const headers = {"content-type": "application/json"}
+      const headers = { "content-type": "application/json" }
 
       // Different nested object
-      let body = JSON.stringify({param1: 3, param2: {subParam: 2}})
+      let body = JSON.stringify({ param1: 3, param2: { subParam: 2 } })
       await makeRequest(body)
 
       // Extra key
-      body = JSON.stringify({param1: 3, param2: {subParam: 1}, param3: false})
+      body = JSON.stringify({ param1: 3, param2: { subParam: 1 }, param3: false })
       await makeRequest(body)
     })
 
     it("decorates the response of an existing tape", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
-      const headers = {"content-type": "application/json"}
-      const body = JSON.stringify({text: "my-test"})
+      const headers = { "content-type": "application/json" }
+      const body = JSON.stringify({ text: "my-test" })
 
       const res = await fetch(`${talkbackHost}/test/echo`, {
         compress: false,
@@ -326,7 +328,7 @@ describe("talkbackServer", () => {
       expect(res.status).to.eq(200)
 
       const resBody = await res.json()
-      expect(resBody).to.eql({text: "my-test"})
+      expect(resBody).to.eql({ text: "my-test" })
     })
   })
 
@@ -339,24 +341,24 @@ describe("talkbackServer", () => {
 
       const nextTapeId = currentTapeId
 
-      let headers = {"x-talkback-ping": "test1"}
+      let headers = { "x-talkback-ping": "test1" }
 
-      let res = await fetch(`${talkbackHost}/test/1`, {compress: false, headers})
+      let res = await fetch(`${talkbackHost}/test/1`, { compress: false, headers })
       expect(res.status).to.eq(200)
       let resBody = await res.json()
-      let expectedBody = {ok: true, body: "test1"}
+      let expectedBody = { ok: true, body: "test1" }
       expect(resBody).to.eql(expectedBody)
 
       let tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
       expect(tape.res.body).to.eql(expectedBody)
 
-      headers = {"x-talkback-ping": "test2"}
+      headers = { "x-talkback-ping": "test2" }
 
-      res = await fetch(`${talkbackHost}/test/1`, {compress: false, headers})
+      res = await fetch(`${talkbackHost}/test/1`, { compress: false, headers })
       expect(res.status).to.eq(200)
       resBody = await res.json()
-      expectedBody = {ok: true, body: "test2"}
+      expectedBody = { ok: true, body: "test2" }
       expect(resBody).to.eql(expectedBody)
 
       tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
@@ -367,21 +369,21 @@ describe("talkbackServer", () => {
 
   describe("## record mode DISABLED", () => {
     it("returns a 404 on unknown request with fallbackMode NOT_FOUND (default)", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false })
       expect(res.status).to.eq(404)
     })
 
     it("proxies request to host on unknown request with fallbackMode PROXY", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED, fallbackMode: FallbackMode.PROXY})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED, fallbackMode: FallbackMode.PROXY })
 
-      const reqBody = JSON.stringify({foo: "bar"})
-      const headers = {"content-type": "application/json"}
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false, method: "POST", headers, body: reqBody})
+      const reqBody = JSON.stringify({ foo: "bar" })
+      const headers = { "content-type": "application/json" }
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false, method: "POST", headers, body: reqBody })
       expect(res.status).to.eq(200)
 
-      const expectedResBody = {ok: true, body: {foo: "bar"}}
+      const expectedResBody = { ok: true, body: { foo: "bar" } }
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
@@ -393,14 +395,14 @@ describe("talkbackServer", () => {
     afterEach(() => td.reset())
 
     it("returns a 500 if anything goes wrong", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
       td.replace(talkbackServer, "requestHandler", {
         handle: () => {
           throw "Test error"
         }
       })
 
-      const res = await fetch(`${talkbackHost}/test/1`, {compress: false})
+      const res = await fetch(`${talkbackHost}/test/1`, { compress: false })
       expect(res.status).to.eq(500)
     })
   })
@@ -409,7 +411,7 @@ describe("talkbackServer", () => {
     afterEach(() => td.reset())
 
     it("prints the summary when enabled", async () => {
-      talkbackServer = await startTalkback({summary: true, silent: false})
+      talkbackServer = await startTalkback({ summary: true, silent: false })
       const logInfo = td.replace(console, "log")
       talkbackServer.close()
 
@@ -417,21 +419,21 @@ describe("talkbackServer", () => {
     })
 
     it("doesn't print the summary when disabled", async () => {
-      talkbackServer = await startTalkback({summary: false, silent: false})
+      talkbackServer = await startTalkback({ summary: false, silent: false })
       const logInfo = td.replace(console, "log")
       talkbackServer.close()
 
-      td.verify(logInfo(td.matchers.contains("SUMMARY")), {times: 0})
+      td.verify(logInfo(td.matchers.contains("SUMMARY")), { times: 0 })
     })
   })
 
   describe("tape usage information", () => {
     it("should indicate that a tape has been used after usage", async () => {
-      talkbackServer = await startTalkback({record: RecordMode.DISABLED})
+      talkbackServer = await startTalkback({ record: RecordMode.DISABLED })
 
       expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(false)
 
-      const res = await fetch(`${talkbackHost}/test/3`, {compress: false})
+      const res = await fetch(`${talkbackHost}/test/3`, { compress: false })
       expect(res.status).to.eq(200)
 
       expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(true)
@@ -441,7 +443,7 @@ describe("talkbackServer", () => {
       expect(talkbackServer.hasTapeBeenUsed("saved-request.json5")).to.eq(false)
 
       const body = await res.json()
-      expect(body).to.eql({ok: true})
+      expect(body).to.eql({ ok: true })
     })
   })
 
@@ -460,7 +462,7 @@ describe("talkbackServer", () => {
       // Disable self-signed certificate check
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-      const res = await fetch(`https://localhost:${talkbackPort}/test/3`, {compress: false})
+      const res = await fetch(`https://localhost:${talkbackPort}/test/3`, { compress: false })
 
       expect(res.status).to.eq(200)
     })
@@ -471,7 +473,7 @@ describe("talkback RequestHandler", () => {
   beforeEach(() => cleanupTapes())
 
   it("matches existing tapes", async () => {
-    const requestHandler = await talkback.requestHandler(fullOptions({ignoreHeaders: ["user-agent", "connection", "accept"]}))
+    const requestHandler = await talkback.requestHandler(fullOptions({ ignoreHeaders: ["user-agent", "connection", "accept"] }))
 
     const req = {
       url: "/test/3",
@@ -484,6 +486,6 @@ describe("talkback RequestHandler", () => {
     expect(res.status).to.eq(200)
 
     const body = JSON.parse(res.body.toString())
-    expect(body).to.eql({ok: true})
+    expect(body).to.eql({ ok: true })
   })
 })

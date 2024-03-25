@@ -11,8 +11,6 @@
         "url": "/test/pretty",
         "method": "POST",
         "headers": {
-            "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
-            "connection": "close",
             "content-type": "application/json",
             "accept": "*/*"
         },

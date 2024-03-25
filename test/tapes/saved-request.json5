@@ -9,8 +9,6 @@
         "url": "/test/3",
         "method": "GET",
         "headers": {
-            "user-agent": "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)",
-            "connection": "close",
             "accept": "*/*"
         },
         "body": ""

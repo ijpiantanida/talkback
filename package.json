@@ -11,7 +11,7 @@
     "json5": "^2.2.3",
     "lodash": "^4.17.21",
     "mkdirp": "^3.0.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "2.7.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -19,7 +19,7 @@
     "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.3.1",
-    "chai": "^4.3.7",
+    "chai": "4.3.7",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
     "mocha": "^10.2.0",

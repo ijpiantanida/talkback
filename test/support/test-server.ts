@@ -18,7 +18,7 @@ const testServer = () => {
           }
           res.writeHead(200, headers)
 
-          let body = null
+          let body: string | string[] | null = null
           if (bodyAsString) {
             body = JSON.parse(bodyAsString)
           }
@@ -28,14 +28,14 @@ const testServer = () => {
             body = pingHeader
           }
 
-          res.end(JSON.stringify({ok: true, body}))
+          res.end(JSON.stringify({ ok: true, body }))
           return
         }
         case "/test/2": {
           const reqBody = Buffer.concat(rawReqBody)
           res.writeHead(200, {})
           const bodyAsJson = JSON.parse(reqBody.toString())
-          res.end(JSON.stringify({ok: true, body: bodyAsJson}))
+          res.end(JSON.stringify({ ok: true, body: bodyAsJson }))
           return
         }
         case "/test/3": {
@@ -56,7 +56,7 @@ const testServer = () => {
           return
         }
         case "/test/invalid-json": {
-          res.writeHead(200, {"content-type": "application/json"})
+          res.writeHead(200, { "content-type": "application/json" })
           res.end('{"invalid: ')
         }
         default: {

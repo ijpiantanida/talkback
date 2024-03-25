@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.5
+- Dependencies updates
+- Close process with exit code 0 when handling process signals (thank **[unstubbable](https://github.com/unstubbable)**)
+
 ## v3.0.4
 - Dependencies updates
 

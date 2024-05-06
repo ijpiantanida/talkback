@@ -74,6 +74,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
+| **numberedTapes** | `Boolean` | Whether to use incrementing numbers for default tape naming or not [More info](#file-name) | `true` |
 | **tapeNameGenerator** | `Function` | [Customize](#file-name) how a tape name is generated for new tapes. | `null` |
 | **allowHeaders** | `[String]` | List of headers to include when matching tapes. If present, headers that are not part of the list will be ignored. By default, most headers are considered (See `ignoreHeaders`)</br></br>Setting this value to `[]` will disable header matching on tapes.</br>Note that `content-type` and `content-encoding` are needed to decode the body into plain-text. [More info](#request-and-response-body)  | `null` |
 | **ignoreHeaders** | `[String]` | List of headers to ignore when matching tapes. By default, most headers are considered | `['content-length', 'host']` |
@@ -148,7 +149,10 @@ If the request or response have a JSON *content-type*, their body will be pretty
 This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost.
 
 #### File Name
-New tapes will be created under the `path` directory with the name `unnamed-n.json5`, where `n` is the tape number.   
+By default new tapes will be created under the `path` directory with the name `unnamed-<n>.json5`, where `<n>` is the tape number.
+
+If you set the option `numberedTapes` to `false` the tapes will instead be named `unnamed-<slug>.json5`, where `<slug>` is a base 36 encoding the timestamp when the tape was created. Example: a tape created at `2020-02-01T11:02:15.130Z` would be named `unnamed-k63hll5m.json5`. This string will be in alphabetically ascending order. It is recommended to set `numberedTapes` to `false` to avoid tapes getting overwritten in some cases (issue[#91](https://github.com/ijpiantanida/talkback/issues/91)).
+
 Tapes can be renamed at will, for example to give some meaning to the scenario the tape represents.  
 If a custom `tapeNameGenerator` is provided, it will be called to produce an alternate file path under `path` that can be based on the tape contents. Note that the file extension `.json5` will be appended automatically.
 

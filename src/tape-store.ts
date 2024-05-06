@@ -89,8 +89,16 @@ export default class TapeStore {
     fs.writeFileSync(fullFilename, JSON5.stringify(toSave, null, 4))
   }
 
-  currentTapeId() {
+  currentTapeNumber() {
     return this.tapes.length
+  }
+
+  currentTapeTimestampId(date: Date) {
+    return date.getTime().toString(36)
+  }
+
+  currentTapeId(tape?: Tape) {
+    return this.options.numberedTapes ? this.currentTapeNumber() : this.currentTapeTimestampId(tape?.meta.createdAt || new Date())
   }
 
   hasTapeBeenUsed(tapeName: string) {
@@ -102,10 +110,10 @@ export default class TapeStore {
   }
 
   createTapePath(tape: Tape) {
-    const currentTapeId = this.currentTapeId()
+    const currentTapeId = this.currentTapeId(tape)
     let tapePath = `unnamed-${currentTapeId}.json5`
     if (this.options.tapeNameGenerator) {
-      tapePath = this.options.tapeNameGenerator(currentTapeId, tape)
+      tapePath = this.options.tapeNameGenerator(this.currentTapeNumber(), tape)
     }
     let result = path.normalize(path.join(this.options.path, tapePath))
     if (!result.endsWith(".json5")) {

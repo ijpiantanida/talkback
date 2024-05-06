@@ -23,6 +23,7 @@ export interface Options {
   record: string | ((req: Req) => string),
   fallbackMode: string | ((req: Req) => string),
   name: string,
+  numberedTapes: boolean,
   tapeNameGenerator?: (tapeNumber: number, tape: Tape) => string,
   https: {
     enabled: boolean,
@@ -56,6 +57,7 @@ export const DefaultOptions: Options = {
   record: RecordMode.NEW,
   fallbackMode: FallbackMode.NOT_FOUND,
   name: "unnamed server",
+  numberedTapes: true,
   tapeNameGenerator: undefined,
 
   https: {

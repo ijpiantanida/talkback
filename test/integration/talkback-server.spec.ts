@@ -65,7 +65,7 @@ const startTalkback = async (opts?: Partial<Options>) => {
   const talkbackServer = talkback(fullOptions(opts))
   await talkbackServer.start()
 
-  currentTapeId = talkbackServer.tapeStore.currentTapeId() + 1
+  currentTapeId = talkbackServer.tapeStore.currentTapeNumber() + 1
   return talkbackServer
 }
 

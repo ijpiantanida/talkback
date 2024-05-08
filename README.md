@@ -22,7 +22,7 @@ Define which host it will be proxying, which port it should listen to and where 
 When a request arrives to talkback, it will try to match it against a previously saved tape and quickly return the tape's response.   
 If no tape matches the request, it will forward it to the origin host, save the tape to disk for future uses and return the response.   
 
-```javascript
+```typescript
 const talkback = require("talkback");
 //import talkback from "talkback/es6";
 
@@ -44,7 +44,7 @@ Talkback can be used in 2 ways:
 Returns an unstarted instance of a talkback server.   
 See all [Options](#options).
 
-```javascript
+```typescript
 const talkback = talkback(options)
 
 talkback.start(() => console.log("Talkback Started"))
@@ -57,7 +57,7 @@ See all [Options](#options).
 
 The handler takes a [request](#request) and returns a [response](#response) Promise.
 
-```javascript
+```typescript
 const talkbackHandler = await talkback.requestHandler(options)
 
 const response = await talkbackHandler.handle(httpRequest)
@@ -148,18 +148,19 @@ If the request or response have a JSON *content-type*, their body will be pretty
 This means differences in formatting are ignored when comparing tapes, and any special formatting in the response will be lost.
 
 #### File Name
-New tapes will be created under the `path` directory with the name `unnamed-n.json5`, where `n` is the tape number.   
+By default, new tapes will be created under the `path` directory with the name `unnamed-[created_at_ms].json5` (`unnamed-1715145165683.json5`).
 Tapes can be renamed at will, for example to give some meaning to the scenario the tape represents.  
-If a custom `tapeNameGenerator` is provided, it will be called to produce an alternate file path under `path` that can be based on the tape contents. Note that the file extension `.json5` will be appended automatically.
+A custom `tapeNameGenerator` function can be provided to generate the file path (relative to `path`) at which to store the tape, using the tape's content.
+Note that the file extension `.json5` will be appended automatically.
 
 ##### Example:
-```javascript
-function nameGenerator(tapeNumber: number, tape: Tape) {
+```typescript
+function nameGenerator(tapeEpoch: number, tape: Tape) {
   // organize in folders by request method
-  // e.g. tapes/GET/unnamed-1.json5
-  //      tapes/GET/unnamed-3.json5
-  //      tapes/POST/unnamed-2.json5
-  return path.join(`${tape.req.method}`, `unnamed-${tapeNumber}`)
+  // e.g. tapes/GET/unnamed-1715145165683.json5
+  //      tapes/GET/unnamed-1715145207909.json5
+  //      tapes/POST/unnamed-1715145207946.json5
+  return path.join(`${tape.req.method}`, `unnamed-${tapeEpoch}`)
 }
 ``` 
  
@@ -187,7 +188,7 @@ There are 2 possible fallback modes:
 
 Both options accept either one of the possible modes to be used for all requests or a function that takes the request as a parameter and returns a valid mode.
 
-```javascript
+```typescript
 const talkback = require("talkback")
 
 const opts = {
@@ -212,7 +213,7 @@ The `bodyMatcher` is not called if tape and request bodies are already the same.
 
 ### Example:
 
-```javascript
+```typescript
 function bodyMatcher(tape: Tape, req: Req) {
     if (tape.meta.tag === "fake-post") {
       const tapeBody = JSON.parse(tape.req.body.toString());
@@ -232,7 +233,7 @@ Similar to the [`bodyMatcher`](#custom-request-body-matcher) option, there's the
 
 ### Example:
 
-```javascript
+```typescript
 function urlMatcher(tape: Tape, req: Req) {
     if (tape.meta.tag === "user-info") {
       // Match if URL is of type /users/{username}
@@ -264,7 +265,7 @@ If you want to customize requests before they're proxied (or looked up in stored
 
 `requestDecorator` takes a function that will receive the original request and the context object as parameters, and should return the modified request.
 
-```javascript
+```typescript
 function requestDecorator(req: Req, context: MatchingContext) {
   requestStartTime[context.id] = new Date().getTime()
 
@@ -286,7 +287,7 @@ Talkback will also update the `Content-Length` header if it was present in the o
 ### Example:
 We're going to hit an `/auth` endpoint, and update just the `expiration` field of the JSON response that was saved in the tape to be a day from now.      
 
-```javascript
+```typescript
 function responseDecorator(tape: Tape, req: Req, context: MatchingContext) {
   if (tape.meta.tag === "auth") {
     const tapeBody = JSON.parse(tape.res.body.toString())
@@ -311,7 +312,7 @@ The function will receive the original tape and the context object as parameters
 
 You can use this to edit any of talkback's properties or add your own `meta` fields.
 
-```javascript
+```typescript
 function tapeDecorator(tape: Tape, context: MatchingContext) {
   if (tape.req.url.includes("/auth/")) {
     tape.meta.tag = "auth"
@@ -384,7 +385,7 @@ To help, when talkback exits, it will print a list of all the tapes that have NO
 ```
 ===== SUMMARY (My Server) =====
 New tapes:
-- unnamed-4.json5
+- unnamed-1715145207909.json5
 Unused tapes:
 - not-valid-request.json5
 - user-profile.json5

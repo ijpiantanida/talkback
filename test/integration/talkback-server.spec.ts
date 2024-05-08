@@ -24,7 +24,7 @@ const del = require("del")
 const RecordMode = talkback.Options.RecordMode
 const FallbackMode = talkback.Options.FallbackMode
 
-let talkbackServer: TalkbackServer | null, proxiedServer: http.Server | null, currentTapeId: number
+let talkbackServer: TalkbackServer | null, proxiedServer: http.Server | null
 const proxiedPort = 8898
 const proxiedHost = `http://localhost:${proxiedPort}`
 const tapesPath = path.join(__dirname, "..", "/tapes")
@@ -65,7 +65,6 @@ const startTalkback = async (opts?: Partial<Options>) => {
   const talkbackServer = talkback(fullOptions(opts))
   await talkbackServer.start()
 
-  currentTapeId = talkbackServer.tapeStore.currentTapeId() + 1
   return talkbackServer
 }
 
@@ -117,7 +116,7 @@ describe("talkbackServer", () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -134,7 +133,7 @@ describe("talkbackServer", () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(undefined)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -153,7 +152,7 @@ describe("talkbackServer", () => {
       const body = await res.json()
       expect(body).to.eql(expectedResBody)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(true)
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.req.url).to.eql("/test/1")
@@ -167,7 +166,7 @@ describe("talkbackServer", () => {
       const res = await fetch(`${talkbackHost}/test/head`, { method: "HEAD", headers })
       expect(res.status).to.eq(200)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.meta.reqHumanReadable).to.eq(undefined)
       expect(tape.meta.resHumanReadable).to.eq(undefined)
       expect(tape.req.url).to.eql("/test/head")
@@ -188,7 +187,7 @@ describe("talkbackServer", () => {
 
       expect(res.status).to.eq(200)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/GET/my-tape-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/new-tapes/GET/my-tape-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
     })
 
@@ -217,7 +216,7 @@ describe("talkbackServer", () => {
 
       expect(res.status).to.eq(200)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
       expect(tape.meta.myOwnData).to.eql(customMetaValue)
     })
@@ -228,7 +227,7 @@ describe("talkbackServer", () => {
 
       expect(res.status).to.eq(200)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/invalid-json")
       expect(tape.meta.resHumanReadable).to.eq(true)
       expect(tape.res.body).to.eql('{"invalid: ')
@@ -250,7 +249,7 @@ describe("talkbackServer", () => {
       const res = await fetch(`${talkbackHost}/test/3`)
       expect(res.status).to.eq(500)
 
-      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${currentTapeId}.json5`))
+      const tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/3")
       expect(tape.res.status).to.eql(500)
     })
@@ -339,8 +338,6 @@ describe("talkbackServer", () => {
         ignoreHeaders: ["x-talkback-ping"],
       })
 
-      const nextTapeId = currentTapeId
-
       let headers = { "x-talkback-ping": "test1" }
 
       let res = await fetch(`${talkbackHost}/test/1`, { compress: false, headers })
@@ -349,7 +346,7 @@ describe("talkbackServer", () => {
       let expectedBody = { ok: true, body: "test1" }
       expect(resBody).to.eql(expectedBody)
 
-      let tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
+      let tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
       expect(tape.res.body).to.eql(expectedBody)
 
@@ -361,7 +358,7 @@ describe("talkbackServer", () => {
       expectedBody = { ok: true, body: "test2" }
       expect(resBody).to.eql(expectedBody)
 
-      tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${nextTapeId}.json5`))
+      tape = JSON5.parse(fs.readFileSync(tapesPath + `/unnamed-${talkbackServer.tapeStore.lastTapeId}.json5`))
       expect(tape.req.url).to.eql("/test/1")
       expect(tape.res.body).to.eql(expectedBody)
     })

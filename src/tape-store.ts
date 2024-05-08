@@ -1,4 +1,4 @@
-import {Options} from "./options"
+import { Options } from "./options"
 
 const fs = require("fs")
 const path = require("path")
@@ -8,13 +8,14 @@ const mkdirp = require("mkdirp")
 import Tape from "./tape"
 import TapeMatcher from "./tape-matcher"
 import TapeRenderer from "./tape-renderer"
-import {Logger} from "./logger"
+import { Logger } from "./logger"
 
 export default class TapeStore {
   private readonly path: string
   private readonly options: Options
-  tapes: Tape[]
   private readonly logger: Logger
+  tapes: Tape[]
+  lastTapeId: number | undefined
 
   constructor(options: Options) {
     this.path = path.normalize(options.path + "/")
@@ -89,10 +90,6 @@ export default class TapeStore {
     fs.writeFileSync(fullFilename, JSON5.stringify(toSave, null, 4))
   }
 
-  currentTapeId() {
-    return this.tapes.length
-  }
-
   hasTapeBeenUsed(tapeName: string) {
     return this.tapes.some(t => t.used && t.path === tapeName)
   }
@@ -102,10 +99,14 @@ export default class TapeStore {
   }
 
   createTapePath(tape: Tape) {
-    const currentTapeId = this.currentTapeId()
-    let tapePath = `unnamed-${currentTapeId}.json5`
+    let nextTapeId = Date.now()
+    if (this.lastTapeId && nextTapeId <= this.lastTapeId) {
+      nextTapeId = this.lastTapeId + 1
+    }
+
+    let tapePath = `unnamed-${nextTapeId}.json5`
     if (this.options.tapeNameGenerator) {
-      tapePath = this.options.tapeNameGenerator(currentTapeId, tape)
+      tapePath = this.options.tapeNameGenerator(nextTapeId, tape)
     }
     let result = path.normalize(path.join(this.options.path, tapePath))
     if (!result.endsWith(".json5")) {
@@ -113,6 +114,8 @@ export default class TapeStore {
     }
     const dir = path.dirname(result)
     mkdirp.sync(dir)
+
+    this.lastTapeId = nextTapeId
 
     return result
   }

@@ -1,9 +1,11 @@
 # Changelog
+## v4.1.0
+- Update default tape naming format and tapeGenerator to use epoch instead of counter as tape id - from `unnammed-1.json5` to `unnamed-1715145207909.json5` (thanks **[@raphaeleidus](https://github.com/raphaeleidus)**)
 
 ## v4.0.0
 - Drop support for node 14 and node 16. Minimum required version 18.0
 - Dependencies updates
-- Close process with exit code 0 when handling process signals (thank **[unstubbable](https://github.com/unstubbable)**)
+- Close process with exit code 0 when handling process signals (thank **[@unstubbable](https://github.com/unstubbable)**)
 
 ## v3.0.4
 - Dependencies updates

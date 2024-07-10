@@ -1,5 +1,6 @@
 import Tape from "./tape"
-import {Req, MatchingContext} from "./types"
+import { Req, MatchingContext } from "./types"
+import { RequestInit } from "node-fetch"
 
 export const RecordMode = {
   NEW: "NEW", // If no tape matches the request, proxy it and save the response to a tape
@@ -24,6 +25,11 @@ export interface Options {
   fallbackMode: string | ((req: Req) => string),
   name: string,
   tapeNameGenerator?: (tapeNumber: number, tape: Tape) => string,
+
+  httpClient: {
+    fetchOptions: Partial<RequestInit>,
+  }
+
   https: {
     enabled: boolean,
     keyPath?: string,
@@ -57,6 +63,10 @@ export const DefaultOptions: Options = {
   fallbackMode: FallbackMode.NOT_FOUND,
   name: "unnamed server",
   tapeNameGenerator: undefined,
+
+  httpClient: {
+    fetchOptions: {},
+  },
 
   https: {
     enabled: false,

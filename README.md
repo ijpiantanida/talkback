@@ -71,6 +71,7 @@ const response = await talkbackHandler.handle(httpRequest)
 | **port** | `String` | Talkback port | `8080` |
 | **path** | `String` | Path where to load and save tapes | `./tapes/` |
 | **https** | `Object` | HTTPS server [options](#https-options) | [Defaults](#https-options) |
+| **httpClient** | `Object` | Customize the options used in the HTTP call when proxying requests. [More info](#http-client-options) | [Defaults](#http-client-options) |
 | **record** | `String \| Function` | Set record mode. [More info](#recording-modes) | `RecordMode.NEW` |
 | **fallbackMode** | `String \| Function` | Fallback mode for unknown requests when recording is disabled. [More info](#recording-modes) | `FallbackMode.NOT_FOUND` |
 | **name** | `String` | Server name | Defaults to `host` value |
@@ -96,6 +97,29 @@ const response = await talkbackHandler.handle(httpRequest)
 | **enabled** | `Boolean` | Enables HTTPS server | `false` |
 | **keyPath** | `String` | Path to the key file | `null` | 
 | **certPath** | `String` | Path to the cert file | `null` | 
+
+### HTTP client options
+| Name | Type | Description | Default |
+|------|------|-------------|---------|
+| **fetchOptions** | `Object` | Additional options passed to the fetch (`node-fetch`) call. [List of supported options](https://www.npmjs.com/package/node-fetch#options). | `{}` |
+
+#### Example: Using a proxy
+You can pass a custom `agent` to the fetch call, for example to use a proxy.
+```typescript
+import { HttpsProxyAgent } from 'https-proxy-agent';
+
+const agent = new HttpsProxyAgent('http://proxy.example.com:3128');
+
+const talkbackOpts = {
+  ...,
+  httpClient: {
+    fetchOptions: {
+      agent
+    }
+  },
+}
+```
+
 
 ## Tapes
 Tapes are where talkback stores requests and their response.   

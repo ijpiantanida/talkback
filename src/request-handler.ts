@@ -1,14 +1,14 @@
 import TapeStore from "./tape-store"
 import { v4 as uuidv4 } from 'uuid';
 
-const fetch = require("node-fetch")
+import fetch from 'node-fetch'
 
 import Tape from "./tape"
-import OptionsFactory, {RecordMode, FallbackMode, Options} from "./options"
+import OptionsFactory, { RecordMode, FallbackMode, Options } from "./options"
 import ErrorRate from "./features/error-rate"
 import Latency from "./features/latency"
-import {HttpRequest, HttpResponse, MatchingContext} from "./types"
-import {Logger} from "./logger"
+import { HttpRequest, HttpResponse, MatchingContext } from "./types"
+import { Logger } from "./logger"
 
 export default class RequestHandler {
   private readonly tapeStore: TapeStore
@@ -61,7 +61,7 @@ export default class RequestHandler {
 
       if (recordMode === RecordMode.NEW || recordMode === RecordMode.OVERWRITE) {
         resObj = await this.makeRealRequest(req)
-        responseTape.res = {...resObj}
+        responseTape.res = { ...resObj }
         if (this.options.tapeDecorator) {
           responseTape = this.options.tapeDecorator(responseTape, matchingContext)
           if (!responseTape) {
@@ -71,7 +71,7 @@ export default class RequestHandler {
         await this.tapeStore.save(responseTape)
       } else {
         resObj = await this.onNoRecord(req)
-        responseTape.res = {...resObj}
+        responseTape.res = { ...resObj }
       }
     }
 
@@ -115,16 +115,16 @@ export default class RequestHandler {
 
     return {
       status: 404,
-      headers: {"content-type": ["text/plain"]},
+      headers: { "content-type": ["text/plain"] },
       body: Buffer.from("talkback - tape not found")
     } as HttpResponse
   }
 
   private async makeRealRequest(req: HttpRequest) {
     let fetchBody: Buffer | null
-    let {method, url, body} = req
+    let { method, url, body } = req
     fetchBody = body
-    const headers = {...req.headers}
+    const headers = { ...req.headers }
     delete headers.host
 
     const host = this.options.host
@@ -134,7 +134,7 @@ export default class RequestHandler {
       fetchBody = null
     }
 
-    const fRes = await fetch(host + url, {method, headers, body: fetchBody, compress: false, redirect: "manual"})
+    const fRes = await fetch(host + url, { method, headers, body: fetchBody, compress: false, redirect: "manual", ...this.options.httpClient.fetchOptions })
     const buff = await fRes.buffer()
     return {
       status: fRes.status,

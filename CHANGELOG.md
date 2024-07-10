@@ -1,4 +1,7 @@
 # Changelog
+## v4.2.0
+- Add [`httpClient` option](/README.md#http-client-options)
+
 ## v4.1.0
 - Update default tape naming format and tapeGenerator to use epoch instead of counter as tape id - from `unnammed-1.json5` to `unnamed-1715145207909.json5` (thanks **[@raphaeleidus](https://github.com/raphaeleidus)**)
 

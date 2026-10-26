@@ -10,7 +10,7 @@ You can use it to accelerate your integration tests or run your application agai
 
 ## Installation
 
-Talkback supports Node.js 18 and newer.
+Talkback supports Node.js 22 and newer.
 
 ```
 pnpm add talkback
@@ -18,7 +18,7 @@ pnpm add talkback
 
 ## Development
 
-Development uses Node.js 26, TypeScript 7, and the pnpm version pinned in `package.json`. The published package supports Node.js 18 and newer. With `n` installed, `n auto` selects the development version pinned in `.node-version`. With Corepack installed, run `corepack enable` to enable pnpm.
+Development uses Node.js 26, TypeScript 7, and the pnpm version pinned in `package.json`. The published package supports Node.js 22 and newer. With `n` installed, `n auto` selects the development version pinned in `.node-version`. With Corepack installed, run `corepack enable` to enable pnpm.
 
 ```sh
 n auto
@@ -28,7 +28,7 @@ pnpm run ci
 
 The CI command checks TypeScript, runs the tests, builds the package, and reruns the tests against the build.
 After building, `pnpm run test:runtime` checks recording and playback using the compiled package.
-GitHub Actions also installs the packed package with strict engine checks and exercises recording and playback on Node.js 18.0.0, 18.x, 20.x, 22.x, 24.x, and 26.x.
+GitHub Actions also installs the packed package with strict engine checks and exercises recording and playback on Node.js 22.x, 24.x, and 26.x.
 Examples are standalone projects: install dependencies in each example directory before running `bash scripts/test_examples.sh` from the repository root.
 
 ## Usage

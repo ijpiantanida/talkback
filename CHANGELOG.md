@@ -1,8 +1,9 @@
 # Changelog
 ## Unreleased
-- Keep Node.js 18+ runtime support; pin Node.js 26 for development in `.node-version` for `n auto`.
+- Drop Node.js 18 and 20 support; require Node.js 22 or newer and test Node.js 22, 24, and 26.
+- Pin Node.js 26 for development in `.node-version` for `n auto`.
 - Migrate development, examples, and CI from Yarn to pnpm 12.
-- Upgrade TypeScript to 7 and update dependencies while retaining Node.js 18 compatibility.
+- Upgrade TypeScript to 7 and update dependencies while retaining Node.js 22 compatibility.
 
 ## v4.2.0
 - Add [`httpClient` option](/README.md#http-client-options)

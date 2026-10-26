@@ -19,7 +19,7 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^18.19.130",
+    "@types/node": "^22.20.5",
     "chai": "6.3.0",
     "cross-env": "^10.1.0",
     "del": "^9.0.1",
@@ -31,7 +31,7 @@
     "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "repository": {
     "type": "git",

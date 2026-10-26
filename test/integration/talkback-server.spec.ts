@@ -233,14 +233,14 @@ describe("talkbackServer", () => {
       expect(tape.res.body).to.eql('{"invalid: ')
     })
 
-    it("preserves relative redirects from proxied responses", async () => {
+    it("preserves redirect targets from proxied responses", async () => {
       talkbackServer = await startTalkback()
 
       const res = await fetch(`${talkbackHost}/test/redirect/1`, { compress: false, method: "GET", redirect: "manual" })
       expect(res.status).to.eq(302)
 
       const location = res.headers.get("location")
-      expect(location).to.eql("/test/1")
+      expect(location).to.eql(`${talkbackHost}/test/1`)
       expect(new URL(location, res.url).href).to.eql(`${talkbackHost}/test/1`)
     })
 

@@ -1,7 +1,6 @@
 import TapeStore from "./tape-store"
-import { v4 as uuidv4 } from 'uuid';
-
-import fetch from 'node-fetch'
+import {randomUUID} from "node:crypto"
+import fetch from "node-fetch"
 
 import Tape from "./tape"
 import OptionsFactory, { RecordMode, FallbackMode, Options } from "./options"
@@ -27,7 +26,7 @@ export default class RequestHandler {
 
   async handle(req: HttpRequest): Promise<HttpResponse> {
     const matchingContext: MatchingContext = {
-      id: uuidv4()
+      id: randomUUID()
     }
     const recordMode = typeof (this.options.record) === "string" ? this.options.record : this.options.record(req)
 

@@ -6,20 +6,20 @@
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
+    "@types/node-fetch": "^2.6.13",
     "ansi-regex": "6.4.0",
     "buffer-shims": "^1.0.0",
-    "content-type": "^3.1.1",
+    "content-type": "^2.1.0",
     "json5": "^2.2.3",
     "lodash": "^4.18.1",
     "mkdirp": "^3.0.1",
-    "node-fetch": "3.3.2",
-    "uuid": "^14.0.3"
+    "node-fetch": "2.7.0"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^26.6.5",
+    "@types/node": "^18.19.130",
     "chai": "6.3.0",
     "cross-env": "^10.1.0",
     "del": "^9.0.1",
@@ -31,7 +31,7 @@
     "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=26"
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
@@ -48,6 +48,7 @@
     "build": "node scripts/build.js",
     "ci": "pnpm run ts-check && pnpm test && pnpm run build && cross-env USE_DIST=1 pnpm test",
     "start": "node examples/server/start.js",
+    "test:runtime": "node scripts/test-runtime.js",
     "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extension ts --extension js \"test/**/*.spec.{ts,js}\"",
     "ts-check": "tsc --noEmit"
   }

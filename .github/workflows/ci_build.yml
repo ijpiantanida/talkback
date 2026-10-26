@@ -18,6 +18,15 @@ jobs:
           cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm run ci
+      - name: Pack runtime compatibility artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/talkback-package"
+          pnpm --dir dist pack --pack-destination "$RUNNER_TEMP/talkback-package"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: talkback-package-${{ env.TALKBACK_VERSION }}
+          path: ${{ runner.temp }}/talkback-package/*.tgz
+          retention-days: 1
       - name: Save artifact
         if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v7
@@ -25,8 +34,34 @@ jobs:
           name: talkback-dist-${{ env.TALKBACK_VERSION }}
           path: ./dist
           retention-days: 1
-  publish:
+  runtime-compatibility:
     needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['18.0.0', '18.x', '20.x', '22.x', '24.x', '26.x']
+    steps:
+      - uses: actions/checkout@v7
+      - name: Get version
+        run: TALKBACK_VERSION=$(node -p "require('./package.json').version") && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v8
+        with:
+          name: talkback-package-${{ env.TALKBACK_VERSION }}
+          path: ${{ runner.temp }}/talkback-package
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+      - name: Install and test the published package
+        run: |
+          runtime_directory=$(mktemp -d)
+          printf '{"private":true}\n' > "$runtime_directory/package.json"
+          npm install --prefix "$runtime_directory" --engine-strict --omit=dev --no-package-lock --no-audit --no-fund "$RUNNER_TEMP/talkback-package/"*.tgz
+          node scripts/test-runtime.js "$runtime_directory"
+  publish:
+    needs: [build, runtime-compatibility]
     if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:

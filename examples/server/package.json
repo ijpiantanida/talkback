@@ -1,12 +1,16 @@
 {
   "name": "talkback-example-server",
   "version": "0.0.1",
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=26"
+  },
   "main": "start.js",
   "license": "MIT",
   "description": "Talkback Example - Server",
   "dependencies": {},
   "devDependencies": {
-    "talkback": "*"
+    "talkback": "^4.2.0"
   },
   "author": "Ignacio Piantanida",
   "scripts": {

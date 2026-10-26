@@ -1,37 +1,37 @@
 {
   "name": "talkback",
   "version": "4.2.0",
+  "packageManager": "pnpm@12.15.0",
   "main": "index.js",
   "license": "MIT",
   "description": "A node.js HTTP proxy that records and playbacks requests",
   "dependencies": {
-    "@types/node-fetch": "^2.6.11",
-    "ansi-regex": "6.0.1",
+    "ansi-regex": "6.4.0",
     "buffer-shims": "^1.0.0",
-    "content-type": "^1.0.5",
+    "content-type": "^3.1.1",
     "json5": "^2.2.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "mkdirp": "^3.0.1",
-    "node-fetch": "2.7.0",
-    "uuid": "^9.0.0"
+    "node-fetch": "3.3.2",
+    "uuid": "^14.0.3"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@types/chai": "^4.3.5",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.3.1",
-    "chai": "4.3.7",
-    "cross-env": "^7.0.3",
-    "del": "^6.0.0",
-    "mocha": "^10.2.0",
-    "nyc": "^15.1.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.5",
+    "chai": "6.3.0",
+    "cross-env": "^10.1.0",
+    "del": "^9.0.1",
+    "mocha": "^12.0.3",
+    "nyc": "^18.0.0",
     "source-map-support": "^0.5.21",
-    "testdouble": "^3.18.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.3"
+    "testdouble": "^4.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=26"
   },
   "repository": {
     "type": "git",
@@ -46,9 +46,9 @@
   "author": "Ignacio Piantanida",
   "scripts": {
     "build": "node scripts/build.js",
-    "ci": "yarn ts-check && yarn test && yarn build && USE_DIST=1 yarn test",
+    "ci": "pnpm run ts-check && pnpm test && pnpm run build && cross-env USE_DIST=1 pnpm test",
     "start": "node examples/server/start.js",
-    "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extensions ts,js \"test/**/*.spec.{ts,js}\"",
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary mocha -r mocha-setup.js --extension ts --extension js \"test/**/*.spec.{ts,js}\"",
     "ts-check": "tsc --noEmit"
   }
 }

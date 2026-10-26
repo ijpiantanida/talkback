@@ -18,8 +18,8 @@ if (process.env.USE_DIST) {
 const JSON5 = require("json5")
 const fs = require("fs")
 const path = require("path")
-const fetch = require("node-fetch")
-const del = require("del")
+import fetch from "node-fetch"
+const {deleteSync} = require("del")
 
 const RecordMode = talkback.Options.RecordMode
 const FallbackMode = talkback.Options.FallbackMode
@@ -78,7 +78,7 @@ const cleanupTapes = () => {
     }
   }
   const newTapesPath = path.join(tapesPath, "new-tapes")
-  del.sync(newTapesPath)
+  deleteSync(newTapesPath)
 }
 
 describe("talkbackServer", () => {
@@ -233,14 +233,15 @@ describe("talkbackServer", () => {
       expect(tape.res.body).to.eql('{"invalid: ')
     })
 
-    it("decorates proxied responses", async () => {
+    it("preserves relative redirects from proxied responses", async () => {
       talkbackServer = await startTalkback()
 
       const res = await fetch(`${talkbackHost}/test/redirect/1`, { compress: false, method: "GET", redirect: "manual" })
       expect(res.status).to.eq(302)
 
       const location = res.headers.get("location")
-      expect(location).to.eql(`${talkbackHost}/test/1`)
+      expect(location).to.eql("/test/1")
+      expect(new URL(location, res.url).href).to.eql(`${talkbackHost}/test/1`)
     })
 
     it("handles when the proxied server returns a 500", async () => {

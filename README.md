@@ -11,8 +11,21 @@ You can use it to accelerate your integration tests or run your application agai
 ## Installation
 
 ```
-npm install talkback
+pnpm add talkback
 ```
+
+## Development
+
+Use Node.js 26, TypeScript 7, and the pnpm version pinned in `package.json`. With `n` installed, `n auto` selects the Node.js version pinned in `.node-version`. With Corepack installed, run `corepack enable` to enable pnpm.
+
+```sh
+n auto
+pnpm install --frozen-lockfile
+pnpm run ci
+```
+
+The CI command checks TypeScript, runs the tests, builds the package, and reruns the tests against the build.
+Examples are standalone projects: install dependencies in each example directory before running `bash scripts/test_examples.sh` from the repository root.
 
 ## Usage
 

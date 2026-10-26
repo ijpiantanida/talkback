@@ -1,5 +1,5 @@
 #! /bin/bash
 
-yarn --cwd examples/request-handler test && \
-yarn --cwd examples/server test && \
-yarn --cwd examples/unit-tests test
+pnpm --dir examples/request-handler test && \
+pnpm --dir examples/server test && \
+pnpm --dir examples/unit-tests test

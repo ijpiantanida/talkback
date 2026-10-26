@@ -1,4 +1,9 @@
 # Changelog
+## Unreleased
+- Require Node.js 26 or newer; pin the development version in `.node-version` for `n auto`.
+- Migrate development, examples, and CI from Yarn to pnpm 12.
+- Upgrade TypeScript to 7 and update dependencies to current stable releases.
+
 ## v4.2.0
 - Add [`httpClient` option](/README.md#http-client-options)
 

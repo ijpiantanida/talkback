@@ -135,7 +135,7 @@ export default class RequestHandler {
     }
 
     const fRes = await fetch(host + url, { method, headers, body: fetchBody, compress: false, redirect: "manual", ...this.options.httpClient.fetchOptions })
-    const buff = await fRes.buffer()
+    const buff = Buffer.from(await fRes.arrayBuffer())
     return {
       status: fRes.status,
       headers: fRes.headers.raw(),

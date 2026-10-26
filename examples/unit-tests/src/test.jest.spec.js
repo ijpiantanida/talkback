@@ -1,5 +1,5 @@
 const assert = require("assert")
-const fetch = require("node-fetch")
+const {default: fetch} = require("node-fetch")
 let talkbackStart = require("./talkback-start")
 
 let talkback

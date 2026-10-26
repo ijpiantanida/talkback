@@ -1,5 +1,5 @@
 const assert = require("assert")
-const fetch = require("node-fetch")
+const {default: fetch} = require("node-fetch")
 
 describe("A test that depends on talkback", () => {
   it("works", async () => {

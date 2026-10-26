@@ -5,54 +5,80 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Get version
         run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Use Node.js from .node-version
+        uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
+          node-version-file: .node-version
+      - uses: pnpm/action-setup@v6
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.OS }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.OS }}-node-${{ matrix.node-version }}
-      - run: yarn install --frozen-lockfile
-      - run: yarn ci
+          cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run ci
+      - name: Pack runtime compatibility artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/talkback-package"
+          pnpm --dir dist pack --pack-destination "$RUNNER_TEMP/talkback-package"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: talkback-package-${{ env.TALKBACK_VERSION }}
+          path: ${{ runner.temp }}/talkback-package/*.tgz
+          retention-days: 1
       - name: Save artifact
-        if: ${{ success() && contains(matrix.node-version, '20') && contains(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
+        if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v7
         with:
           name: talkback-dist-${{ env.TALKBACK_VERSION }}
           path: ./dist
           retention-days: 1
-  publish:
+  runtime-compatibility:
     needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['22.x', '24.x', '26.x']
+    steps:
+      - uses: actions/checkout@v7
+      - name: Get version
+        run: TALKBACK_VERSION=$(node -p "require('./package.json').version") && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v8
+        with:
+          name: talkback-package-${{ env.TALKBACK_VERSION }}
+          path: ${{ runner.temp }}/talkback-package
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+      - name: Install and test the published package
+        run: |
+          runtime_directory=$(mktemp -d)
+          printf '{"private":true}\n' > "$runtime_directory/package.json"
+          npm install --prefix "$runtime_directory" --engine-strict --omit=dev --no-package-lock --no-audit --no-fund "$RUNNER_TEMP/talkback-package/"*.tgz
+          node scripts/test-runtime.js "$runtime_directory"
+  publish:
+    needs: [build, runtime-compatibility]
     if: ${{ success() && contains(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Get version
         run: TALKBACK_VERSION=$(cat package.json | jq -r '.version') && echo "TALKBACK_VERSION=$TALKBACK_VERSION" >> $GITHUB_ENV && echo $TALKBACK_VERSION
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
+      - name: Use Node.js from .node-version
+        uses: actions/setup-node@v7
         with:
-          node-version: '20.x'
+          node-version-file: .node-version
           registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-      - uses: actions/download-artifact@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/download-artifact@v8
         with:
           name: talkback-dist-${{ env.TALKBACK_VERSION }}
           path: ./dist
-      - run: yarn publish
+      - run: pnpm publish --no-git-checks
         working-directory: dist
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,5 +1,5 @@
 const fs = require("fs")
-const del = require("del")
+const {deleteAsync: del} = require("del")
 const pkg = require("../package.json")
 
 const exec = require("child_process").exec
@@ -7,7 +7,7 @@ const exec = require("child_process").exec
 let promise = Promise.resolve()
   .then(() => del(["dist/*"]))
   .then(() => new Promise((resolve, reject) => {
-    exec("yarn run tsc", function(error, stdout, stderr) {
+    exec("pnpm exec tsc", function(error, stdout, stderr) {
       console.info(stdout)
       if (error) {
         reject(error)
@@ -18,6 +18,7 @@ let promise = Promise.resolve()
   }))
   .then(() => {
     delete pkg.private
+    delete pkg.packageManager
     delete pkg.devDependencies
     delete pkg.scripts
     delete pkg.nyc
@@ -28,4 +29,7 @@ let promise = Promise.resolve()
 
   })
 
-promise.catch(err => console.error(err.stack))
+promise.catch(err => {
+  console.error(err.stack)
+  process.exitCode = 1
+})

@@ -15,7 +15,7 @@ describe("Logger", () => {
 
     const mockedDate = new Date(Date.UTC(2021, 9, 23, 15, 23, 19))
 
-    td.replace(global, 'Date', () => mockedDate)
+    td.replace(global, 'Date', function () { return mockedDate })
   })
 
   afterEach(() => td.reset())
